@@ -35,9 +35,9 @@
 
 ## Descripcion del Proyecto
 
-Este proyecto consiste en el desarrollo de un sistema web inteligente orientado a la optimizacion de rutas de reparto sostenibles para la empresa DistriRapido S.A.C. en la ciudad de Lima.
+Este proyecto consiste en el desarrollo de un sistema web inteligente orientado a la optimizacion de rutas de reparto sostenibles para la empresa DistriRapido S.A.C. en la ciudad de Lima, considerando restricciones de trafico, capacidad de vehiculos, horarios de entrega y optimizacion de recursos logisticos.
 
-El sistema busca reducir costos operativos, minimizar el impacto ambiental y mejorar la eficiencia en la distribucion de productos mediante tecnicas de optimizacion de rutas y analisis de datos en tiempo real.
+El sistema busca reducir costos operativos, minimizar el impacto ambiental y mejorar la eficiencia en la distribucion de productos mediante tecnicas de optimizacion combinatoria (TSP - Problema del Viajero y VRP - Problema de Rutas de Vehiculos).
 
 ---
 
@@ -52,9 +52,17 @@ La distribucion de productos en la ciudad de Lima presenta multiples desafios de
 - Dificultad para gestionar flotas de vehiculos
 - Falta de visibilidad en tiempo real de las operaciones
 
+Actualmente, gran parte del proceso se realiza manualmente o mediante herramientas limitadas, ocasionando:
+
+- Rutas no optimizadas
+- Aumento de costos operativos
+- Insatisfaccion del cliente
+- Impacto ambiental negativo
+- Baja eficiencia en la distribucion
+
 DistriRapido S.A.C. enfrenta problemas de rentabilidad y sostenibilidad debido a la ineficiencia en la planificacion de rutas de reparto, lo que afecta su competitividad en el mercado.
 
-El problema pertenece al proceso logistico de distribucion y corresponde a un problema de optimizacion combinatoria (Problema del Viajero - TSP y VRP).
+El problema pertenece al proceso logistico de distribucion y corresponde a un problema de optimizacion combinatoria NP-Hard de alta complejidad computacional (TSP y VRP).
 
 ---
 
@@ -72,6 +80,7 @@ Desarrollar un sistema web capaz de generar rutas de reparto optimizadas y soste
 - Gestionar eficientemente la flota de vehiculos
 - Proporcionar visibilidad en tiempo real de las operaciones
 - Automatizar la planificacion de rutas de distribucion
+- Facilitar la validacion operativa de rutas
 
 ---
 
@@ -122,21 +131,25 @@ El proceso logistico identificado incluye:
 - Registro de pedidos de clientes
 - Gestion de direcciones y zonas de entrega
 - Priorizacion de pedidos urgentes
+- Gestion completa de datos mediante operaciones CRUD
 
 ### Gestion de Flota
 - Registro de vehiculos y conductores
 - Asignacion de vehiculos a rutas
 - Gestion de disponibilidad de flota
+- Control de capacidad de carga
 
 ### Optimizacion de Rutas
 - Motor basado en algoritmos de optimizacion (TSP/VRP)
 - Generacion automatica de rutas optimizadas
 - Consideracion de restricciones (trafico, horarios, capacidad)
+- Minimizacion de distancias y tiempos
 
 ### Visualizacion y Seguimiento
 - Mapa interactivo con rutas generadas
 - Seguimiento en tiempo real de entregas
 - Dashboard con metricas clave
+- Filtros por conductor, vehiculo y zona
 
 ### Seguridad
 - Autenticacion JWT con expiracion de 8 horas
@@ -161,40 +174,43 @@ La comunicacion entre frontend y backend se realiza a traves de HTTP/REST. El CO
 ## Estructura del Proyecto
 Taller de Proyectos 2/
 ├── backend/
-│   ├── app/
-│   │   ├── core/           # Configuracion, seguridad y dependencias
-│   │   ├── middleware/     # Middlewares personalizados
-│   │   └── modules/
-│   │       ├── auth/       # Autenticacion y tokens JWT
-│   │       ├── pedidos/    # Gestion de pedidos de clientes
-│   │       ├── flota/      # Gestion de vehiculos y conductores
-│   │       ├── rutas/      # Optimizacion de rutas (TSP/VRP)
-│   │       └── monitoreo/  # Seguimiento en tiempo real
-│   ├── requirements.txt
-│   └── .env
+│ ├── app/
+│ │ ├── core/ # Configuracion, seguridad y dependencias
+│ │ ├── middleware/ # Middlewares personalizados
+│ │ └── modules/
+│ │ ├── auth/ # Autenticacion y tokens JWT
+│ │ ├── pedidos/ # Gestion de pedidos de clientes
+│ │ ├── flota/ # Gestion de vehiculos y conductores
+│ │ ├── rutas/ # Optimizacion de rutas (TSP/VRP)
+│ │ └── monitoreo/ # Seguimiento en tiempo real
+│ ├── requirements.txt
+│ └── .env
 ├── docs/
-│   ├── inicio/
-│   ├── planificacion/
-│   ├── ejecucion/
-│   ├── seguimiento_control/
-│   ├── cierre/
-│   └── otros/
+│ ├── inicio/
+│ ├── planificacion/
+│ ├── ejecucion/
+│ ├── seguimiento_control/
+│ ├── cierre/
+│ └── otros/
 ├── frontend/
-│   ├── src/
-│   │   ├── components/     # Componentes reutilizables
-│   │   ├── pages/          # Paginas organizadas por rol
-│   │   ├── routes/         # Definicion de rutas
-│   │   └── context/        # Estado global con Context API
-│   ├── test/               # Pruebas unitarias y de integracion
-│   ├── package.json
-│   └── vite.config.js
-├── tests/                  # Pruebas automatizadas
+│ ├── src/
+│ │ ├── components/ # Componentes reutilizables
+│ │ ├── pages/ # Paginas organizadas por rol
+│ │ ├── routes/ # Definicion de rutas
+│ │ └── context/ # Estado global con Context API
+│ ├── test/ # Pruebas unitarias y de integracion
+│ ├── package.json
+│ └── vite.config.js
+├── tests/ # Pruebas automatizadas
 ├── .env.example
 ├── .gitignore
 ├── README.md
 ├── CONSTITUTION.md
 └── AGENT.md
-text---
+
+text
+
+---
 
 ## Tecnologias Utilizadas
 
@@ -228,7 +244,8 @@ text---
 git clone https://github.com/jhanpooldev/TP2-DistriRapido.git
 cd TP2-DistriRapido
 2. Configurar el Backend
-Bashcd backend
+bash
+cd backend
 
 # Crear y activar entorno virtual
 python -m venv venv
@@ -240,7 +257,7 @@ pip install -r requirements.txt
 
 # Copiar y configurar variables de entorno
 cp .env.example .env
-# Editar .env con tus credenciales
+# Editar .env con tus credenciales (ver seccion Variables de Entorno)
 
 # Ejecutar migraciones
 alembic upgrade head
@@ -248,10 +265,11 @@ alembic upgrade head
 # Iniciar el servidor de desarrollo
 uvicorn app.main:app --reload
 El backend estara disponible en http://localhost:8000.
-
 La documentacion interactiva de la API (Swagger) se encuentra en http://localhost:8000/docs.
+
 3. Configurar el Frontend
-Bashcd frontend
+bash
+cd frontend
 
 # Instalar dependencias
 npm install
@@ -263,66 +281,22 @@ El frontend estara disponible en http://localhost:5173.
 Variables de Entorno
 Copia el archivo .env.example ubicado en backend/ y renombralo como .env. Las variables requeridas son:
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-VariableDescripcionEjemploDB_HOSTHost de la base de datoslocalhostDB_PORTPuerto de PostgreSQL5432DB_NAMENombre de la base de datosdistrirapidoDB_USERUsuario de PostgreSQLpostgresDB_PASSWORDContraseña de PostgreSQLtu_passwordJWT_SECRETClave secreta para firmar tokens JWTclave_segura_aleatoriaJWT_ALGORITHMAlgoritmo de firma JWTHS256JWT_EXPIRE_HOURSDuracion del token en horas8GOOGLE_MAPS_API_KEYAPI Key para Google Mapstu_api_key
+VariableDescripcionEjemplo
+DB_HOSTHost de la base de datoslocalhost
+DB_PORTPuerto de PostgreSQL5432
+DB_NAMENombre de la base de datosdistrirapido
+DB_USERUsuario de PostgreSQLpostgres
+DB_PASSWORDContraseña de PostgreSQLtu_password
+JWT_SECRETClave secreta para firmar tokens JWTclave_segura_aleatoria
+JWT_ALGORITHMAlgoritmo de firma JWTHS256
+JWT_EXPIRE_HOURSDuracion del token en horas8
+GOOGLE_MAPS_API_KEYAPI Key para Google Mapstu_api_key
 Nunca incluyas el archivo .env en el repositorio. Esta excluido por .gitignore.
 
 Ejecucion de Pruebas
 Backend (pytest)
-Bashcd backend
+bash
+cd backend
 source venv/bin/activate
 
 # Ejecutar todas las pruebas
@@ -331,7 +305,8 @@ pytest
 # Con reporte de cobertura
 pytest --cov=app --cov-report=term-missing
 Frontend (Vitest)
-Bashcd frontend
+bash
+cd frontend
 
 # Ejecutar pruebas
 npm run test
@@ -342,7 +317,8 @@ npm run test:cobertura
 # Modo TDD (watch)
 npm run test:tdd
 Frontend (Cypress - E2E)
-Bashcd frontend
+bash
+cd frontend
 
 # Modo interactivo
 npm run test:cypress:open
@@ -352,55 +328,32 @@ npm run test:cypress:run
 Objetivo de cobertura: Total >= 70% · Modulo de validacion >= 80%
 
 Estandares y Buenas Practicas Aplicadas
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-EstandarAplicacionISO/IEC 25010Calidad del softwareOWASP Top 10SeguridadWCAG 2.1 AAAccesibilidadGit FlowControl de versionesScrumGestion agilTDDCalidad y testing
-
+EstandarAplicacion
+ISO/IEC 25010Calidad del software
+OWASP Top 10Seguridad
+WCAG 2.1 AAAccesibilidad
+Git FlowControl de versiones
+ScrumGestion agil
+TDDCalidad y testing
 Metodologia de Desarrollo
 El proyecto utiliza:
 
-Scrum — Desarrollo iterativo con sprints de 2 semanas
-Git Flow — Ramas main, develop, feature/* y release/*
-TDD — Ciclo Red → Green → Refactor
-Conventional Commits — Mensajes de commit estandarizados (feat:, fix:, docs:, etc.)
-Desarrollo incremental basado en MVP
+Scrum — Desarrollo iterativo con sprints cortos
 
+Git Flow — Ramas main, develop, feature/* y release/*
+
+TDD — Ciclo Red -> Green -> Refactor
+
+Conventional Commits — Mensajes de commit estandarizados (feat:, fix:, docs:, etc.)
+
+Desarrollo incremental basado en MVP
 
 Licencia
 Proyecto desarrollado con fines academicos para el curso Taller de Proyectos 2 – Ingenieria de Sistemas e Informatica.
-Enlaces
 
+Enlaces
 Repositorio: https://github.com/jhanpooldev/TP2-DistriRapido
+
 Documentacion: /docs/
+
 Video explicativo: [Enlace pendiente]
