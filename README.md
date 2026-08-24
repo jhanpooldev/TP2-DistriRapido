@@ -320,4 +320,5 @@ ecologistica-lima/
 ├── CONSTITUTION.md
 ├── CHANGELOG.md
 ├── .gitignore
-└── .env.example
+└── .env.example#   T P 2 - D i s t r i R a p i d o  
+ 
