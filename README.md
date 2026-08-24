@@ -172,7 +172,6 @@ La comunicacion entre frontend y backend se realiza a traves de HTTP/REST. El CO
 ---
 
 ## Estructura del Proyecto
-Taller de Proyectos 2/
 ├── backend/
 │ ├── app/
 │ │ ├── core/ # Configuracion, seguridad y dependencias
@@ -207,10 +206,6 @@ Taller de Proyectos 2/
 ├── README.md
 ├── CONSTITUTION.md
 └── AGENT.md
-
-text
-
----
 
 ## Tecnologias Utilizadas
 
