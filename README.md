@@ -1,5 +1,4 @@
-@"
-# Sistema Web de Optimizacion de Rutas Sostenibles - EcoLogistica Lima
+﻿# Sistema Web de Optimizacion de Rutas Sostenibles - EcoLogistica Lima
 
 ## Tabla de Contenidos (TOC)
 
@@ -160,3 +159,248 @@ La comunicacion entre frontend y backend se realiza a traves de HTTP/REST. El CO
 ---
 
 ## Estructura del Proyecto
+Taller de Proyectos 2/
+├── backend/
+│   ├── app/
+│   │   ├── core/           # Configuracion, seguridad y dependencias
+│   │   ├── middleware/     # Middlewares personalizados
+│   │   └── modules/
+│   │       ├── auth/       # Autenticacion y tokens JWT
+│   │       ├── pedidos/    # Gestion de pedidos de clientes
+│   │       ├── flota/      # Gestion de vehiculos y conductores
+│   │       ├── rutas/      # Optimizacion de rutas (TSP/VRP)
+│   │       └── monitoreo/  # Seguimiento en tiempo real
+│   ├── requirements.txt
+│   └── .env
+├── docs/
+│   ├── inicio/
+│   ├── planificacion/
+│   ├── ejecucion/
+│   ├── seguimiento_control/
+│   ├── cierre/
+│   └── otros/
+├── frontend/
+│   ├── src/
+│   │   ├── components/     # Componentes reutilizables
+│   │   ├── pages/          # Paginas organizadas por rol
+│   │   ├── routes/         # Definicion de rutas
+│   │   └── context/        # Estado global con Context API
+│   ├── test/               # Pruebas unitarias y de integracion
+│   ├── package.json
+│   └── vite.config.js
+├── tests/                  # Pruebas automatizadas
+├── .env.example
+├── .gitignore
+├── README.md
+├── CONSTITUTION.md
+└── AGENT.md
+text---
+
+## Tecnologias Utilizadas
+
+| Capa | Tecnologia |
+| :--- | :--- |
+| Frontend | React + Vite |
+| Estilos | Tailwind CSS |
+| Backend | FastAPI (Python) |
+| ORM | SQLAlchemy + Alembic |
+| Base de datos | PostgreSQL |
+| Autenticacion | JWT (PyJWT + bcrypt) |
+| Optimizacion | OR-Tools / Google Maps API |
+| Pruebas Backend | pytest + pytest-cov |
+| Pruebas Frontend | Vitest + Cypress |
+| Control de versiones | Git + GitHub |
+
+---
+
+## Instalacion y Puesta en Marcha
+
+### Requisitos previos
+
+- Python 3.10+
+- Node.js 18+
+- PostgreSQL 14+
+- Git
+
+### 1. Clonar el repositorio
+
+`ash
+git clone https://github.com/jhanpooldev/TP2-DistriRapido.git
+cd TP2-DistriRapido
+2. Configurar el Backend
+Bashcd backend
+
+# Crear y activar entorno virtual
+python -m venv venv
+source venv/bin/activate        # Linux / macOS
+venv\Scripts\activate           # Windows
+
+# Instalar dependencias
+pip install -r requirements.txt
+
+# Copiar y configurar variables de entorno
+cp .env.example .env
+# Editar .env con tus credenciales
+
+# Ejecutar migraciones
+alembic upgrade head
+
+# Iniciar el servidor de desarrollo
+uvicorn app.main:app --reload
+El backend estara disponible en http://localhost:8000.
+
+La documentacion interactiva de la API (Swagger) se encuentra en http://localhost:8000/docs.
+3. Configurar el Frontend
+Bashcd frontend
+
+# Instalar dependencias
+npm install
+
+# Iniciar el servidor de desarrollo
+npm run dev
+El frontend estara disponible en http://localhost:5173.
+
+Variables de Entorno
+Copia el archivo .env.example ubicado en backend/ y renombralo como .env. Las variables requeridas son:
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+VariableDescripcionEjemploDB_HOSTHost de la base de datoslocalhostDB_PORTPuerto de PostgreSQL5432DB_NAMENombre de la base de datosdistrirapidoDB_USERUsuario de PostgreSQLpostgresDB_PASSWORDContraseña de PostgreSQLtu_passwordJWT_SECRETClave secreta para firmar tokens JWTclave_segura_aleatoriaJWT_ALGORITHMAlgoritmo de firma JWTHS256JWT_EXPIRE_HOURSDuracion del token en horas8GOOGLE_MAPS_API_KEYAPI Key para Google Mapstu_api_key
+Nunca incluyas el archivo .env en el repositorio. Esta excluido por .gitignore.
+
+Ejecucion de Pruebas
+Backend (pytest)
+Bashcd backend
+source venv/bin/activate
+
+# Ejecutar todas las pruebas
+pytest
+
+# Con reporte de cobertura
+pytest --cov=app --cov-report=term-missing
+Frontend (Vitest)
+Bashcd frontend
+
+# Ejecutar pruebas
+npm run test
+
+# Con reporte de cobertura
+npm run test:cobertura
+
+# Modo TDD (watch)
+npm run test:tdd
+Frontend (Cypress - E2E)
+Bashcd frontend
+
+# Modo interactivo
+npm run test:cypress:open
+
+# Modo headless (CI)
+npm run test:cypress:run
+Objetivo de cobertura: Total >= 70% · Modulo de validacion >= 80%
+
+Estandares y Buenas Practicas Aplicadas
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+EstandarAplicacionISO/IEC 25010Calidad del softwareOWASP Top 10SeguridadWCAG 2.1 AAAccesibilidadGit FlowControl de versionesScrumGestion agilTDDCalidad y testing
+
+Metodologia de Desarrollo
+El proyecto utiliza:
+
+Scrum — Desarrollo iterativo con sprints de 2 semanas
+Git Flow — Ramas main, develop, feature/* y release/*
+TDD — Ciclo Red → Green → Refactor
+Conventional Commits — Mensajes de commit estandarizados (feat:, fix:, docs:, etc.)
+Desarrollo incremental basado en MVP
+
+
+Licencia
+Proyecto desarrollado con fines academicos para el curso Taller de Proyectos 2 – Ingenieria de Sistemas e Informatica.
+Enlaces
+
+Repositorio: https://github.com/jhanpooldev/TP2-DistriRapido
+Documentacion: /docs/
+Video explicativo: [Enlace pendiente]
