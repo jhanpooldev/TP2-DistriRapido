@@ -22,16 +22,6 @@
 
 ---
 
-## Equipo de Desarrollo
-
-| Nombre | Rol |
-| :--- | :--- |
-| Jhanpool | [Rol] |
-| [Nombre] | [Rol] |
-| [Nombre] | [Rol] |
-| [Nombre] | [Rol] |
-
----
 
 ## Descripcion del Proyecto
 
