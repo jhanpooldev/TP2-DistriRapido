@@ -20,6 +20,26 @@ Para efectos de este entregable, se definen los siguientes Requisitos No Funcion
 | RNF-02 | El acceso al sistema debe requerir autenticación, y toda comunicación debe viajar cifrada (HTTPS). | Buena práctica de seguridad no cubierta explícitamente en el Acta |
 | RNF-03 | Todo cambio integrado a la rama principal debe desplegarse automáticamente a un ambiente de Staging. | Buenas prácticas de desarrollo, consigna del repositorio |
 
+## 1.1 Calendario de Sprints
+
+El cronograma se organiza en **sprints quincenales** (ver sección 5 del documento
+`docs/inicio/01. Selección del enfoque del proyecto`), alineados con los hitos del
+Acta de Constitución.
+
+| Periodo | Nombre | Contenido | Hito |
+|---|---|---|---|
+| 01/10/2026 – 04/10/2026 | **Sprint 0 — Base del proyecto** | Estructura del repositorio, variables de entorno, `.gitignore`, base de datos y migraciones, modelos, esquema base del backend y del frontend, suites de pruebas y flujo de integración continua. No genera funcionalidad de negocio visible. | **H3 — PMV Sprint 1** |
+| 05/10/2026 – 18/10/2026 | **Sprint 1** | US-001, US-003, EN-01, EN-02 | — |
+| 19/10/2026 – 01/11/2026 | **Sprint 2** | US-004, US-005, US-002, US-007 | — |
+| 02/11/2026 – 08/11/2026 | **Sprint 3** | US-006, EN-03, US-008 | **H5 — PMV Completo** |
+
+> **Nota de trazabilidad.** El Sprint 0 corresponde al hito H3 del Acta de
+> Constitución, cuyo entregable es *"Backend base (API) y Frontend base (UI)
+> funcionando de forma independiente"*. No se contabiliza en Story Points porque no
+> contiene historias de usuario del backlog: es trabajo de habilitación técnica
+> previo al primer flujo end-to-end. El Sprint 1 conserva el Sprint Goal y los
+> 21 Story Points definidos en la sección 2.
+
 ## 2. Backlog Priorizado (resumen)
 
 Elementos ordenados por valor de negocio y riesgo técnico, con estimación en Story Points (secuencia de Fibonacci). Esta tabla es la fuente directa para cargar el Backlog en Jira.
@@ -305,7 +325,7 @@ Toda Historia de Usuario o Historia Técnica se considera **"Done"** únicamente
 
 - [ ] Código implementado y funcionando según los Criterios de Aceptación definidos.
 - [ ] Cobertura de pruebas unitarias ≥ 80% sobre el código nuevo o modificado.
-- [ ] Análisis estático de código ejecutado (SonarQube / CodeQL) sin vulnerabilidades críticas ni bloqueantes abiertas.
+- [ ] Análisis estático y de seguridad ejecutado sin vulnerabilidades críticas ni bloqueantes abiertas: Ruff en Python y ESLint en JavaScript como análisis estático local, más CodeQL en el pipeline para detección de vulnerabilidades.
 - [ ] Revisión de código (Peer Review) aprobada por al menos un integrante distinto al autor, mediante Pull Request.
 - [ ] Cambios desplegados automáticamente y verificados en el ambiente de Staging/Pruebas.
 - [ ] Documentación de API/código actualizada (especificación OpenAPI/Swagger para endpoints nuevos o modificados).

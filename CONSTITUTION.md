@@ -12,15 +12,20 @@ El proyecto será desarrollado como un Producto Mínimo Viable (PMV) durante un 
 
 **Estructura raíz:**
 
-/backend         # FastAPI (Python)
+/src/backend        # FastAPI (Python)
 
-/frontend        # React + Vite
+/src/frontend       # React + Vite
 
-/docs            # Documentación
+/docs               # Documentación
 
-/tests           # Pruebas automatizadas
+Las pruebas automatizadas residen dentro de cada aplicación, junto al código
+que verifican: `/src/backend/tests` (pytest) y `/src/frontend/src/**/*.test.jsx` (Vitest).
+No se mantiene una carpeta `/tests` en la raíz para evitar duplicar la suite y
+repartirla entre las aplicaciones que la consumen.
 
-/docker          # Configuraciones Docker (opcional)
+`/docker` y `docker-compose.yml` se consideran **opcionales y no se aplican en el PMV**,
+por no existir Docker en el entorno de desarrollo del equipo y para mantener el
+costo de infraestructura en S/ 0.00.
 
 **Documentación:**
 
@@ -44,6 +49,7 @@ El proyecto será desarrollado como un Producto Mínimo Viable (PMV) durante un 
 - `CHANGELOG.md`
 - `CONSTITUTION.md`
 - `SPECS.md`
+- `AGENT.md`
 
 El archivo `.env` no deberá incluirse en el repositorio.
 

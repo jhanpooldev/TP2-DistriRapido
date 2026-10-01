@@ -9,7 +9,7 @@
 >
 > **Política estricta de recorte:** cada imagen debe estar recortada exclusivamente al panel/contenedor del elemento de Jira a demostrar — sin escritorio, sin barra de tareas del sistema operativo, sin pestañas del navegador ni espacio sobrante. El incumplimiento resta el 50% del puntaje de la sección.
 >
-> Guarda las imágenes dentro de `docs/02 Planificación/img/` (crea la carpeta) y referencia cada una con la sintaxis `![descripción](img/nombre-archivo.png)` en lugar del marcador `[INSERTAR CAPTURA AQUÍ]`.
+> Crea la carpeta `docs/planificacion/img/` al momento de tomar la primera captura y guarda las imágenes dentro de ella, referenciándolas con la sintaxis `![descripción](img/nombre-archivo.png)` en lugar del marcador `[INSERTAR CAPTURA AQUÍ]`.
 
 ## Evidencia 1: Roadmap del Proyecto
 
@@ -38,7 +38,7 @@
 
 **Ítems incluidos en Sprint 1:** US-001, US-003, EN-01, EN-02 (21 Story Points — ver sección 2 de [01 Transformando a ágil](01%20Transformando%20a%20ágil%20V_1_0_0.md)).
 
-**Descripción:** *(completar: fecha de inicio/fin real del Sprint 1 configurada en Jira)*
+**Descripción:** Fechas configuradas en Jira para el Sprint 1: **inicio 05/10/2026 y fin 18/10/2026**. El Sprint 0 — Base del proyecto (01/10/2026 – 04/10/2026) corresponde al hito H3 del Acta de Constitución y no se registra como sprint Scrum, por no contener historias del backlog.
 
 ## Evidencia 4: Tablero Scrum Activo
 

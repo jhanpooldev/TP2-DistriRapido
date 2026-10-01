@@ -6,18 +6,24 @@ Siempre utiliza una estructura de proyecto modular y mantenible.
 
 **Estructura raíz:**
 
-/backend         # FastAPI (Python)
-/frontend        # React + Vite
-/docs            # Documentation
-/tests           # Automated tests
+/src/backend        # FastAPI (Python)
+/src/frontend       # React + Vite
+/docs               # Documentación (inicio, planificacion, ejecucion, etc.)
 
 
 **Siempre incluir:**
 
 - `README.md`
+- `CONSTITUTION.md`
+- `SPECS.md`
+- `CHANGELOG.md`
 - `.gitignore`
-- `docker-compose.yml` (opcional)
 - `.env.example`
+
+Las pruebas automatizadas viven dentro de cada aplicación:
+`/src/backend/tests` (pytest) y `/src/frontend/src/**/*.test.jsx` (Vitest).
+
+Docker y `docker-compose.yml` son opcionales y no se aplican en el PMV.
 
 ---
 
