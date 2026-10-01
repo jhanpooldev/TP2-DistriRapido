@@ -1,0 +1,138 @@
+# ==============================================================================
+# OPENSPEC FINAL REFINADO (V1.0.0)
+# Proyecto: EcoLogística Lima - DistriRápido S.A.C.
+# Módulo: Autenticación MFA y Gestión Segura de Sesiones
+# ==============================================================================
+
+openspec: "1.0.0"
+info:
+  title: "Especificación de Autenticación MFA y Gestión de Sesiones"
+  version: "1.0.0"
+  description: "Especificación técnica desambiguada y auditada según RFC 6238, OWASP ASVS v4.0 y RN-001 a RN-006."
+
+module:
+  name: "auth_mfa_session"
+  architecture: "FastAPI + SQLAlchemy + JWT (HS256) + TOTP (RFC 6238)"
+  security_level: "OWASP ASVS Nivel 2"
+
+constants:
+  PASSWORD_HASH_ALGORITHM: "bcrypt"
+  JWT_ALGORITHM: "HS256"
+  JWT_ACCESS_TOKEN_EXPIRE_MINUTES: 480 # 8 horas según RN-005
+  MFA_INTERMEDIATE_TOKEN_EXPIRE_MINUTES: 5
+  TOTP_INTERVAL_SECONDS: 30
+  TOTP_WINDOW_SKEW: 1 # Ventana de tolerancia ±30 segundos
+  MAX_FAILED_LOGIN_ATTEMPTS: 3 # RN-002
+  ACCOUNT_LOCKOUT_MINUTES: 15 # RN-002
+  BACKUP_CODES_COUNT: 5
+
+models:
+  Usuario:
+    id_usuario: "UUID (PK)"
+    nombre: "string(100)"
+    correo: "string(150, unique)"
+    contrasena_hash: "string(255)"
+    rol: "string(50)" # Administrador, Operador, Gerente
+    mfa_activado: "boolean (default: false)"
+    mfa_secreto: "string(64, nullable)" # Base32 TOTP secret
+    intentos_fallidos: "integer (default: 0)"
+    bloqueado_hasta: "datetime (nullable)"
+    fecha_creacion: "datetime"
+
+  CodigoRecuperacion:
+    id: "UUID (PK)"
+    id_usuario: "UUID (FK -> Usuario.id_usuario)"
+    codigo_hash: "string(255)" # Hash del código de 8 caracteres
+    usado: "boolean (default: false)"
+    fecha_uso: "datetime (nullable)"
+
+  SesionActiva:
+    id_sesion: "UUID (PK)"
+    jti: "string(64, unique)" # JWT ID único para revocación
+    id_usuario: "UUID (FK -> Usuario.id_usuario)"
+    creado_en: "datetime"
+    expira_en: "datetime"
+    revocado: "boolean (default: false)"
+    user_agent: "string(255, nullable)"
+    ip_origen: "string(50, nullable)"
+
+endpoints:
+  - path: "/api/auth/register"
+    method: "POST"
+    description: "Registro de nuevo usuario con contraseña cifrada"
+    request_body:
+      nombre: "string"
+      correo: "string (email)"
+      contrasena: "string (min: 8)"
+      rol: "string (opcional, default: Operador)"
+    responses:
+      201: "Usuario creado exitosamente"
+      400: "El correo electrónico ya se encuentra registrado"
+
+  - path: "/api/auth/login"
+    method: "POST"
+    description: "Autenticación primaria (Paso 1). Detecta si requiere MFA"
+    request_body:
+      correo: "string (email)"
+      contrasena: "string"
+    responses:
+      200:
+        description: "Login completado o desafío MFA emitido"
+        schema:
+          mfa_required: "boolean"
+          mfa_token: "string (JWT temporal con scope: mfa_pending, expira en 5 min)"
+          access_token: "string (JWT de sesión, solo si mfa_required == false)"
+          token_type: "bearer"
+      401: "Credenciales incorrectas (no expone si falló correo o clave)"
+      423: "Cuenta bloqueada temporalmente por 15 minutos (RN-002)"
+
+  - path: "/api/auth/mfa/setup"
+    method: "POST"
+    security: "Bearer Auth (Token de sesión activo)"
+    description: "Genera secreto TOTP, URI para QR y códigos de respaldo"
+    responses:
+      200:
+        secreto_base32: "string"
+        otpauth_uri: "string (otpauth://totp/EcoLogistica:correo?...)"
+        qr_code_base64: "string (data:image/png;base64,...)"
+        codigos_respaldo: "array[string]"
+
+  - path: "/api/auth/mfa/enable"
+    method: "POST"
+    security: "Bearer Auth (Token de sesión activo)"
+    description: "Verifica el primer código de 6 dígitos y activa definitivamente el MFA"
+    request_body:
+      codigo_totp: "string (regex: ^[0-9]{6}$)"
+    responses:
+      200: "MFA activado exitosamente en la cuenta"
+      400: "Código TOTP inválido o fuera de ventana"
+
+  - path: "/api/auth/mfa/verify"
+    method: "POST"
+    description: "Verificación de desafío MFA (Paso 2 del Login) con código TOTP o código de respaldo"
+    request_body:
+      mfa_token: "string (token temporal del login)"
+      codigo: "string (6 dígitos TOTP u 8 caracteres de backup)"
+    responses:
+      200:
+        access_token: "string (JWT definitivo de sesión, expira en 8 horas)"
+        token_type: "bearer"
+        usuario: "objeto con datos de perfil"
+      401: "Código de verificación inválido o expirado"
+      423: "Cuenta bloqueada temporalmente por acumulación de intentos fallidos"
+
+  - path: "/api/auth/logout"
+    method: "POST"
+    security: "Bearer Auth"
+    description: "Revocación inmediata del token de sesión actual (Blacklist JTI)"
+    responses:
+      200: "Sesión cerrada y token revocado exitosamente"
+      401: "Token inválido o ya revocado"
+
+  - path: "/api/auth/me"
+    method: "GET"
+    security: "Bearer Auth"
+    description: "Consulta de usuario autenticado y estado de seguridad"
+    responses:
+      200: "Datos de usuario y sesión activa"
+      401: "No autorizado o token revocado"

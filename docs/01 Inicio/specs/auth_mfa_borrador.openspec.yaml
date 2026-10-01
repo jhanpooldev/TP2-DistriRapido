@@ -1,0 +1,37 @@
+# ==============================================================================
+# OPENSPEC DRAFT - BORRADOR INICIAL (V0.1.0)
+# Proyecto: EcoLogística Lima - DistriRápido S.A.C.
+# Módulo: Autenticación con MFA y Gestión Segura de Sesiones
+# ==============================================================================
+
+openspec: "1.0.0"
+info:
+  title: "Módulo de Autenticación MFA y Gestión de Sesiones"
+  version: "0.1.0-draft"
+  description: "Borrador inicial para la especificación del módulo de seguridad y acceso."
+
+module:
+  name: "auth_mfa_session"
+  scope: "Gestión de identidad, doble factor y control de sesiones web"
+
+requirements:
+  - id: "REQ-AUTH-001"
+    name: "Inicio de sesión seguro"
+    description: "El usuario debe poder iniciar sesión ingresando su correo y contraseña. Si los datos son correctos, se le otorgará una sesión segura con un tiempo razonable de expiración."
+    rules:
+      - "Validar que el correo y la contraseña coincidan con la base de datos."
+      - "Si el usuario tiene MFA activado, solicitarle su código de verificación."
+
+  - id: "REQ-AUTH-002"
+    name: "Autenticación de Doble Factor (MFA)"
+    description: "Permitir a los usuarios configurar un segundo factor en su teléfono para proteger su cuenta. El sistema validará el código de 6 dígitos emitido por su aplicación."
+    rules:
+      - "Generar un código QR para que el usuario vincule su celular."
+      - "Comprobar que el código ingresado sea el correcto antes de darle acceso total."
+
+  - id: "REQ-AUTH-003"
+    name: "Control de Sesiones e Intentos Fallidos"
+    description: "El sistema debe bloquear a los atacantes que intenten adivinar contraseñas y cerrar sesión cuando el usuario lo solicite."
+    rules:
+      - "Bloquear el usuario si intenta muchas veces de forma incorrecta."
+      - "Permitir cerrar sesión para que no se pueda usar más el token."
