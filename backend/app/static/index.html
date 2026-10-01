@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EcoLogística Lima - Módulo MFA y Sesiones Seguras</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    .gradient-header {
+      background: linear-gradient(135deg, #065f46 0%, #047857 100%);
+    }
+  </style>
+</head>
+<body class="bg-slate-100 text-slate-800 font-sans min-h-screen flex flex-col">
+
+  <!-- Header -->
+  <header class="gradient-header text-white shadow-md">
+    <div class="max-w-7xl mx-auto px-4 py-4 flex flex-wrap justify-between items-center gap-4">
+      <div class="flex items-center space-x-3">
+        <div class="bg-emerald-400/20 p-2 rounded-lg border border-emerald-300/30">
+          <i class="fa-solid fa-shield-halved text-2xl text-emerald-300"></i>
+        </div>
+        <div>
+          <h1 class="text-xl font-bold tracking-tight">EcoLogística Lima</h1>
+          <p class="text-xs text-emerald-200">DistriRápido S.A.C. &bull; Módulo de Autenticación MFA y Sesiones (RN-001 a RN-006)</p>
+        </div>
+      </div>
+      <div class="flex items-center space-x-3">
+        <a href="/docs" target="_blank" class="text-xs bg-emerald-800 hover:bg-emerald-700 px-3 py-1.5 rounded-md font-medium border border-emerald-600 transition flex items-center space-x-1.5">
+          <i class="fa-solid fa-code"></i>
+          <span>Swagger API Docs</span>
+        </a>
+        <div id="sessionBadge" class="hidden text-xs bg-emerald-500/30 text-emerald-100 px-3 py-1.5 rounded-full border border-emerald-400/30 flex items-center space-x-2">
+          <span class="w-2 h-2 rounded-full bg-emerald-300 animate-pulse"></span>
+          <span id="sessionUserEmail"></span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Contenedor Principal -->
+  <main class="max-w-7xl mx-auto px-4 py-8 flex-1 w-full grid grid-cols-1 lg:grid-cols-12 gap-8">
+
+    <!-- Panel Izquierdo: Formularios de Flujo -->
+    <div class="lg:col-span-7 space-y-6">
+
+      <!-- Sección 1: Registro y Login Inicial -->
+      <div id="cardAuth" class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+        <div class="flex items-center justify-between border-b border-slate-100 pb-3 mb-4">
+          <h2 class="text-lg font-bold text-slate-900 flex items-center space-x-2">
+            <span class="w-6 h-6 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center text-xs font-bold">1</span>
+            <span>Inicio de Sesión y Registro</span>
+          </h2>
+          <div class="flex space-x-2 text-xs">
+            <button onclick="setAuthTab('login')" id="tabBtnLogin" class="font-semibold text-emerald-600 border-b-2 border-emerald-600 pb-1">Iniciar Sesión</button>
+            <button onclick="setAuthTab('register')" id="tabBtnRegister" class="text-slate-500 hover:text-slate-800 pb-1">Registrar Nuevo</button>
+          </div>
+        </div>
+
+        <!-- Formulario Registro -->
+        <form id="formRegister" class="hidden space-y-3" onsubmit="handleRegister(event)">
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 mb-1">Nombre Completo</label>
+            <input type="text" id="regName" value="Jhanpool Flores" required class="w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 mb-1">Correo Corporativo</label>
+            <input type="email" id="regEmail" value="jhanpool@distrirapido.pe" required class="w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 mb-1">Contraseña (Mínimo 8 caracteres)</label>
+            <input type="password" id="regPassword" value="Segura2026*" required class="w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 mb-1">Rol</label>
+            <select id="regRole" class="w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+              <option value="Operador">Operador Logístico</option>
+              <option value="Administrador">Administrador</option>
+              <option value="Gerente">Gerente</option>
+            </select>
+          </div>
+          <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-2 rounded-lg text-sm transition">
+            Crear Usuario
+          </button>
+        </form>
+
+        <!-- Formulario Login -->
+        <form id="formLogin" class="space-y-3" onsubmit="handleLogin(event)">
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 mb-1">Correo Electrónico</label>
+            <input type="email" id="loginEmail" value="jhanpool@distrirapido.pe" required class="w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 mb-1">Contraseña</label>
+            <input type="password" id="loginPassword" value="Segura2026*" required class="w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+          </div>
+          <div class="flex gap-2">
+            <button type="submit" class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-2 rounded-lg text-sm transition flex items-center justify-center space-x-2">
+              <i class="fa-solid fa-arrow-right-to-bracket"></i>
+              <span>Ingresar (Paso 1)</span>
+            </button>
+            <button type="button" onclick="simularFalloLogin()" title="Probar bloqueo tras 3 intentos (RN-002)" class="px-3 py-2 bg-red-50 hover:bg-red-100 text-red-700 border border-red-200 rounded-lg text-xs font-medium transition">
+              Simular Error
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Sección 2: Desafío MFA (Paso 2) -->
+      <div id="cardMfaChallenge" class="hidden bg-amber-50/70 border border-amber-300 rounded-xl p-6 shadow-sm">
+        <div class="flex items-center space-x-3 text-amber-900 border-b border-amber-200 pb-3 mb-4">
+          <i class="fa-solid fa-mobile-screen-button text-2xl text-amber-600"></i>
+          <div>
+            <h2 class="text-base font-bold">Paso 2: Verificación Multifactor Requerida</h2>
+            <p class="text-xs text-amber-700">Se detectó MFA activo en tu cuenta. Ingresa el código de 6 dígitos de tu aplicación autenticadora o un código de respaldo.</p>
+          </div>
+        </div>
+        <form onsubmit="handleVerifyMFA(event)" class="space-y-4">
+          <div>
+            <label class="block text-xs font-bold text-amber-900 mb-1">Código de 6 dígitos (TOTP) o Código de Respaldo</label>
+            <input type="text" id="mfaCodeInput" placeholder="Ej: 123456 ó ABCD-1234" maxlength="12" required class="w-full text-center text-xl tracking-widest font-mono py-2.5 border border-amber-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:outline-none bg-white">
+          </div>
+          <div class="flex gap-2">
+            <button type="submit" class="flex-1 bg-amber-600 hover:bg-amber-700 text-white font-semibold py-2 rounded-lg text-sm transition">
+              Verificar y Acceder
+            </button>
+            <button type="button" onclick="cancelMfaChallenge()" class="px-4 py-2 bg-slate-200 text-slate-700 rounded-lg text-xs font-medium">
+              Cancelar
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Sección 3: Configuración y Enrolamiento de MFA (Setup) -->
+      <div id="cardMfaSetup" class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+        <div class="flex items-center justify-between border-b border-slate-100 pb-3 mb-4">
+          <h2 class="text-lg font-bold text-slate-900 flex items-center space-x-2">
+            <span class="w-6 h-6 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center text-xs font-bold">2</span>
+            <span>Configuración de Doble Factor (TOTP)</span>
+          </h2>
+          <span id="mfaStatusBadge" class="text-xs px-2.5 py-1 rounded-full bg-slate-100 text-slate-600 font-medium">
+            MFA: Desactivado
+          </span>
+        </div>
+
+        <div id="mfaSetupUnauthenticated" class="text-center py-6 text-slate-500 text-sm">
+          <i class="fa-solid fa-lock text-3xl mb-2 text-slate-400"></i>
+          <p>Inicia sesión en el Paso 1 para activar o configurar tu autenticador MFA.</p>
+        </div>
+
+        <div id="mfaSetupAuthenticated" class="hidden space-y-4">
+          <p class="text-xs text-slate-600 leading-relaxed">
+            Protege tu cuenta de EcoLogística vinculando una aplicación compatible con el estándar <strong>RFC 6238</strong> como <em>Google Authenticator</em>, <em>Microsoft Authenticator</em> o <em>Authy</em>.
+          </p>
+
+          <div class="flex flex-wrap gap-3">
+            <button onclick="iniciarSetupMFA()" class="bg-slate-900 hover:bg-slate-800 text-white text-xs px-4 py-2 rounded-lg font-medium transition flex items-center space-x-2">
+              <i class="fa-solid fa-qrcode"></i>
+              <span>Generar Código QR y Clave</span>
+            </button>
+            <button id="btnDesactivarMFA" onclick="desactivarMFA()" class="hidden bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 text-xs px-3 py-2 rounded-lg font-medium transition">
+              Desactivar MFA
+            </button>
+          </div>
+
+          <!-- Contenedor QR y Secret -->
+          <div id="qrContainer" class="hidden bg-slate-50 border border-slate-200 rounded-xl p-4 space-y-4">
+            <div class="flex flex-col sm:flex-row items-center gap-6">
+              <div class="bg-white p-2 border rounded-lg shadow-sm">
+                <img id="qrImage" src="" alt="Código QR MFA" class="w-40 h-40">
+              </div>
+              <div class="space-y-2 text-xs flex-1">
+                <div>
+                  <span class="font-bold text-slate-700 block">Clave Secreta Base32:</span>
+                  <code id="secretKeyText" class="font-mono text-emerald-800 bg-emerald-50 px-2 py-1 rounded border border-emerald-200 block text-xs break-all select-all"></code>
+                </div>
+                <div>
+                  <span class="font-bold text-slate-700 block mb-1">Códigos de Recuperación de Emergencia (1 solo uso):</span>
+                  <div id="backupCodesList" class="grid grid-cols-2 gap-1 text-[11px] font-mono text-slate-700 bg-white p-2 rounded border"></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Confirmación con primer código -->
+            <div class="border-t border-slate-200 pt-3">
+              <label class="block text-xs font-bold text-slate-700 mb-1">Confirmar Activación (Ingresa el código actual de tu celular):</label>
+              <div class="flex gap-2">
+                <input type="text" id="confirmTotpCode" maxlength="6" placeholder="000000" class="w-32 text-center font-mono py-1.5 border rounded-lg text-sm font-bold tracking-widest focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+                <button onclick="confirmarActivacionMFA()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs px-4 py-1.5 rounded-lg font-medium transition">
+                  Activar Definitivamente
+                </button>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Panel Derecho: Estado de Sesión y Log de Seguridad en Tiempo Real -->
+    <div class="lg:col-span-5 space-y-6">
+
+      <!-- Panel de Sesión Activa -->
+      <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+        <h2 class="text-base font-bold text-slate-900 border-b border-slate-100 pb-3 mb-3 flex items-center justify-between">
+          <span class="flex items-center space-x-2">
+            <i class="fa-solid fa-key text-emerald-600"></i>
+            <span>Estado de Sesión (RN-005)</span>
+          </span>
+          <button onclick="handleLogout()" id="btnLogout" class="hidden text-xs bg-red-50 hover:bg-red-100 text-red-600 font-medium px-2.5 py-1 rounded border border-red-200 transition">
+            Cerrar Sesión (Logout)
+          </button>
+        </h2>
+
+        <div id="sessionDetails" class="space-y-2 text-xs">
+          <div class="flex justify-between py-1 border-b border-slate-100">
+            <span class="text-slate-500">Estado:</span>
+            <span id="txtSesionEstado" class="font-semibold text-slate-600">No autenticado</span>
+          </div>
+          <div class="flex justify-between py-1 border-b border-slate-100">
+            <span class="text-slate-500">Usuario:</span>
+            <span id="txtSesionUsuario" class="font-medium text-slate-800">-</span>
+          </div>
+          <div class="flex justify-between py-1 border-b border-slate-100">
+            <span class="text-slate-500">Rol RBAC:</span>
+            <span id="txtSesionRol" class="font-medium text-slate-800">-</span>
+          </div>
+          <div class="flex justify-between py-1 border-b border-slate-100">
+            <span class="text-slate-500">Identificador JTI:</span>
+            <span id="txtSesionJTI" class="font-mono text-[10px] text-slate-600 break-all">-</span>
+          </div>
+          <div class="flex justify-between py-1 border-b border-slate-100">
+            <span class="text-slate-500">Validez:</span>
+            <span id="txtSesionExpira" class="font-medium text-slate-800">8 horas (RN-005)</span>
+          </div>
+        </div>
+
+        <div class="mt-4 pt-3 border-t border-slate-100 flex gap-2">
+          <button onclick="probarTokenRevocado()" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 py-1.5 rounded text-xs font-medium transition">
+            Probar Consulta /api/auth/me
+          </button>
+        </div>
+      </div>
+
+      <!-- Log de Respuestas de Seguridad (Para Capturas) -->
+      <div class="bg-slate-900 rounded-xl shadow-sm p-4 text-emerald-400 font-mono text-xs">
+        <div class="flex justify-between items-center border-b border-slate-800 pb-2 mb-2">
+          <span class="text-slate-400 font-bold uppercase tracking-wider text-[10px]">Consola de Seguridad / Auditoría</span>
+          <button onclick="clearConsole()" class="text-[10px] text-slate-500 hover:text-slate-300">Limpiar</button>
+        </div>
+        <div id="consoleOutput" class="h-64 overflow-y-auto space-y-1.5 text-[11px] pr-1">
+          <div class="text-slate-500">// Esperando eventos de autenticación...</div>
+        </div>
+      </div>
+
+    </div>
+
+  </main>
+
+  <footer class="bg-white border-t border-slate-200 py-4 text-center text-xs text-slate-500">
+    EcoLogística Lima &bull; Universidad Continental &bull; Rama de desarrollo: <code class="bg-slate-100 px-1 py-0.5 rounded font-mono text-emerald-700">flores</code>
+  </footer>
+
+  <script>
+    let state = {
+      accessToken: localStorage.getItem('access_token') || null,
+      mfaToken: null,
+      currentUser: null,
+      failedAttempts: 0
+    };
+
+    function log(message, type = 'info') {
+      const el = document.getElementById('consoleOutput');
+      const time = new Date().toLocaleTimeString();
+      let color = 'text-emerald-400';
+      if (type === 'error') color = 'text-red-400 font-bold';
+      if (type === 'warn') color = 'text-amber-400 font-bold';
+      if (type === 'success') color = 'text-cyan-300 font-bold';
+      
+      const div = document.createElement('div');
+      div.className = color;
+      div.innerHTML = `<span class="text-slate-500">[${time}]</span> ${message}`;
+      el.appendChild(div);
+      el.scrollTop = el.scrollHeight;
+    }
+
+    function clearConsole() {
+      document.getElementById('consoleOutput').innerHTML = '<div class="text-slate-500">// Consola reiniciada.</div>';
+    }
+
+    function setAuthTab(tab) {
+      if (tab === 'login') {
+        document.getElementById('formLogin').classList.remove('hidden');
+        document.getElementById('formRegister').classList.add('hidden');
+        document.getElementById('tabBtnLogin').className = 'font-semibold text-emerald-600 border-b-2 border-emerald-600 pb-1';
+        document.getElementById('tabBtnRegister').className = 'text-slate-500 hover:text-slate-800 pb-1';
+      } else {
+        document.getElementById('formLogin').classList.add('hidden');
+        document.getElementById('formRegister').classList.remove('hidden');
+        document.getElementById('tabBtnRegister').className = 'font-semibold text-emerald-600 border-b-2 border-emerald-600 pb-1';
+        document.getElementById('tabBtnLogin').className = 'text-slate-500 hover:text-slate-800 pb-1';
+      }
+    }
+
+    async function handleRegister(e) {
+      e.preventDefault();
+      const payload = {
+        nombre: document.getElementById('regName').value,
+        correo: document.getElementById('regEmail').value,
+        contrasena: document.getElementById('regPassword').value,
+        rol: document.getElementById('regRole').value
+      };
+      log(`POST /api/auth/register -> Registrando usuario ${payload.correo}...`);
+      try {
+        const res = await fetch('/api/auth/register', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        if (res.ok) {
+          log(`✅ Registro exitoso [HTTP 201]: Usuario ${data.correo} creado. Hasheado bcrypt (RN-004).`, 'success');
+          setAuthTab('login');
+          document.getElementById('loginEmail').value = payload.correo;
+          document.getElementById('loginPassword').value = payload.contrasena;
+        } else {
+          log(`❌ Error [HTTP ${res.status}]: ${data.detail || 'Fallo al registrar'}`, 'error');
+        }
+      } catch (err) {
+        log(`❌ Error de red: ${err.message}`, 'error');
+      }
+    }
+
+    async function handleLogin(e) {
+      e.preventDefault();
+      const payload = {
+        correo: document.getElementById('loginEmail').value,
+        contrasena: document.getElementById('loginPassword').value
+      };
+      log(`POST /api/auth/login -> Validando credenciales para ${payload.correo}...`);
+      try {
+        const res = await fetch('/api/auth/login', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        if (res.ok) {
+          if (data.mfa_required) {
+            state.mfaToken = data.mfa_token;
+            log(`⚠️ [DESAFÍO MFA ACTIVO]: Se requiere verificación Paso 2. Token temporal emitido (5 min).`, 'warn');
+            document.getElementById('cardMfaChallenge').classList.remove('hidden');
+            document.getElementById('mfaCodeInput').focus();
+          } else {
+            setLoggedInSession(data.access_token, data.usuario);
+            log(`✅ [LOGIN EXITOSO]: Sesión activa emitida por 8 horas (RN-005).`, 'success');
+          }
+        } else if (res.status === 423) {
+          log(`🚨 [BLOQUEO RN-002 ACTIVADO]: ${data.detail}`, 'error');
+          alert(data.detail);
+        } else {
+          log(`❌ [HTTP ${res.status}]: ${data.detail || 'Credenciales incorrectas'}`, 'error');
+        }
+      } catch (err) {
+        log(`❌ Error: ${err.message}`, 'error');
+      }
+    }
+
+    async function simularFalloLogin() {
+      const email = document.getElementById('loginEmail').value;
+      log(`⚡ Probando contraseña incorrecta contra ${email} para verificar RN-002...`);
+      try {
+        const res = await fetch('/api/auth/login', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({correo: email, contrasena: 'clave_invalida_error'})
+        });
+        const data = await res.json();
+        if (res.status === 423) {
+          log(`🔒 [BLOQUEADO]: ${data.detail}`, 'error');
+          alert(data.detail);
+        } else {
+          log(`❌ [HTTP ${res.status}]: ${data.detail}`, 'warn');
+        }
+      } catch (err) {
+        log(`Error: ${err.message}`, 'error');
+      }
+    }
+
+    async function handleVerifyMFA(e) {
+      e.preventDefault();
+      const code = document.getElementById('mfaCodeInput').value.trim();
+      log(`POST /api/auth/mfa/verify -> Validando código TOTP / Respaldo: ${code}...`);
+      try {
+        const res = await fetch('/api/auth/mfa/verify', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({mfa_token: state.mfaToken, codigo: code})
+        });
+        const data = await res.json();
+        if (res.ok) {
+          document.getElementById('cardMfaChallenge').classList.add('hidden');
+          setLoggedInSession(data.access_token, data.usuario);
+          log(`✅ [MFA VERIFICADO]: Segundo factor correcto. Sesión final concedida.`, 'success');
+        } else {
+          log(`❌ [HTTP ${res.status}]: ${data.detail}`, 'error');
+        }
+      } catch (err) {
+        log(`Error: ${err.message}`, 'error');
+      }
+    }
+
+    function cancelMfaChallenge() {
+      state.mfaToken = null;
+      document.getElementById('cardMfaChallenge').classList.add('hidden');
+      log(`Desafío MFA cancelado por el usuario.`);
+    }
+
+    function setLoggedInSession(token, user) {
+      state.accessToken = token;
+      state.currentUser = user;
+      localStorage.setItem('access_token', token);
+      
+      document.getElementById('sessionBadge').classList.remove('hidden');
+      document.getElementById('sessionUserEmail').innerText = user ? user.correo : 'Sesión Activa';
+      document.getElementById('btnLogout').classList.remove('hidden');
+      
+      document.getElementById('mfaSetupUnauthenticated').classList.add('hidden');
+      document.getElementById('mfaSetupAuthenticated').classList.remove('hidden');
+
+      actualizarDatosPerfil();
+    }
+
+    async function actualizarDatosPerfil() {
+      if (!state.accessToken) return;
+      try {
+        const res = await fetch('/api/auth/me', {
+          headers: {'Authorization': `Bearer ${state.accessToken}`}
+        });
+        if (res.ok) {
+          const profile = await res.json();
+          document.getElementById('txtSesionEstado').innerText = 'Autenticado (Token Válido)';
+          document.getElementById('txtSesionEstado').className = 'font-semibold text-emerald-600';
+          document.getElementById('txtSesionUsuario').innerText = `${profile.nombre} (${profile.correo})`;
+          document.getElementById('txtSesionRol').innerText = profile.rol;
+          document.getElementById('txtSesionJTI').innerText = profile.jti;
+          
+          const badge = document.getElementById('mfaStatusBadge');
+          const btnDesactivar = document.getElementById('btnDesactivarMFA');
+          if (profile.mfa_activado) {
+            badge.innerText = 'MFA: Activado (TOTP)';
+            badge.className = 'text-xs px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-800 font-bold';
+            btnDesactivar.classList.remove('hidden');
+          } else {
+            badge.innerText = 'MFA: Desactivado';
+            badge.className = 'text-xs px-2.5 py-1 rounded-full bg-amber-100 text-amber-800 font-medium';
+            btnDesactivar.classList.add('hidden');
+          }
+        }
+      } catch (err) {}
+    }
+
+    async function iniciarSetupMFA() {
+      if (!state.accessToken) {
+        alert('Debe iniciar sesión primero.');
+        return;
+      }
+      log(`POST /api/auth/mfa/setup -> Solicitando clave secreta Base32 y código QR...`);
+      try {
+        const res = await fetch('/api/auth/mfa/setup', {
+          method: 'POST',
+          headers: {'Authorization': `Bearer ${state.accessToken}`}
+        });
+        const data = await res.json();
+        if (res.ok) {
+          document.getElementById('qrContainer').classList.remove('hidden');
+          document.getElementById('qrImage').src = data.qr_code_base64;
+          document.getElementById('secretKeyText').innerText = data.secreto_base32;
+          
+          const listEl = document.getElementById('backupCodesList');
+          listEl.innerHTML = '';
+          data.codigos_respaldo.forEach(code => {
+            const span = document.createElement('span');
+            span.className = 'bg-slate-100 px-1.5 py-0.5 rounded border text-center';
+            span.innerText = code;
+            listEl.appendChild(span);
+          });
+          log(`✅ QR y Códigos generados. Escanea el QR con Google Authenticator para confirmar.`, 'success');
+        } else {
+          log(`❌ Error al inicializar MFA: ${data.detail}`, 'error');
+        }
+      } catch (err) {
+        log(`Error: ${err.message}`, 'error');
+      }
+    }
+
+    async function confirmarActivacionMFA() {
+      const code = document.getElementById('confirmTotpCode').value.trim();
+      if (!code) {
+        alert('Ingresa el código de 6 dígitos.');
+        return;
+      }
+      log(`POST /api/auth/mfa/enable -> Confirmando código ${code}...`);
+      try {
+        const res = await fetch('/api/auth/mfa/enable', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${state.accessToken}`
+          },
+          body: JSON.stringify({codigo_totp: code})
+        });
+        const data = await res.json();
+        if (res.ok) {
+          log(`🎉 [MFA ACTIVADO CON ÉXITO]: Tu cuenta ahora requiere Google Authenticator para ingresar.`, 'success');
+          alert('¡MFA activado con éxito! Ahora tu cuenta está protegida.');
+          document.getElementById('qrContainer').classList.add('hidden');
+          actualizarDatosPerfil();
+        } else {
+          log(`❌ Error en confirmación: ${data.detail}`, 'error');
+        }
+      } catch (err) {
+        log(`Error: ${err.message}`, 'error');
+      }
+    }
+
+    async function desactivarMFA() {
+      const pwd = prompt('Ingrese su contraseña para desactivar MFA:');
+      if (!pwd) return;
+      try {
+        const res = await fetch('/api/auth/mfa/disable', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${state.accessToken}`
+          },
+          body: JSON.stringify({contrasena: pwd})
+        });
+        const data = await res.json();
+        if (res.ok) {
+          log(`MFA desactivado correctamente.`);
+          actualizarDatosPerfil();
+        } else {
+          log(`❌ Error: ${data.detail}`, 'error');
+        }
+      } catch (err) {}
+    }
+
+    async function handleLogout() {
+      if (!state.accessToken) return;
+      log(`POST /api/auth/logout -> Invocando cierre de sesión y revocación en blacklist...`);
+      try {
+        const res = await fetch('/api/auth/logout', {
+          method: 'POST',
+          headers: {'Authorization': `Bearer ${state.accessToken}`}
+        });
+        const data = await res.json();
+        log(`🚪 [LOGOUT COMPLETADO]: ${data.mensaje} (JTI invalidado en blacklist).`, 'warn');
+      } catch (err) {}
+
+      state.accessToken = null;
+      state.currentUser = null;
+      localStorage.removeItem('access_token');
+      
+      document.getElementById('sessionBadge').classList.add('hidden');
+      document.getElementById('btnLogout').classList.add('hidden');
+      document.getElementById('txtSesionEstado').innerText = 'Sesión Cerrada (Token Revocado)';
+      document.getElementById('txtSesionEstado').className = 'font-semibold text-red-600';
+      document.getElementById('txtSesionUsuario').innerText = '-';
+      document.getElementById('txtSesionRol').innerText = '-';
+      document.getElementById('txtSesionJTI').innerText = '-';
+      document.getElementById('mfaSetupUnauthenticated').classList.remove('hidden');
+      document.getElementById('mfaSetupAuthenticated').classList.add('hidden');
+    }
+
+    async function probarTokenRevocado() {
+      log(`GET /api/auth/me con el token almacenado...`);
+      const token = state.accessToken || 'token_invalido_de_prueba';
+      try {
+        const res = await fetch('/api/auth/me', {
+          headers: {'Authorization': `Bearer ${token}`}
+        });
+        const data = await res.json();
+        if (res.ok) {
+          log(`✅ [SESIÓN VÁLIDA]: Bienvenido ${data.nombre} (${data.correo}).`, 'success');
+        } else {
+          log(`🚫 [RECHAZADO HTTP ${res.status}]: ${data.detail}`, 'error');
+        }
+      } catch (err) {
+        log(`Error: ${err.message}`, 'error');
+      }
+    }
+
+    // Inicialización automática
+    window.onload = () => {
+      log(`🚀 Sistema EcoLogística Lima inicializado en rama "flores".`);
+      if (state.accessToken) {
+        actualizarDatosPerfil();
+      }
+    };
+  </script>
+</body>
+</html>

@@ -1,0 +1,38 @@
+# Entornos virtuales de Python
+.venv/
+venv/
+ENV/
+env/
+backend/.venv/
+
+# Bytecode y caches
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.coverage
+htmlcov/
+dist/
+build/
+*.egg-info/
+
+# Archivos de entorno y credenciales sensibles
+.env
+.env.local
+.env.*.local
+*.pem
+*.key
+
+# Node / Frontend
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# IDEs y sistemas operativos
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
