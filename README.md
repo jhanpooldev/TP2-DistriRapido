@@ -1,4 +1,4 @@
-﻿# Sistema Web de Optimizacion de Rutas Sostenibles - EcoLogistica Lima
+# Sistema Web de Optimizacion de Rutas Sostenibles - EcoLogistica Lima
 
 ## Tabla de Contenidos (TOC)
 
@@ -141,9 +141,13 @@ El proceso logistico identificado incluye:
 - Dashboard con metricas clave
 - Filtros por conductor, vehiculo y zona
 
-### Seguridad
-- Autenticacion JWT con expiracion de 8 horas
-- Control de acceso basado en roles (administrador, conductor, cliente)
+### Seguridad y Gestión de Acceso
+- Autenticación JWT con expiración de 8 horas (`RN-005`).
+- Autenticación Multifactor (MFA/2FA) basada en TOTP RFC 6238 (Google Authenticator, Microsoft Authenticator) y códigos de recuperación de respaldo.
+- Desafío en dos pasos con token efímero (`mfa_token`, 5 min) para mitigar elevación de privilegios.
+- Gestión segura de ciclo de vida de sesiones con revocación inmediata en Logout mediante lista negra de identificadores de token (`jti`).
+- Protección contra ataques de fuerza bruta mediante bloqueo temporal de 15 minutos tras 3 intentos fallidos consecutivos (`RN-002`).
+- Control de acceso basado en roles RBAC (Administrador, Operador Logístico, Gerente).
 
 ---
 
