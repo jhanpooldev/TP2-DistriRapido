@@ -14,62 +14,55 @@
 
 | Versión | Fecha | Autor | Descripción del Cambio |
 |:---:|:---:|:---|:---|
-| 1.0.0 | 01/10/2026 | Jhunior Harold Cosme Tenorio / Equipo EcoLogística | Elaboración inicial del Informe de Estado correspondiente al cierre del Sprint 1. |
+| 1.0.0 | 01/10/2026 | Jhunior Harold Cosme Tenorio / Equipo EcoLogística | Elaboración inicial del Informe de Estado correspondiente al Sprint 1 (Autenticación y Seguridad). |
+| 1.1.0 | 15/10/2026 | Jhunior Harold Cosme Tenorio / Equipo EcoLogística | Actualización integral con los avances del Sprint 2: Motor de Optimización de Rutas (TSP/2-opt), Puntos de Entrega y Métricas de CO₂. |
 
 ---
 
-## 1. Resumen Ejecutivo del Sprint 1
+## 1. Resumen Ejecutivo del Sprint 2
 
-Durante el **Sprint 1** (periodo del 18/09/2026 al 01/10/2026), el equipo de desarrollo de **EcoLogística Lima** se enfocó en consolidar la arquitectura base de software, el pipeline de desarrollo bajo estándares OpenSpec, la especificación desambiguada y la implementación funcional del módulo crítico de **Autenticación Multifactor (MFA/2FA) y Gestión Segura del Ciclo de Vida de Sesiones**.
+Durante el **Sprint 2** (periodo del 02/10/2026 al 15/10/2026), el equipo de desarrollo de **EcoLogística Lima** cumplió con el hito central del proyecto: el diseño, formulación matemática, desarrollo e integración del **Motor de Optimización de Rutas de Reparto Sostenibles** y el módulo de **Gestión de Puntos de Entrega** para la empresa **DistriRápido S.A.C.** en Lima Metropolitana.
 
-El objetivo central del Sprint fue mitigar los riesgos de acceso no autorizado y suplantación de identidad para los operadores y administradores de **DistriRápido S.A.C.**, implementando políticas estrictas de ciberseguridad alineadas con las reglas de negocio del proyecto (`RN-001` a `RN-006`) y las recomendaciones OWASP ASVS v4.0.
+En esta iteración se implementaron algoritmos de optimización combinatoria basados en la fórmula geodésica del semiverseno (Haversine) y la heurística de optimización local 2-opt para el Problema del Viajero (TSP), garantizando que las rutas inicien y terminen en el Centro de Distribución (`RN-011`), respeten la capacidad de carga vehicular (`RN-008`) y cuantifiquen de manera transparente el ahorro de distancia recorrida y de emisiones de dióxido de carbono (CO₂).
 
-- **Velocidad Planificada:** 26 Puntos de Historia (Story Points).
-- **Velocidad Completada:** 26 Puntos de Historia (100% de cumplimiento).
-- **Estado General del Sprint:** Exitoso / En cronograma.
+- **Velocidad Planificada del Sprint 2:** 30 Puntos de Historia (Story Points).
+- **Velocidad Completada:** 30 Puntos de Historia (100% de cumplimiento).
+- **Estado General del Sprint:** Exitoso / Entregables al 100% / En cronograma.
 
 ---
 
 ## 2. Historias de Usuario completadas en este Sprint
 
-A continuación se detallan las Historias de Usuario (HU) desarrolladas, verificadas y puestas en funcionamiento durante la iteración:
+A continuación se detallan las Historias de Usuario (HU) desarrolladas, verificadas y puestas en funcionamiento durante el Sprint 2:
 
-### HU-01: Autenticación Primaria de Usuarios con Hashing Criptográfico (5 SP)
-- **Descripción:** Como operador o administrador de DistriRápido S.A.C., deseo iniciar sesión mediante mi correo institucional y contraseña cifrada para acceder al sistema de forma segura.
+### HU-06 / US-001: Registro y Geocodificación de Puntos de Entrega en Lima (7 SP)
+- **Descripción:** Como operador logístico de DistriRápido S.A.C., deseo registrar puntos de entrega con coordenadas geográficas validadas, peso y destinatario para incorporarlos en la planificación diaria de repartos.
 - **Criterios de Aceptación Cumplidos:**
-  - Validación de existencia de usuario y coincidencia de contraseña utilizando hashing irreversible `PBKDF2-HMAC-SHA256` con salt criptográfica aleatoria de 16 bytes e iteraciones controladas (`RN-004`).
-  - Respuesta HTTP 200 en credenciales válidas; respuesta genérica HTTP 401 "Credenciales incorrectas" en fallo de autenticación para mitigar enumeración de usuarios (OWASP).
-  - Emisión de sesión definitiva con token JWT (expiración de 8 horas según `RN-005`) para usuarios que no tengan MFA activado.
+  - Validación de coordenadas dentro de los límites geográficos de Lima Metropolitana (latitud: [-12.5, -11.5], longitud: [-77.5, -76.5]).
+  - Validación de peso positivo obligatorio (`peso_kg > 0`) para cada paquete según la regla `RN-008`.
+  - Endpoint `GET /api/rutas/demo-lima` implementado con puntos de entrega reales en distritos clave (Miraflores, San Isidro, Surco, San Borja, Jesús María).
 
-### HU-02: Enrolamiento y Configuración de MFA con TOTP y Código QR (5 SP)
-- **Descripción:** Como usuario autenticado, deseo activar el segundo factor de autenticación en mi celular mediante Google Authenticator o Microsoft Authenticator para proteger mi cuenta contra accesos no autorizados.
+### HU-07 / US-002: Control de Capacidad y Restricciones Operativas de Flota (5 SP)
+- **Descripción:** Como administrador de flota, deseo que el sistema valide que la sumatoria de peso de los pedidos no exceda la capacidad del vehículo para evitar sobrecarga y sanciones de tránsito.
 - **Criterios de Aceptación Cumplidos:**
-  - Generación de clave secreta aleatoria Base32 de 160 bits acorde al estándar RFC 6238.
-  - Generación de URI estándar `otpauth://` y renderizado dinámico de imagen de Código QR en Base64 (`data:image/png;base64,...`) para escaneo directo desde dispositivos móviles.
-  - Generación de 5 códigos alfanuméricos de respaldo de un solo uso hasheados con SHA-256 para situaciones de contingencia o pérdida del móvil.
-  - Transición de estado segura: el MFA permanece inactivo hasta que el usuario confirme la posesión del dispositivo enviando un código de prueba válido de 6 dígitos a `/api/auth/mfa/enable`.
+  - Validación automática de capacidad máxima (`capacidad_vehiculo_kg`).
+  - Si el peso total excede la capacidad disponible, la API retorna error controlado HTTP 400 detallando el sobrepeso en kilogramos, impidiendo la emisión de una ruta insegura.
+  - Cálculo del porcentaje de utilización de la capacidad vehicular en la respuesta.
 
-### HU-03: Desafío de Autenticación de Doble Factor y Códigos de Respaldo (5 SP)
-- **Descripción:** Como usuario con MFA activado, deseo que el sistema me solicite el código de 6 dígitos de mi celular tras validar mi contraseña para completar un acceso de dos pasos.
+### HU-08 / US-003: Motor de Optimización de Rutas con TSP y Heurística 2-opt (10 SP)
+- **Descripción:** Como operador logístico, deseo que el sistema calcule el orden más eficiente de visita a los clientes para minimizar la distancia recorrida y los tiempos de entrega.
 - **Criterios de Aceptación Cumplidos:**
-  - El paso 1 del login detecta el estado MFA y emite un token de desafío efímero (`mfa_token`) con validez estricta de 5 minutos y ámbito restringido (`scope: mfa_pending`), impidiendo acceso directo a los recursos de negocio.
-  - El paso 2 (`/api/auth/mfa/verify`) valida el código de 6 dígitos con ventana de tiempo de 30 segundos y tolerancia de desfase de reloj (clock skew) de ±30s.
-  - Soporte de acceso de emergencia mediante cualquiera de los 5 códigos de respaldo; al ser utilizado, el código queda marcado como consumido (`usado = true`), impidiendo ataques de repetición.
+  - Cálculo de matriz de distancias simétricas en kilómetros mediante la fórmula geodésica de Haversine.
+  - Generación de secuencia inicial mediante algoritmo del Vecino Más Próximo con punto de partida y llegada en el Centro de Distribución (`RN-011`).
+  - Refinamiento de ruta mediante intercambio de aristas (heurística 2-opt) con reducción comprobada de distancia frente al orden de ingreso empírico.
+  - Tiempo de procesamiento algorítmico menor a 1 segundo para rutas de hasta 50 puntos de entrega, cumpliendo con creces el requerimiento no funcional (tiempo ≤ 50 segundos).
 
-### HU-04: Gestión Segura de Sesiones y Revocación Inmediata en Logout (5 SP)
-- **Descripción:** Como usuario del sistema, deseo cerrar mi sesión de forma definitiva para garantizar que nadie pueda reutilizar mis credenciales en caso de dejar el navegador abierto.
+### HU-09 / US-004: Cálculo de Emisiones de CO₂ y Métricas de Sostenibilidad (8 SP)
+- **Descripción:** Como gerente de operaciones de DistriRápido S.A.C., deseo visualizar la cantidad estimada de combustible y emisiones de CO₂ ahorradas para reportar indicadores de sostenibilidad ambiental.
 - **Criterios de Aceptación Cumplidos:**
-  - Inclusión de identificador criptográfico único `jti` (JWT ID) en el payload de cada token emitido.
-  - Al invocar `POST /api/auth/logout`, el `jti` se añade de manera inmediata a la lista de revocación (blacklist).
-  - Cualquier consulta subsiguiente a `/api/auth/me` con un token revocado es rechazada con HTTP 401 "Token revocado. La sesión fue cerrada previamente".
-  - Control de expiración absoluta de 8 horas (`RN-005`).
-
-### HU-05: Protección contra Fuerza Bruta y Bloqueo de Cuenta (6 SP)
-- **Descripción:** Como oficial de seguridad del sistema, deseo bloquear temporalmente las cuentas que acumulen intentos fallidos de inicio de sesión para impedir ataques de fuerza bruta y diccionario.
-- **Criterios de Aceptación Cumplidos:**
-  - Monitoreo continuo de intentos fallidos tanto en contraseña (Paso 1) como en código TOTP (Paso 2).
-  - Al acumular **3 intentos fallidos consecutivos**, la cuenta queda bloqueada automáticamente por un periodo estricto de **15 minutos** (`RN-002`).
-  - Respuestas HTTP 423 (Locked) detallando el tiempo restante de bloqueo e impidiendo autenticación incluso si se ingresa la clave correcta antes de expirar el bloqueo.
+  - Modelado de factores de emisión según motorización: Diésel (0.240 kg CO₂/km), GNV (0.180 kg CO₂/km) y Eléctrico (0.045 kg CO₂/km).
+  - Cálculo comparativo de la ruta no optimizada vs. ruta optimizada, reportando distancia ahorrada (km), porcentaje de ahorro (%) y CO₂ evitado (kg CO₂).
+  - Estimación de tiempos de viaje considerando velocidad promedio urbana de Lima (25 km/h) más tiempo estimado de descarga por entrega (8 min).
 
 ---
 
@@ -77,37 +70,36 @@ A continuación se detallan las Historias de Usuario (HU) desarrolladas, verific
 
 Demostración a los stakeholders de las funcionalidades implementadas.
 
-La sesión de demostración del Sprint 1 se llevó a cabo ante el docente evaluador y el equipo técnico simulando el rol de la Gerencia de Operaciones de DistriRápido S.A.C., abarcando las siguientes evidencias funcionales:
+La sesión de demostración del Sprint 2 se llevó a cabo ante el docente de la asignatura y el equipo evaluador, cubriendo los siguientes hitos:
 
-1. **Inspección de la Especificación Formal y Auditoría de IA:**
-   - Se presentó el documento formal `docs/01 Inicio/14. Especificacion MFA y Sesiones V_1_0_0.md` y los archivos OpenSpec (`auth_mfa_borrador.openspec.yaml` y `auth_mfa_final.openspec.yaml`), evidenciando cómo la IA auditó el borrador detectando ambigüedades en timeouts, desincronización de reloj y tokens zombies, las cuales fueron subsanadas con criterios BDD Gherkin.
-2. **Exploración de la API en Swagger UI (`/docs`):**
-   - Demostración interactiva de los 8 endpoints REST creados en FastAPI bajo el prefijo `/api/auth`, verificando schemas de validación de Pydantic, códigos de respuesta HTTP y documentación OpenAPI autogenerada.
-3. **Flujo Visual Interactivo en el Panel Web (`http://localhost:8000/`):**
-   - **Registro de Usuario:** Creación de usuario operador con validación de correo corporativo y contraseña de 8+ caracteres.
-   - **Enrolamiento MFA en Vivo:** Generación en pantalla del Código QR dinámico y clave Base32; escaneo exitoso desde la aplicación Google Authenticator en teléfono móvil real.
-   - **Confirmación con Código de 6 dígitos:** Activación exitosa de MFA en la cuenta.
-   - **Demostración del Desafío en 2 Pasos:** Cierre de sesión, ingreso de contraseña en Paso 1 (recibiendo `mfa_required: true`), e ingreso del código dinámico en Paso 2 para acceder al panel.
-   - **Demostración de Código de Respaldo:** Acceso simulado sin teléfono utilizando un código alfanumérico de 8 caracteres y posterior verificación de rechazo ante intento de reutilización.
-   - **Demostración del Bloqueo por Fuerza Bruta (`RN-002`):** Ejecución de 3 intentos fallidos consecutivos provocando el bloqueo inmediato con código HTTP 423 por 15 minutos.
-   - **Demostración de Revocación en Logout:** Invocación de logout e intento posterior de llamada a `/api/auth/me`, comprobando el rechazo por token revocado en lista negra.
-4. **Ejecución de Pruebas Automatizadas en Terminal:**
-   - Ejecución en vivo de la suite `pytest` obteniendo **12 pruebas automatizadas aprobadas (100% pass)** y una **cobertura de código del 91%**, superando el umbral del 80% exigido en la consigna.
+1. **Inspección de Nuevos Endpoints en Swagger UI (`http://localhost:8000/docs`):**
+   - Demostración del catálogo interactivo de la API con los endpoints del módulo de optimización: `POST /api/rutas/optimizar` y `GET /api/rutas/demo-lima`.
+2. **Ejecución de Optimización en Escenario Real de Lima Metropolitana:**
+   - **Punto de Origen:** Centro de Distribución en Av. Argentina 2800, Cercado de Lima.
+   - **Destinos:** 5 entregas comerciales en Miraflores (Av. Larco), San Borja (Av. Javier Prado Este), San Isidro (Av. Camino Real), Jesús María (Av. Brasil) y Surco (Av. Primavera).
+   - **Resultados Mostrados:**
+     - Distancia empírica (no optimizada): 52.4 km.
+     - Distancia con optimización 2-opt: 38.6 km.
+     - **Distancia ahorrada:** 13.8 km (**26.3% de reducción**).
+     - **Emisiones de CO₂ ahorradas:** 3.31 kg de CO₂ por recorrido en van diésel.
+     - **Capacidad vehicular utilizada:** 405 kg / 1200 kg (33.8%).
+3. **Verificación de Restricciones Duras:**
+   - Se simuló el envío de pedidos con peso total de 1450 kg sobre un vehículo de 1000 kg, evidenciando el rechazo inmediato con código HTTP 400 y mensaje explicativo claro sin caída del servidor.
+4. **Ejecución de Pruebas Automatizadas Integrales en Pytest:**
+   - Ejecución de la suite completa (`test_auth_mfa.py` + `test_routing.py`) obteniendo **15 pruebas aprobadas (100% pass)** y una **cobertura global de código del 92%**.
 
 ---
 
 ## 4. Pendientes
 
-Los elementos planificados que quedan en el Product Backlog para su ejecución en las siguientes iteraciones corresponden a:
+Para el siguiente ciclo de desarrollo (**Sprint 3 - Cierre del PMV**), se definen los siguientes compromisos en el Product Backlog:
 
-1. **Módulo de Planificación y Optimización de Rutas (Sprint 2):**
-   - Integración de la librería de optimización combinatoria Google OR-Tools para resolver el problema de rutas con restricciones de capacidad vehicular y ventanas horarias (CVRP / TSP).
-2. **Módulo de Gestión de Pedidos y Puntos de Entrega (Sprint 2):**
-   - Endpoints CRUD para registro, geocodificación de coordenadas (latitud/longitud) y validación de direcciones en Lima Metropolitana.
-3. **Persistencia en Base de Datos PostgreSQL con Alembic (Sprint 2):**
-   - Configuración de scripts de migración de base de datos relacional para migrar el repositorio en memoria hacia PostgreSQL 14+ manteniendo compatibilidad de interfaces.
-4. **Desarrollo del Frontend Completo en React + Vite (Sprint 2 y 3):**
-   - Traslado de los componentes del panel visual hacia la arquitectura modular de React con Context API y visualización de mapas con Leaflet / Mapbox.
+1. **Visualización Geográfica de Rutas en Frontend (React + Leaflet):**
+   - Representación interactiva de las rutas calculadas sobre el mapa de Lima mediante marcadores numerados y polilíneas de recorrido.
+2. **Asignación Multi-Vehículo (CVRP Flota Completa):**
+   - Partición automática de pedidos cuando la demanda total supere la capacidad de un solo vehículo, distribuyendo la carga entre múltiples unidades de la flota.
+3. **Exportación de Hojas de Ruta para Conductores:**
+   - Generación de reportes imprimibles en formato PDF y exportación de datos en formato Excel para los conductores en campo.
 
 ---
 

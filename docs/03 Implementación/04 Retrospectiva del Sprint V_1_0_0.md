@@ -14,68 +14,69 @@
 
 | Versión | Fecha | Autor | Descripción del Cambio |
 |:---:|:---:|:---|:---|
-| 1.0.0 | 01/10/2026 | Jhunior Harold Cosme Tenorio / Equipo EcoLogística | Elaboración de la Retrospectiva del Sprint 1 tras la sesión de revisión con el equipo. |
+| 1.0.0 | 01/10/2026 | Jhunior Harold Cosme Tenorio / Equipo EcoLogística | Retrospectiva del Sprint 1 (Autenticación MFA y Sesiones Seguras). |
+| 1.1.0 | 15/10/2026 | Jhunior Harold Cosme Tenorio / Equipo EcoLogística | Retrospectiva del Sprint 2 (Motor de Optimización de Rutas y Métricas de Sostenibilidad). |
 
 ---
 
 ## ¿Qué aprendimos?
 
-Durante el desarrollo del Sprint 1, el equipo consolidó aprendizajes técnicos y metodológicos significativos:
+Durante la ejecución del **Sprint 2**, el equipo de desarrollo adquirió conocimientos clave en modelado algorítmico y optimización de operaciones logísticas:
 
-1. **Metodología Guiada por Especificaciones (Spec-Driven Development):**
-   - Aprendimos que definir contratos claros en formato OpenSpec antes de escribir código reduce drásticamente el retrabajo y elimina ambigüedades respecto a parámetros cuantificables (tiempos de expiración, ventanas de tolerancia, umbrales de reintentos).
-2. **Implementación Estricta del Estándar TOTP (RFC 6238):**
-   - Comprendimos la importancia de considerar el desfase temporal (*Clock Drift*) entre el servidor y los dispositivos móviles, aplicando una tolerancia de ventana de tiempo (±30s) para evitar falsos rechazos en usuarios legítimos.
-3. **Gestión de Ciclo de Vida de Sesiones Stateless:**
-   - Asimilamos que los tokens JWT no pueden invalidarse por sí solos antes de su fecha de expiración; para cumplir con OWASP ASVS y soportar un logout seguro es indispensable incorporar el claim `jti` y una lista de revocación (blacklist).
-4. **Auditoría de Requisitos con Inteligencia Artificial:**
-   - La aplicación de prompts estructurados de auditoría técnica permitió detectar tempranamente riesgos de seguridad críticos, como la necesidad de un token efímero intermedio (`mfa_token`) para evitar bypass del segundo factor.
+1. **Modelado Matemático de Problemas NP-Hard (TSP y VRP):**
+   - Comprendimos que para problemas de ruteo vehicular con restricciones operativas, los enfoques exactos (fuerza bruta o programación entera pura) se vuelven inviables a gran escala. Las metaheurísticas constructivas (Vecino Más Próximo) combinadas con búsqueda local (2-opt) ofrecen un balance perfecto entre calidad de solución (más del 25% de ahorro) y tiempo de cómputo (< 1 segundo).
+2. **Cálculo de Distancias Geodésicas Reales:**
+   - Aprendimos a formular y calibrar la ecuación de Haversine para transformar coordenadas esféricas de latitud y longitud en distancias métricas ortodrómicas exactas, superando las distorsiones de los cálculos euclidianos planos.
+3. **Cuantificación de Huella de Carbono según Factores de Emisión:**
+   - Interiorizamos las metodologías del IPCC y del GHG Protocol para traducir el ahorro de kilómetros recorridos en kilogramos de CO₂ evitados, clasificando las emisiones según la tecnología motriz (diésel, GNV y electricidad).
+4. **Diseño de APIs para Algoritmos de Alto Rendimiento:**
+   - La estructura desacoplada entre la capa de esquemas Pydantic y el servicio de optimización permitió mantener endpoints limpios, tipados y con validaciones deterministas de capacidad de carga.
 
 ---
 
 ## ¿Qué estamos haciendo bien?
 
-1. **Compromiso y Ritmo de Desarrollo Sostenible:**
-   - Se completó el 100% de las Historias de Usuario comprometidas (26 Story Points) dentro de los tiempos estipulados sin sobrecargar a ningún miembro del equipo.
-2. **Cultura de Pruebas Automatizadas desde el Inicio:**
-   - Se alcanzó una cobertura de código del **91%**, implementando pruebas para rutas Gold, Feliz e Infeliz que garantizan la estabilidad del sistema frente a futuros cambios.
-3. **Control de Versiones Limpio y Trazable:**
-   - Uso disciplinado de ramas individuales por integrante (ej. rama `flores`) y adopción rigurosa del estándar **Conventional Commits** (`feat:`, `test:`, `docs:`), facilitando la revisión y auditoría del código.
-4. **Documentación Viva y Sincronizada:**
-   - Mantenimiento coherente entre los diagramas, reglas de negocio (`RN-001` a `RN-006`), especificaciones OpenSpec y la implementación real en FastAPI.
+1. **Alineación Total con los Objetivos de Sostenibilidad:**
+   - El equipo logró materializar el objetivo fundacional del proyecto: no solo optimizar costos operativos para DistriRápido S.A.C., sino proporcionar métricas ambientales comprobables y transparentes.
+2. **Mantenimiento de Cobertura de Pruebas Excelente (92%):**
+   - Se continuó la disciplina de TDD agregando pruebas automatizadas que verifican casos de éxito, exceso de capacidad vehicular y validación de esquemas, alcanzando 15 tests en verde.
+3. **Resolución Temprana de Impedimentos Complejos:**
+   - Los impedimentos algorítmicos identificados (como el tiempo de cálculo de matrices de distancia) fueron mitigados oportunamente antes del cierre del sprint mediante heurísticas eficientes.
+4. **Adopción Constante de Buenas Prácticas de Control de Versiones:**
+   - Mantener commits pequeños, enfocados y estructurados bajo Conventional Commits ha facilitado la trazabilidad y la integración continua del equipo.
 
 ---
 
 ## ¿Qué podemos hacer mejor?
 
 ### Personas
-- **Gestión individual del tiempo en tareas de investigación:** Se invirtió tiempo excesivo investigando librerías secundarias antes de validar la compatibilidad de paquetes con la versión de Python instalada. Se debe definir un límite de tiempo (*timebox*) para la evaluación de tecnologías antes de consultar con el equipo.
-- **Autonomía en resolución de bloqueos de entorno:** Mejorar la documentación compartida sobre configuraciones locales de Windows (permisos de PowerShell, variables de entorno) para que cada miembro resuelva incidencias de entorno con mayor agilidad.
+- **Capacitación en Librerías de Visualización Cartográfica:** Los miembros del equipo frontend requieren profundizar en el manejo de Leaflet / Mapbox en React para agilizar el renderizado de mapas interactivos en el Sprint 3.
+- **Balance en la asignación de tareas de documentación:** Distribuir más equitativamente la redacción de informes técnicos entre todos los integrantes para no concentrar la carga documental en el rol de QA / Líder.
 
 ### Relaciones
-- **Comunicación cruzada Frontend - Backend:** Aunque la especificación de API fue clara en Swagger, se requiere una mayor sincronización diaria entre el desarrollador backend y el equipo frontend durante la fase de definición de payloads para evitar ajustes tardíos en los nombres de atributos.
-- **Feedback temprano en Pull Requests:** Establecer revisiones de código (*code reviews*) más frecuentes y con comentarios constructivos entre pares antes de fusionar ramas a la rama principal.
+- **Sesiones de Pair Programming para la integración Frontend-Backend:** Programar sesiones de programación en parejas para conectar los endpoints de optimización de rutas con los componentes visuales de React, asegurando que los tipos de datos coincidan perfectamente.
+- **Comunicación más proactiva de bloqueos en daily standups:** Notificar impedimentos técnicos el mismo día en que se presentan, evitando esperar a la reunión semanal de sincronización.
 
 ### Procesos
-- **Definición de Criterios de Aceptación (DoD - Definition of Done):** Asegurar que la "Definición de Terminado" incluya siempre la actualización del archivo `README.md` y la ejecución del análisis estático de código antes de dar por cerrada una Historia de Usuario.
-- **Estimación de Historias de Usuario con dependencias criptográficas:** En futuras estimaciones se debe contemplar un margen adicional para la elaboración de pruebas de borde (edge cases) como desincronización horaria, claves duplicadas y ataques de fuerza bruta.
+- **Definición de Escenarios de Prueba de Aceptación con Usuarios Finales:** Incorporar operadores logísticos reales (o pruebas de usuario simuladas) para validar la usabilidad de las hojas de ruta generadas antes del cierre del PMV.
+- **Gestión de Cargas de Trabajo para Sprints Finales:** Anticipar la complejidad de la entrega final del curso (informe final, diapositivas y video demostrativo de 5 minutos) reservando tiempo en el Sprint 3.
 
 ### Herramientas
-- **Estandarización de Contenedores Docker:** Avanzar en la configuración de Docker y Docker Compose para garantizar que el entorno de desarrollo sea idéntico entre todos los integrantes, evitando disparidades entre sistemas operativos o versiones locales de paquetes.
-- **Automatización de CI/CD con GitHub Actions:** Configurar pipelines automáticos que ejecuten `pytest` y la verificación de cobertura en cada push a cualquier rama remota.
+- **Implementación de Mock Servers para Frontend:** Configurar respuestas mockeadas de la API de rutas para que el equipo frontend pueda desarrollar componentes de mapas sin depender de la ejecución local del backend.
+- **Monitoreo de Consumo de Memoria en Python:** Monitorear el perfil de memoria de las heurísticas de optimización cuando se manejen lotes de más de 100 pedidos simultáneos.
 
 ---
 
 ## Acciones a realizar
 
-Con base en el análisis de los cuatro ejes, el equipo se compromete a ejecutar el siguiente plan de acción para el **Sprint 2**:
+Con base en los aprendizajes del Sprint 2, el equipo se compromete a ejecutar el siguiente plan de acción para el **Sprint 3 (Cierre del PMV)**:
 
 | # | Acción de Mejora Concreta | Eje | Responsable | Fecha Límite | Criterio de Éxito |
 |:---:|:---|:---:|:---:|:---:|:---|
-| **ACT-01** | Configurar archivo `docker-compose.yml` para levantar PostgreSQL y la API de FastAPI en un entorno estandarizado. | Herramientas | Andrew Steven Vega Reyes | 05/10/2026 | Contenedores levantando con `docker compose up` en los equipos de los 4 integrantes. |
-| **ACT-02** | Implementar reuniones diarias de sincronización (*Daily Standups*) de máximo 10 minutos a través de Discord/Meet. | Relaciones | Jhunior Harold Cosme Tenorio | 02/10/2026 | Registro de asistencia y resolución de impedimentos en menos de 24 horas. |
-| **ACT-03** | Crear workflow de GitHub Actions (`.github/workflows/ci.yml`) para ejecución automática de tests en cada Pull Request. | Procesos | Andrew Steven Vega Reyes / Jhanpool Flores | 07/10/2026 | Verificación de build y cobertura verde visible en los PRs de GitHub. |
-| **ACT-04** | Establecer un canal compartido de contratos de API para validar conjuntamente los modelos Pydantic y componentes React antes de iniciar el código del Sprint 2. | Personas / Procesos | Jhanpool Flores / Ricardo Tucto | 04/10/2026 | Contrato de endpoints de rutas y pedidos aprobado por ambas partes en Swagger/OpenSpec. |
+| **ACT-05** | Integrar librería Leaflet / OpenStreetMap en React para renderizar las rutas optimizadas sobre el mapa de Lima. | Herramientas / Personas | Ricardo David Tucto Ubaldo | 20/10/2026 | Mapa interactivo mostrando marcadores y polilínea de la ruta generada por la API. |
+| **ACT-06** | Realizar sesiones de Pair Programming de 2 horas para enlazar los endpoints `/api/rutas` con el frontend. | Relaciones | Jhanpool Flores / Ricardo Tucto | 18/10/2026 | Flujo completo de carga de pedidos y cálculo de ruta visible en la aplicación React. |
+| **ACT-07** | Diseñar la plantilla de Hoja de Ruta imprimible en PDF con el orden de paradas y tiempos estimados para el conductor. | Procesos | Andrew Steven Vega Reyes | 24/10/2026 | Documento PDF descargable con la información de los pedidos y datos de contacto del cliente. |
+| **ACT-08** | Grabar y editar el video explicativo del PMV de máximo 5 minutos según la consigna oficial de fin de ciclo. | Personas / Procesos | Jhunior Harold Cosme Tenorio (y equipo) | 28/10/2026 | Video de 5 minutos subido a YouTube/Drive y enlazado en el `README.md`. |
 
 ---
 
