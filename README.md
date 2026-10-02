@@ -18,7 +18,8 @@
 14. [Ejecucion de Pruebas](#ejecucion-de-pruebas)
 15. [Estandares y Buenas Practicas Aplicadas](#estandares-y-buenas-practicas-aplicadas)
 16. [Metodologia de Desarrollo](#metodologia-de-desarrollo)
-17. [Licencia](#licencia)
+17. [Entregables del Sprint 1](#entregables-del-sprint-1-implementacion)
+18. [Licencia](#licencia)
 
 ---
 
@@ -337,7 +338,22 @@ Conventional Commits — Mensajes de commit estandarizados (feat:, fix:, docs:, 
 
 Desarrollo incremental basado en MVP
 
-Licencia
+---
+
+## Entregables del Sprint 1 (Implementacion)
+
+En cumplimiento con la consigna de la asignatura **Taller de Proyectos 2**, a continuación se presentan los enlaces relativos hacia los documentos oficiales de gestión, arquitectura y cierre del **Sprint 1** alojados en la carpeta `docs/03 Implementación`:
+
+| Entregable | Documento Oficial | Descripción del Artefacto |
+|:---|:---|:---|
+| **01. Informe de Estado** | [01 Informe de estado del proyecto V_1_0_0.md](docs/03%20Implementación/01%20Informe%20de%20estado%20del%20proyecto%20V_1_0_0.md) | Informe ejecutivo sobre el avance del Sprint 1, Historias de Usuario completadas, métricas y pendientes. |
+| **02. Registro de Impedimentos** | [02 Registro de Impedimentos V_1_0_0.md](docs/03%20Implementación/02%20Registro%20de%20Impedimentos%20V_1_0_0.md) | Matriz de obstáculos técnicos (Python 3.14, PowerShell, clock drift TOTP, revocación JTI) con trazabilidad y resolución. |
+| **03. Revisión del Sprint** | [03 Revisión del Sprint V_1_0_0.md](docs/03%20Implementación/03%20Revisión%20del%20Sprint%20V_1_0_0.md) | Detalle de las 5 Historias de Usuario desarrolladas, resumen de la demostración a stakeholders y backlog futuro. |
+| **04. Retrospectiva del Sprint** | [04 Retrospectiva del Sprint V_1_0_0.md](docs/03%20Implementación/04%20Retrospectiva%20del%20Sprint%20V_1_0_0.md) | Análisis crítico en los cuatro ejes (Personas, Relaciones, Procesos, Herramientas) y plan de acción de mejora para el Sprint 2. |
+
+---
+
+## Licencia
 Proyecto desarrollado con fines academicos para el curso Taller de Proyectos 2 – Ingenieria de Sistemas e Informatica.
 
 Enlaces
