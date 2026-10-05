@@ -9,6 +9,119 @@ versionado sigue [SemVer](https://semver.org/lang/es/) (`MAJOR.MINOR.PATCH`).
 
 ## [No publicado]
 
+### Sprint 2 implementado (US-002, US-004, US-005, US-007)
+
+- **US-004**: las respuestas de ruta incorporan `ahorro_co2_kg`,
+  `ahorro_co2_pct`, `ahorro_distancia_pct` y `sin_reduccion_significativa`.
+  Los porcentajes nunca son negativos (RN-018) y las reducciones inferiores al
+  1 % se reportan como "sin reducción significativa" en lugar de mostrar un
+  ahorro engañoso. Los kilos ahorrados se calculan con el factor de emisión real
+  del vehículo, no con la diferencia en kilómetros. Nueva pestaña
+  **Impacto Ambiental** con la comparación lado a lado.
+- **US-005**: el mapa Leaflet/OpenStreetMap detecta el fallo del proveedor de
+  tiles y muestra un mensaje controlado con opción de reintentar, en lugar de
+  presentar un mapa en blanco. Si el mapa base no carga, el orden de entrega
+  sigue visible en la tabla.
+- **US-002**: `PUT /api/v1/rutas/{id}` reemplaza los puntos de una ruta
+  guardada y recalcula distancia, tiempo y CO₂. Interfaz con botones
+  **Editar** (multiselección de puntos, validación de capacidad) y
+  **Eliminar** con confirmación.
+- **US-007**: `GET /api/v1/rutas` acepta `desde`, `hasta` y `estado`. Las fechas
+  admiten `YYYY-MM-DD` o ISO completo, el rango es inclusivo y un formato
+  inválido devuelve `400` explicando el formato esperado en vez de ignorarse en
+  silencio. La interfaz muestra un aviso cuando el filtro no arroja resultados.
+- **Corrección de defectos**:
+  - `PUT /rutas/{id}` no confirmaba la transacción, por lo que las ediciones se
+    perdían al cerrar la sesión. Ahora la edición persiste y no crea una ruta
+    duplicada.
+  - El borrado de una ruta dejaba filas huérfanas en `ruta_puntos`.
+  - RN-013 se aplica de forma explícita: no se puede eliminar una ruta con
+    entregas en curso o completadas.
+  - Los filtros de fecha con `hasta` exclusive del día completo excluían las
+    rutas creadas ese mismo día.
+- **Depuración completa (auditoría de API)**: se corrigieron los siguientes
+  defectos detectados al revisar cada endpoint contra `SPECS.md`:
+  - `GET /api/v1/auth/me` no devolvía el rol del usuario. `UsuarioResponse` ahora
+    incluye `rol` anidado con `RolResponse`, y el campo es obligatorio para
+    reflejar que `id_rol` es `NOT NULL` en la base de datos. El hash de la
+    contraseña nunca se expone.
+  - `POST /auth/register` era público, lo que permitía que cualquiera creara un
+    Administrador y escalara privilegios. Ahora exige rol Administrador.
+  - `DELETE /puntos-entrega/{id}` dejaba filas huérfanas en `ruta_puntos` al
+    borrar un punto asignado a una ruta. Ahora se bloquea con `400`.
+  - `PUT /puntos-entrega/{id}` no existía en la API. Se añadió con las mismas
+    validaciones de creación y devuelve el recurso actualizado.
+  - `GET /api/v1/health` figuraba en `SPECS.md` sin implementar. Ahora responde
+    `200` con el estado de la base de datos y devuelve `503` cuando la base de
+    datos no responde, en lugar de aparentar un servicio sano.
+  - El arranque de la API fallaba si la base de datos no estaba disponible, con
+    lo que `/health` no podía reportar el problema. El inicializador registra el
+    error y la API arranca para que el chequeo de salud sea útil.
+  - `RutaResponse.puntos` usaba una lista mutable por defecto, compartida entre
+    instancias. Ahora usa `default_factory`.
+- **Correcciones en el frontend**:
+  - `App.jsx` usaba su propia instancia de Axios, sin timeout ni manejo de
+    errores, y cerraba la sesión en silencio si el backend no respondía. Ahora
+    usa el cliente compartido, solo cierra la sesión ante un `401` y ofrece
+    reintentar cuando el servidor está caído.
+  - `Login.jsx` usaba `fetch` sin timeout y mostraba errores en inglés. Ahora usa
+    el cliente compartido, muestra mensajes en español y evita el doble envío.
+  - El botón "Reintentar" del mapa recargaba toda la aplicación con
+    `window.location.reload()`, perdiendo el estado. Ahora solo recrea la capa de
+    tiles.
+  - El contador de fallos de tiles se reiniciaba con cada tile correcto, por lo
+    que un proveedor de mapas parcialmente caído no mostraba aviso. Ahora los
+    errores solo se limpian al reintentar.
+  - `MapView` y `MapPicker` no destruían la instancia de Leaflet al
+    desmontarse, duplicando contenedores al cambiar de pestaña. Ahora liberan el
+    mapa en el cleanup del efecto.
+- **Verificación**: 51 pruebas unitarias (`pytest`), una auditoría de API de
+  extremo a extremo (`auditoria_api.py`, sin anomalías) y un smoke test
+  (`smoke_sprint2.py`) cubren los criterios de aceptación, el aislamiento entre
+  usuarios y los permisos por rol.
+
+### Desviación conocida
+
+- **RN-014**: si la carga supera la capacidad del vehículo, la API rechaza la
+  operación completa en lugar de dejar los puntos excedentes "pendientes". Es
+  el comportamiento más simple de Implementar y de explicar; se documenta como
+  desviación respecto del texto de la regla.
+- **HTTPS**: el entorno local sirve por HTTP; la Johns Hopkins exige HTTPS en
+  Staging, previsto para el Sprint 3.
+
+### Sprint 1 verificado contra los criterios de aceptación
+
+Se auditó el código contra los ítems **US-001, US-003, EN-01 y EN-02** (21 Story
+Points, 05/10/2026 – 18/10/2026) y se corrigieron las brechas encontradas:
+
+- **EN-02**: las peticiones sin token o con token inválido devolvían `403`; ahora
+  devuelven `401 Unauthorized` con cabecera `WWW-Authenticate: Bearer`, según el
+  criterio de aceptación.
+- **US-001**: se valida que la dirección no sea vacío y que las coordenadas no
+  correspondan a una geolocalización fallida (`0,0`); el sistema rechaza el punto
+  con un mensaje explicativo en lugar de registrarlo.
+- **US-003 / EN-01**: los límites de 2 a 20 puntos por ruta se validan en el
+  endpoint y devuelven mensajes en español; antes el mensaje provenía del
+  validador de Pydantic. La interfaz deshabilita los botones de cálculo cuando
+  la selección es inválida e informa el límite alcanzado.
+- **Corrección de defecto**: `GET /api/v1/rutas/{id}/puntos` serializaba la
+  entidad intermedia `RutaPunto` y fallaba en tiempo de ejecución; ahora devuelve
+  los datos del punto correctamente.
+- Se eliminó la duplicación de cálculo entre `POST /rutas/optimizar` y
+  `POST /rutas`, centralizándolo en una función compartida.
+
+### Añadido
+
+- Suite de pruebas automatizadas en `src/backend/tests/` (25 pruebas) que cubre
+  el motor de ruteo, las validaciones de entrada y la seguridad JWT, incluidas
+  las pruebas del SLA de 5 segundos con 20 puntos de EN-01.
+
+### Documentado como desviación
+
+- **RNF-02 (HTTPS)**: el desarrollo y la demostración se realizan sobre HTTP en
+  `localhost`. El cifrado en tránsito queda planteado para el ambiente de
+  Staging, que se configura en el Sprint 3 con EN-03.
+
 ### Cambios documentales en curso
 
 Saneamiento de coherencia interna entre los artefactos de las fases de Inicio y
