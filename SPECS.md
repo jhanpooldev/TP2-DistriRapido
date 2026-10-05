@@ -214,10 +214,17 @@ Visualizar reportes.
 
 # API (Resumen)
 
-## Autenticación
-POST /api/auth/login
+## Autenticación y Gestión de Sesiones (MFA)
 POST /api/auth/register
+POST /api/auth/login
+POST /api/auth/mfa/setup
+POST /api/auth/mfa/enable
+POST /api/auth/mfa/verify
+POST /api/auth/mfa/disable
+POST /api/auth/logout
 POST /api/auth/refresh
+GET /api/auth/me
+GET /api/auth/sessions
 
 ## Usuarios
 GET /api/usuarios

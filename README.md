@@ -1,4 +1,4 @@
-﻿# Sistema Web de Optimizacion de Rutas Sostenibles - EcoLogistica Lima
+# Sistema Web de Optimizacion de Rutas Sostenibles - EcoLogistica Lima
 
 ## Tabla de Contenidos (TOC)
 
@@ -18,7 +18,8 @@
 14. [Ejecucion de Pruebas](#ejecucion-de-pruebas)
 15. [Estandares y Buenas Practicas Aplicadas](#estandares-y-buenas-practicas-aplicadas)
 16. [Metodologia de Desarrollo](#metodologia-de-desarrollo)
-17. [Licencia](#licencia)
+17. [Entregables del Sprint 1](#entregables-del-sprint-1-implementacion)
+18. [Licencia](#licencia)
 
 ---
 
@@ -141,9 +142,13 @@ El proceso logistico identificado incluye:
 - Dashboard con metricas clave
 - Filtros por conductor, vehiculo y zona
 
-### Seguridad
-- Autenticacion JWT con expiracion de 8 horas
-- Control de acceso basado en roles (administrador, conductor, cliente)
+### Seguridad y Gestión de Acceso
+- Autenticación JWT con expiración de 8 horas (`RN-005`).
+- Autenticación Multifactor (MFA/2FA) basada en TOTP RFC 6238 (Google Authenticator, Microsoft Authenticator) y códigos de recuperación de respaldo.
+- Desafío en dos pasos con token efímero (`mfa_token`, 5 min) para mitigar elevación de privilegios.
+- Gestión segura de ciclo de vida de sesiones con revocación inmediata en Logout mediante lista negra de identificadores de token (`jti`).
+- Protección contra ataques de fuerza bruta mediante bloqueo temporal de 15 minutos tras 3 intentos fallidos consecutivos (`RN-002`).
+- Control de acceso basado en roles RBAC (Administrador, Operador Logístico, Gerente).
 
 ---
 
@@ -333,7 +338,24 @@ Conventional Commits — Mensajes de commit estandarizados (feat:, fix:, docs:, 
 
 Desarrollo incremental basado en MVP
 
-Licencia
+---
+
+## Entregables de Implementacion (Sprint 1 y Sprint 2)
+
+En cumplimiento con las consignas oficiales de la asignatura **Taller de Proyectos 2** (Programa Académico de Ingeniería de Sistemas e Informática), a continuación se presentan los enlaces relativos hipervinculados hacia los documentos oficiales de gestión, arquitectura y control de versiones alojados en la carpeta `docs/03 Implementación`:
+
+| Entregable | Documento Oficial | Cobertura Sprint 1 | Cobertura Sprint 2 |
+|:---|:---|:---|:---|
+| **01. Informe de Estado** | [01 Informe de estado del proyecto V_1_0_0.md](docs/03%20Implementación/01%20Informe%20de%20estado%20del%20proyecto%20V_1_0_0.md) | Avance en arquitectura, seguridad y MFA (26 SP). | Avance en motor de optimización de rutas (TSP/2-opt) y métricas de CO₂ (30 SP). |
+| **02. Registro de Impedimentos** | [02 Registro de Impedimentos V_1_0_0.md](docs/03%20Implementación/02%20Registro%20de%20Impedimentos%20V_1_0_0.md) | Resolución de IMP-01 a IMP-06 (PowerShell, TOTP drift, bypass MFA, tokens revocables). | Resolución de IMP-07 a IMP-10 (Matriz Haversine, complejidad 2-opt, exceso de carga, CO₂). |
+| **03. Revisión del Sprint** | [03 Revisión del Sprint V_1_0_0.md](docs/03%20Implementación/03%20Revisión%20del%20Sprint%20V_1_0_0.md) | Detalle de HU-01 a HU-05 y demo con Google Authenticator. | Detalle de HU-06 a HU-09 y demo de rutas en Lima Metropolitana con 26.3% de ahorro. |
+| **04. Retrospectiva del Sprint** | [04 Retrospectiva del Sprint V_1_0_0.md](docs/03%20Implementación/04%20Retrospectiva%20del%20Sprint%20V_1_0_0.md) | Retrospectiva en 4 ejes y plan de acción ACT-01 a ACT-04. | Retrospectiva en 4 ejes y plan de acción ACT-05 a ACT-08 para el cierre del PMV. |
+
+> *Nota de Navegación:* Todos los documentos cuentan con enlace de retorno hacia este `README.md` principal.
+
+---
+
+## Licencia
 Proyecto desarrollado con fines academicos para el curso Taller de Proyectos 2 – Ingenieria de Sistemas e Informatica.
 
 Enlaces
