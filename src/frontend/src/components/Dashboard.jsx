@@ -114,6 +114,12 @@ export default function Dashboard({ user, onLogout }) {
     setActiveTab('mapa')
   }
 
+  const descartarPreview = () => {
+    setPreviewRoute(null)
+    setSelectedRoute(null)
+    setActiveTab('rutas')
+  }
+
   const mensajeDeValidacion = () => {
     if (cantidadPuntos === 0) return 'Agrega al menos 2 pedidos para poder calcular la ruta.'
     if (cantidadPuntos === 1) return 'Falta al menos 1 pedido: una ruta necesita 2 puntos.'
@@ -392,8 +398,9 @@ export default function Dashboard({ user, onLogout }) {
 
           {previewRoute && (
             <div className="alert alert-info">
-              Vista previa: esta ruta todavia no esta guardada. Pulsa
-              <strong> Confirmar y guardar </strong> en la pestaña Rutas para conservarla.
+              Vista previa: esta ruta todavia no esta guardada. Si te satisface,
+              pulsa <strong>Confirmar y guardar</strong>; si no, usa{' '}
+              <strong>Descartar y volver a Rutas</strong> para ajustar la seleccion.
             </div>
           )}
 
@@ -420,6 +427,17 @@ export default function Dashboard({ user, onLogout }) {
                     </div>
                   </div>
                 </div>
+
+                {previewRoute && (
+                  <div className="btn-grupo sep">
+                    <button type="button" onClick={confirmRuta}>
+                      Confirmar y guardar
+                    </button>
+                    <button type="button" className="btn-secondary" onClick={descartarPreview}>
+                      Descartar y volver a Rutas
+                    </button>
+                  </div>
+                )}
 
                 <MapView puntos={ruta.puntos} center={[-12.115, -76.97]} zoom={12} />
 
