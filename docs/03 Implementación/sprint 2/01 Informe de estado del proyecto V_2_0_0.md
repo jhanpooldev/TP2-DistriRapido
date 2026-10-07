@@ -1,4 +1,4 @@
-# Revisión del sprint
+# Informe de estado del proyecto
 
 [← Volver al README principal](../../../README.md)
 
@@ -9,6 +9,8 @@
 **Líder del Proyecto:** Jhunior Harold Cosme Tenorio
 
 **Sprint:** 2 – Iteración de mayor valor sobre lo construido en el Sprint 1
+
+**Periodo:** 19/10/2026 – 01/11/2026
 
 ---
 

@@ -223,7 +223,7 @@ El repositorio cumple las **cinco estructuras requeridas** del PFA:
 | 1 | `docs/` | Documentación (Inicio, Planificación, Implementación) |
 | 2 | `src/` | Código fuente (backend y frontend) |
 | 3 | `pruebas/` | Pruebas: plan, evidencias e índice de las suites automatizadas |
-| 4 | `base de datos/` | Scripts SQL (DDL del esquema) |
+| 4 | `base de datos/` | Scripts SQL (DDL del esquema, en `src/backend/esquema.sql`) |
 | 5 | `modelos/` | Modelamiento (C4, base de datos, reglas de negocio) |
 
 ```text
@@ -260,6 +260,7 @@ El repositorio cumple las **cinco estructuras requeridas** del PFA:
 |   |   |-- tests/                 # Pruebas pytest
 |   |   |-- auditoria_api.py        # Auditoría de extremo a extremo de la API
 |   |   |-- smoke_sprint2.py        # Verificación de flujo completo
+|   |   |-- esquema.sql             # DDL PostgreSQL (generado de los modelos ORM)
 |   |   `-- requirements.txt
 |   `-- frontend/                # React + Vite
 |       |-- src/
@@ -273,9 +274,8 @@ El repositorio cumple las **cinco estructuras requeridas** del PFA:
 |
 |-- pruebas/                    # Estructura 3: Pruebas
 |   `-- README.md               # Índice: plan, evidencias y suites automatizadas
-|-- base de datos/              # Estructura 4: Scripts SQL
-|   |-- esquema.sql             # DDL PostgreSQL (generado de los modelos ORM)
-|   `-- README.md               # Índice de contenidos
+|-- base de datos/              # Estructura 4: Índice de Scripts SQL
+|   `-- README.md               # Índice de contenidos (DDL en src/backend/esquema.sql)
 `-- modelos/                    # Estructura 5: Modelamiento
     `-- README.md               # Índice de modelos (C4, base de datos, RN)
 ```
@@ -496,29 +496,29 @@ El detalle del backlog, los sprints y la Definition of Done se encuentran en
 
 | # | Documento |
 | :--- | :--- |
-| 01 | Selección del enfoque del proyecto |
-| 02 | Acta de constitución del proyecto |
-| 03 | Declaración de la visión |
-| 04 | Registro de supuestos y restricciones |
-| 05 | Registro de interesados |
-| 06 | Requisitos funcionales (RF-001 a RF-014) |
-| 07 | Requisitos no funcionales (RNF-001 a RNF-015) |
-| 08 | Identificación y perfiles de usuarios |
-| 09 | Reglas de negocio y trazabilidad (RN-001 a RN-020) |
-| 10 | Evaluación e identificación del stack tecnológico |
-| 11 | Diseño e ingeniería de base de datos |
-| 12 | Arquitectura de software (modelo C4) |
-| 13 | Análisis multidimensional de restricciones |
-| 14 | Especificación MFA y sesiones (no implementada) |
+| 01 | [Selección del enfoque del proyecto](docs/inicio/01.%20Selección%20del%20enfoque%20del%20proyecto%20V_1_0_0.md) |
+| 02 | [Acta de constitución del proyecto](docs/inicio/02.%20Acta%20de%20constitución%20V_1_0_0.md) |
+| 03 | [Declaración de la visión](docs/inicio/03.%20Declaración%20de%20la%20visión%20V_1_0_0.md) |
+| 04 | [Registro de supuestos y restricciones](docs/inicio/04.%20Registro%20de%20supuestos%20y%20restricciones%20V_1_0_0.md) |
+| 05 | [Registro de interesados](docs/inicio/05.%20Registro%20de%20interesados%20V_1_0_0.md) |
+| 06 | [Requisitos funcionales (RF-001 a RF-014)](docs/inicio/06.%20Requisitos%20funcionales%20V_1_0_0.md) |
+| 07 | [Requisitos no funcionales (RNF-001 a RNF-015)](docs/inicio/07.%20Requisitos%20no%20funcionales%20V_1_0_0.md) |
+| 08 | [Identificación y perfiles de usuarios](docs/inicio/08.%20Usuarios%20V_1_0_0.md) |
+| 09 | [Reglas de negocio y trazabilidad (RN-001 a RN-020)](docs/inicio/09.%20Reglas%20de%20negocio%20V_1_0_0.md) |
+| 10 | [Evaluación e identificación del stack tecnológico](docs/inicio/10.%20Stack%20tecnológico%20V_1_0_0.md) |
+| 11 | [Diseño e ingeniería de base de datos](docs/inicio/11.%20Base%20de%20datos%20V_1_0_0.md) |
+| 12 | [Arquitectura de software (modelo C4)](docs/inicio/12.%20Modelo%20C4%20V_1_0_0.md) |
+| 13 | [Análisis multidimensional de restricciones](docs/inicio/13.%20Restricciones%20V_1_0_0.md) |
+| 14 | [Especificación MFA y sesiones (no implementada)](docs/inicio/14.%20Especificacion%20MFA%20y%20Sesiones%20V_1_0_0.md) |
 
 ### Fase de Planificación (`docs/planificacion/`)
 
 | # | Documento |
 | :--- | :--- |
-| 01 | Transformando a ágil (backlog priorizado y Definition of Done) |
-| 02 | Artefactos Jira |
-| 03 | Registro de riesgos |
-| 04 | Presupuesto del proyecto |
+| 01 | [Transformando a ágil (backlog priorizado y Definition of Done)](docs/planificacion/01%20Transformando%20a%20ágil%20V_1_0_0.md) |
+| 02 | [Artefactos Jira](docs/planificacion/02%20Artefactos%20Jira%20V_1_0_0.md) |
+| 03 | [Registro de riesgos](docs/planificacion/03%20Registro%20de%20riesgos%20V_1_0_0.md) |
+| 04 | [Presupuesto del proyecto](docs/planificacion/04%20Presupuesto%20del%20proyecto%20V_1_0_0.md) |
 
 ### Fase de Implementación (`docs/03 Implementación/`)
 

@@ -14,10 +14,12 @@ versionado sigue [SemVer](https://semver.org/lang/es/) (`MAJOR.MINOR.PATCH`).
 - El repositorio cumple ahora las cinco estructuras requeridas del PFA a nivel de
   raíz: `docs/` (Documentación), `src/` (Código), `pruebas/` (Pruebas),
   `base de datos/` (Scripts SQL) y `modelos/` (Modelamiento).
-- **`base de datos/esquema.sql`**: DDL completo de PostgreSQL, generado
+- **`src/backend/esquema.sql`**: DDL completo de PostgreSQL, generado
   automáticamente desde los modelos SQLAlchemy (`src/backend/app/models`) e
-  incluyendo constraints, checks e índices. Complementa la ausencia de migraciones
-  (el proyecto crea el esquema con `Base.metadata.create_all` al arrancar).
+  incluyendo constraints, checks e índices. Vive dentro del backend, junto al
+  código que lo usa, para mantener limpia la raíz del proyecto. Complementa la
+  ausencia de migraciones (el proyecto crea el esquema con
+  `Base.metadata.create_all` al arrancar).
 - **`pruebas/`**: índice que consigna el plan de pruebas y las evidencias, y
   referencia las suites automatizadas (`src/backend/tests`) y las herramientas de
   verificación de extremo a extremo (`auditoria_api.py`, `smoke_sprint2.py`).

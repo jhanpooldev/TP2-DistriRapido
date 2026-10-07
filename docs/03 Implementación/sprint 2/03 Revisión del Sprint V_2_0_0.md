@@ -10,6 +10,8 @@
 
 **Sprint:** 2
 
+**Periodo:** 19/10/2026 – 01/11/2026
+
 ---
 
 ## Control de Versiones del Documento

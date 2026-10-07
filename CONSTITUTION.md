@@ -20,7 +20,7 @@ El proyecto será desarrollado como un Producto Mínimo Viable (PMV) durante un 
 
 /pruebas            # Estructura 3: Pruebas (plan, evidencias, índice de suites)
 
-/base de datos      # Estructura 4: Scripts SQL (esquema.sql)
+/base de datos      # Estructura 4: Índice de Scripts SQL (DDL en src/backend/esquema.sql)
 
 /modelos            # Estructura 5: Modelamiento (C4, base de datos, RN)
 

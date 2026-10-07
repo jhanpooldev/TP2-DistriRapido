@@ -10,7 +10,7 @@ Siempre utiliza una estructura de proyecto modular y mantenible.
 /src/backend        # Estructura 2: Código - FastAPI (Python)
 /src/frontend       # Estructura 2: Código - React + Vite
 /pruebas            # Estructura 3: Pruebas (plan, evidencias, índice de suites)
-/base de datos      # Estructura 4: Scripts SQL (esquema.sql)
+/base de datos      # Estructura 4: Índice de Scripts SQL (DDL en src/backend/esquema.sql)
 /modelos            # Estructura 5: Modelamiento (C4, base de datos, RN)
 
 

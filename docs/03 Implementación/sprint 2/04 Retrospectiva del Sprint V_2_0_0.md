@@ -1,4 +1,4 @@
-# Reprospectiva del sprint
+# Retrospectiva del sprint
 
 [← Volver al README principal](../../../README.md)
 
@@ -9,6 +9,8 @@
 **Líder del Proyecto:** Jhunior Harold Cosme Tenorio
 
 **Sprint:** 2
+
+**Periodo:** 19/10/2026 – 01/11/2026
 
 ---
 
@@ -36,7 +38,7 @@
 4. **El rendimiento del motor quedó holgado frente al SLA.** Con 20 puntos, las cinco
    ejecuciones medidas se situaron entre 17.9 ms y 20.2 ms, muy por debajo de los
    5 segundos exigidos por EN-01. La heurística NN + 2-opt cumple con holgura, lo que
-   permite relever el número de puntos en un sprint futuro.
+   permite reevaluar el número de puntos en un sprint futuro.
 5. **Las interfaces heredan los defectos de sus dependencias.** El botón Reintentar
    recargaba la aplicación y las instancias de Leaflet no se destruían; ninguno de los
    dos problemas estaba en la lógica de negocio.
@@ -59,7 +61,7 @@
 
 - **Distribución de la revisión entre pares.** La revisión del código de rutas y la
   del motor se concentraron en el rol de backend. Rotar revisores entre sprints
-  Sesión allows spreading the contexto.
+  reparte el contexto del motor.
 - **Práctica del motor por más de una persona.** `haversine`, `nearest_neighbor` y
    `two_opt` solo los comprende a fondo quien los escribió, lo que genera un punto
    único de falla para el Sprint 3.
@@ -71,7 +73,7 @@
   esquema compartido evitaría la espera entre capas.
 - **Documentar el alcance de cada sprint en el momento de la planificación.** Durante
    este sprint se detectó que los entregables de `docs/03 Implementación/`
-   correspondían al Sprint 2 pese a nombrarse Sprint 1. La discrepancia seOrigins en
+   correspondían al Sprint 2 pese a nombrarse Sprint 1. La discrepancia se originó en
    una actualización posterior de esos archivos.
 
 ### Procesos
