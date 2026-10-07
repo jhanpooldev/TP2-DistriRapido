@@ -9,7 +9,7 @@ const OSM_ATTRIBUTION = '&copy; <a href="https://www.openstreetmap.org/copyright
 
 const ICON = L.divIcon({
   className: '',
-  html: `<div style="background:#c0392b;color:#fff;border-radius:50% 50% 50% 0;transform:rotate(-45deg);width:30px;height:30px;border:2px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,.35)"><div style="transform:rotate(45deg);width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:13px">&#128205;</div></div>`,
+  html: `<div style="background:#4a7fa5;color:#fff;border-radius:50% 50% 50% 0;transform:rotate(-45deg);width:30px;height:30px;border:2px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,.28)"><div style="transform:rotate(45deg);width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:13px">&#128205;</div></div>`,
   iconSize: [30, 30],
   iconAnchor: [15, 30],
   popupAnchor: [0, -28],
@@ -166,18 +166,14 @@ export default function MapPicker({ latitud, longitud, onPick }) {
     setMensaje({ tipo: 'ok', texto: `Ubicacion fijada: ${item.direccion}` })
   }
 
-  const estiloMensaje = tipo =>
-    tipo === 'error' ? '#c0392b' : tipo === 'ok' ? '#1e8449' : '#2c5f8a'
-
   return (
     <div>
-      <form onSubmit={buscar} style={{ display: 'flex', gap: '10px', marginBottom: '12px', flexWrap: 'wrap' }}>
+      <form onSubmit={buscar} className="picker-busqueda">
         <input
           type="text"
           value={query}
           onChange={e => setQuery(e.target.value)}
           placeholder="Busca una calle o avenida (ej. Av. Javier Prado, Lima)"
-          style={{ flex: 1, minWidth: '240px', padding: '10px 12px', border: '1px solid #ccc', borderRadius: '4px' }}
         />
         <button type="submit" disabled={buscando}>
           {buscando ? 'Buscando...' : 'Buscar'}
@@ -188,53 +184,26 @@ export default function MapPicker({ latitud, longitud, onPick }) {
       </form>
 
       {mensaje && (
-        <p style={{ fontSize: '13px', color: estiloMensaje(mensaje.tipo), margin: '0 0 10px' }}>
-          {mensaje.texto}
-        </p>
+        <p className={`mensaje-inline ${mensaje.tipo}`}>{mensaje.texto}</p>
       )}
 
       {resultados.length > 0 && (
-        <ul
-          style={{
-            listStyle: 'none',
-            padding: 0,
-            margin: '0 0 12px',
-            maxHeight: '180px',
-            overflowY: 'auto',
-            border: '1px solid #ddd',
-            borderRadius: '4px',
-          }}
-        >
+        <ul className="picker-lista">
           {resultados.map((item, i) => (
             <li key={`${item.latitud}-${item.longitud}-${i}`}>
-              <button
-                type="button"
-                onClick={() => elegirResultado(item)}
-                style={{
-                  width: '100%',
-                  textAlign: 'left',
-                  padding: '10px 12px',
-                  background: 'transparent',
-                  border: 'none',
-                  borderBottom: '1px solid #eee',
-                  cursor: 'pointer',
-                  fontWeight: 'normal',
-                }}
-              >
-                <span style={{ display: 'block', color: '#2c5f8a', fontWeight: 'bold' }}>{item.direccion}</span>
-                <span style={{ display: 'block', fontSize: '12px', color: '#666' }}>{item.descripcion}</span>
+              <button type="button" className="picker-item" onClick={() => elegirResultado(item)}>
+                <strong>{item.direccion}</strong>
+                <span>{item.descripcion}</span>
               </button>
             </li>
           ))}
         </ul>
       )}
 
-      <div
-        ref={mapRef}
-        style={{ width: '100%', height: '380px', borderRadius: '8px', border: '1px solid #ccc', cursor: 'crosshair' }}
-      />
-      <p style={{ fontSize: '13px', color: '#555', marginTop: '8px' }}>
-        Busca una direccion, usa tu ubicacion o haz click en el mapa. Arrastra el marcador para ajustar la posicion.
+      <div ref={mapRef} className="mapa-mini" />
+      <p className="mapa-ayuda">
+        Busca una direccion, usa tu ubicacion o haz click en el mapa. Arrastra el marcador para
+        ajustar la posicion.
       </p>
     </div>
   )

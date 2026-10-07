@@ -38,7 +38,7 @@ def seed_data():
                 id_rol=admin_rol.id_rol,
             )
             operador = Usuario(
-                nombre="Operador Demo",
+                nombre="Operador Principal",
                 correo="operador@distrirapido.com",
                 contrasena_hash=hash_password("operador123"),
                 id_rol=operador_rol.id_rol,

@@ -4,11 +4,14 @@
 
 Siempre utiliza una estructura de proyecto modular y mantenible.
 
-**Estructura raíz:**
+**Estructura raíz (5 estructuras requeridas del PFA):**
 
-/src/backend        # FastAPI (Python)
-/src/frontend       # React + Vite
-/docs               # Documentación (inicio, planificacion, ejecucion, etc.)
+/docs               # Estructura 1: Documentación (inicio, planificacion, ejecucion, etc.)
+/src/backend        # Estructura 2: Código - FastAPI (Python)
+/src/frontend       # Estructura 2: Código - React + Vite
+/pruebas            # Estructura 3: Pruebas (plan, evidencias, índice de suites)
+/base de datos      # Estructura 4: Scripts SQL (esquema.sql)
+/modelos            # Estructura 5: Modelamiento (C4, base de datos, RN)
 
 
 **Siempre incluir:**

@@ -99,7 +99,7 @@ export default function MapView({ puntos = [], center = DEFAULT_CENTER, zoom = D
 
     if (valid.length > 1) {
       polylineRef.current = L.polyline(valid, {
-        color: '#2c5f8a',
+        color: '#2f7f68',
         weight: 4,
         opacity: 0.9,
         lineCap: 'round',
@@ -111,7 +111,7 @@ export default function MapView({ puntos = [], center = DEFAULT_CENTER, zoom = D
       const marker = L.marker(coord, {
         icon: L.divIcon({
           className: '',
-          html: `<div style="background:#2c5f8a;color:#fff;border-radius:50%;width:28px;height:28px;display:flex;align-items:center;justify-content:center;font-weight:bold;font-size:12px;border:2px solid #fff;box-shadow:0 2px 4px rgba(0,0,0,.3)">${i + 1}</div>`,
+          html: `<div style="background:#2f7f68;color:#fff;border-radius:50%;width:28px;height:28px;display:flex;align-items:center;justify-content:center;font-weight:bold;font-size:12px;border:2px solid #fff;box-shadow:0 2px 4px rgba(0,0,0,.25)">${i + 1}</div>`,
           iconSize: [28, 28],
           iconAnchor: [14, 14],
         }),
@@ -133,8 +133,8 @@ export default function MapView({ puntos = [], center = DEFAULT_CENTER, zoom = D
 
   return (
     <div>
-      <div style={{ position: 'relative' }}>
-        <div ref={mapRef} style={{ width: '100%', height: '500px', borderRadius: '8px' }} />
+      <div className="mapa-contenedor">
+        <div ref={mapRef} style={{ width: '100%', height: '500px' }} />
 
         {cargando && !sinTiles && (
           <div style={capaAviso}>
@@ -169,11 +169,12 @@ const capaAviso = {
   top: 10,
   left: 10,
   right: 10,
-  padding: '10px 14px',
-  background: 'rgba(255,255,255,0.95)',
-  border: '1px solid #ccc',
-  borderRadius: '6px',
+  padding: '11px 14px',
+  background: 'rgba(255,255,255,0.96)',
+  border: '1px solid #cbd6d2',
+  borderRadius: '7px',
   fontSize: '13px',
-  color: '#333',
+  color: '#1e2a26',
   zIndex: 1000,
+  boxShadow: '0 1px 3px rgba(30,42,38,0.06), 0 4px 14px rgba(30,42,38,0.05)',
 }

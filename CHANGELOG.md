@@ -9,6 +9,101 @@ versionado sigue [SemVer](https://semver.org/lang/es/) (`MAJOR.MINOR.PATCH`).
 
 ## [No publicado]
 
+### Estructura del PFA alineada a las 5 estructuras de la pauta
+
+- El repositorio cumple ahora las cinco estructuras requeridas del PFA a nivel de
+  raíz: `docs/` (Documentación), `src/` (Código), `pruebas/` (Pruebas),
+  `base de datos/` (Scripts SQL) y `modelos/` (Modelamiento).
+- **`base de datos/esquema.sql`**: DDL completo de PostgreSQL, generado
+  automáticamente desde los modelos SQLAlchemy (`src/backend/app/models`) e
+  incluyendo constraints, checks e índices. Complementa la ausencia de migraciones
+  (el proyecto crea el esquema con `Base.metadata.create_all` al arrancar).
+- **`pruebas/`**: índice que consigna el plan de pruebas y las evidencias, y
+  referencia las suites automatizadas (`src/backend/tests`) y las herramientas de
+  verificación de extremo a extremo (`auditoria_api.py`, `smoke_sprint2.py`).
+- **`modelos/`**: índice que consigna el modelamiento del PMV (C4, diseño de base
+  de datos y reglas de negocio) residente en la fase de Inicio.
+- `README.md` (sección Estructura del Proyecto) actualizado para reflejar las
+  cinco estructuras y la ubicación real de `auditoria_api.py` y `smoke_sprint2.py`.
+
+### Experiencia de uso (UX) y seleccion de pedidos por cercania
+
+- **Paleta visual reescrita** en `src/frontend/src/styles/index.css` con variables
+  de color (verde azulado ecologico sobre fondo neutro). Se reemplazaron los azules
+  saturados y grises que "tapaban" el contenido por colores suaves y coherentes entre
+  el login, el mapa, los marcadores y las alertas.
+- **Proposito del programa visible**: la pantalla de ingreso explica "para que sirve"
+  y el panel inicial muestra "Como funciona" en tres pasos (registrar pedidos, armar la
+  ruta, medir el ahorro).
+- **Navegacion por flujo**: el menu superior enumera los pasos (1 Pedidos, 2 Rutas,
+  3 Mapa, 4 Impacto, 5 Vehiculos) y las pestanas sin datos muestran que accion tomar
+  en lugar de tablas vacias.
+- **Seleccion de pedidos por cercania**: nuevo componente `SelectorPuntos` que ordena
+  los pedidos del mas cercano al mas lejano respecto al ultimo punto agregado (o el
+  centro de Lima), muestra la distancia de cada uno, permite buscar por direccion o
+  destinatario, y con un clic agrega "el siguiente mas cercano". Incluye barra de
+  ocupacion de la carga del vehiculo y bloquea un pedido que excedera la capacidad.
+- **El flujo de deteccion de cercania se comparte con la edicion de rutas**: editar una
+  ruta guardada usa el mismo selector, de modo que el pedido mas cercano tambien puede
+  sumarse a una ruta existente.
+- **Utilidad `distancia.js`** con `haversineKm` (la misma formula del backend),
+  `ordenarPorCercania`, `masCercano` y `formatoKm`, probada en aislamiento.
+- **Detalles menores**: alertas con boton de cierre, botones con jerarquia
+  (primario/secundario/ghost/eliminar), tablas con desplazamiento en pantallas
+  pequenas, formularios con etiquetas vinculadas y mensajes de validacion mas claros.
+
+### Documentación del Sprint 1 y limpieza del repositorio
+
+- Restaurados los cuatro entregables de la fase de Implementación, que habían
+  sido sobrescritos con el contenido del Sprint 2:
+  `01 Informe de estado del proyecto V_1_0_0.md`,
+  `02 Registro de Impedimentos V_1_0_0.md`,
+  `03 Revisión del Sprint V_1_0_0.md` y
+  `04 Retrospectiva del Sprint V_1_0_0.md`.
+- **Consolidada la retrospectiva del Sprint 1** en `04 Retrospectiva del Sprint V_1_0_0.md`,
+  el nombre que exige la consigna. El archivo previo declaraba cifras que el repositorio no
+  respalda (15 pruebas en verde, 92 % de cobertura) y presentaba MFA como parte del Sprint 1;
+  ambos datos se retiraron. El título interno se conserva como `# Reprospectiva del sprint`,
+  conforme a la plantilla oficial.
+- Los entregables del Sprint 2 quedaron archivados en `docs/03 Implementación/sprint 2/`
+  con versión `V_2_0_0`, tras retirar de ellos las cifras de cobertura y de total de
+  pruebas que no resultaban verificables.
+- **Eliminado `backend/` de la raíz del repositorio** (24 archivos versionados).
+  Era una implementación heredada e inactiva, con MFA y una organización distinta de
+  módulos, que coexistía con el backend real en `src/backend` y podía inducir a
+  trabajar sobre el código equivocado.
+- **README corregido** para que refleje el repositorio real: se retiraron Tailwind,
+  Alembic, Vitest, Testing Library y GitHub Actions, que no existen en el proyecto; se
+  documentó que no hay migraciones, ni lint, ni pruebas de frontend; y se añadieron los
+  enlaces a los entregables de ambos sprints.
+- `docs/inicio/14. Especificacion MFA y Sesiones` incluye ahora una nota de estado que
+  aclara que el módulo de MFA **no está implementado**, y se corrigió la ruta interna
+  del borrador OpenSpec.
+
+### Herramientas de verificación corregidas
+
+- `auditoria_api.py` ya no toma los puntos del listado del operador para calcular
+  rutas: creaba sus propios puntos y los eliminaba al terminar. La auditoría usaba el
+  operador demo sembrado, que acumula puntos de sesiones anteriores, de modo que un
+  punto residual con coordenadas inválidas producía "rutas" de miles de kilómetros
+  dentro de Lima y activaba falsas anomalías.
+- `smoke_sprint2.py` se autoprovisiona: si no hay ninguna ruta guardada, crea una con
+  puntos propios. Antes dependía de una ruta preexistente y la borraba al finalizar,
+  por lo que solo podía ejecutarse una vez.
+- El factor de emisión dejó de estar fijo en `smoke_sprint2.py` y se lee del vehículo
+  de la ruta, conforme a **RN-017**. La comprobación anterior validaba una constante
+  del propio script en lugar de la regla de negocio.
+- Ambos scripts son ahora **herméticos**: dejan la base de datos en el mismo estado en
+  que la encontraron y su ejecución es repetible.
+
+### Limitación conocida registrada
+
+- Con **exactamente tres puntos**, la búsqueda local 2-opt no se ejecuta: el recorrido
+  `range(1, len(best) - 2)` queda vacío y la ruta devuelta es la del Vecino Más Cercano
+  sin refinar. Si el orden de entrada resulta mejor, la API puede informar una distancia
+  optimizada levemente mayor que la no optimizada. El ahorro no llega a ser negativo
+  porque se acota en cero. Registrado como **IMP-10**.
+
 ### Sprint 2 implementado (US-002, US-004, US-005, US-007)
 
 - **US-004**: las respuestas de ruta incorporan `ahorro_co2_kg`,

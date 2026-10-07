@@ -78,8 +78,39 @@ check(
     all(r["estado"] == "Confirmada" for r in por_estado),
 )
 
+# El smoke test se autoprovisiona: si el operador no tiene rutas, crea una con
+# puntos propios. Depender de una ruta preexistente hacia el script irrepetible,
+# porque al final borra la ruta que ejercita.
+smoke_puntos = []
 if not hoy:
-    print("\nNo hay rutas guardadas; se omite la prueba de edicion/borrado.")
+    print("\nNo hay rutas guardadas: se crea una ruta propia para la prueba.")
+
+    smoke_veh = None
+    status, vehs = call("GET", "/vehiculos", token)
+    if status == 200 and isinstance(vehs, list) and vehs:
+        smoke_veh = vehs[0]["id_vehiculo"]
+
+    for i, (lat, lng) in enumerate([(-12.0430, -77.0200), (-12.0600, -76.9900), (-12.0100, -77.0350)]):
+        status, creado = call("POST", "/puntos-entrega", token, body={
+            "direccion": f"Punto smoke base #{i+1}",
+            "latitud": lat, "longitud": lng,
+            "peso_kg": 2.5, "destinatario": "Smoke",
+        })
+        check(f"Crear punto base #{i+1}", status == 201, status)
+        if status == 201:
+            smoke_puntos.append(creado["id_punto"])
+
+    if smoke_veh and len(smoke_puntos) >= 3:
+        status, creada = call("POST", "/rutas", token, body={
+            "id_vehiculo": smoke_veh, "punto_ids": smoke_puntos,
+        })
+        check("Crear ruta propia para la prueba", status == 201, creada if status != 201 else "")
+        if status == 201:
+            status, hoy = call("GET", "/rutas", token)
+            check("Ruta propia aparece en el listado", status == 200 and len(hoy) > 0, len(hoy))
+
+if not hoy:
+    print("\nNo se pudo obtener una ruta; se omite la prueba de edicion/borrado.")
     sys.exit(1 if fallos else 0)
 
 ruta = hoy[-1]
@@ -104,12 +135,21 @@ check(
     ruta["co2_estimado_kg"] <= ruta["co2_sin_optimizar_kg"] + 0.001,
 )
 
-esperado = (ruta["distancia_sin_optimizar_km"] - ruta["distancia_total_km"]) * 0.5 * 2.31
-check(
-    "kg CO2 usa el factor de emision del vehiculo",
-    abs(ruta["ahorro_co2_kg"] - esperado) < 0.05,
-    f"{ruta['ahorro_co2_kg']} vs {esperado:.3f}",
-)
+# El factor de emision pertenece al vehiculo (RN-017): se leen sus parametros
+# reales en lugar de fijar un valor, de modo que la comprobacion valida la regla de
+# negocio y no una constante del propio script.
+status, veh_ruta = call("GET", f"/vehiculos/{ruta['id_vehiculo']}", token)
+check("Se pudo leer el vehiculo de la ruta", status == 200, status)
+if status == 200 and isinstance(veh_ruta, dict):
+    factor = float(veh_ruta.get("factor_emision_co2", 0)) * float(veh_ruta.get("consumo_litros_km", 0))
+    esperado = (ruta["distancia_sin_optimizar_km"] - ruta["distancia_total_km"]) * factor
+    check(
+        "kg CO2 usa el factor de emision del vehiculo",
+        abs(ruta["ahorro_co2_kg"] - esperado) < 0.05,
+        f"{ruta['ahorro_co2_kg']} vs {esperado:.3f} (factor {factor})",
+    )
+else:
+    check("kg CO2 usa el factor de emision del vehiculo", False, "no se pudo leer el vehiculo")
 
 status, resumen = call("GET", f"/rutas/{ruta['id_ruta']}/resumen", token)
 check("Resumen incluye ahorro_co2_pct", status == 200 and "ahorro_co2_pct" in resumen, status)
@@ -203,6 +243,12 @@ check("No quedan puntos huerfanos", status == 404, status)
 for p in nuevos:
     status, _ = call("DELETE", f"/puntos-entrega/{p['id_punto']}", token)
     check(f"Eliminar punto de prueba {p['id_punto'][:8]}", status == 204, status)
+
+# Los puntos base solo se crean cuando no habia ninguna ruta; se liberan al borrar
+# la ruta que los consumio, asi que ahora deben eliminarse.
+for id_punto in smoke_puntos:
+    status, _ = call("DELETE", f"/puntos-entrega/{id_punto}", token)
+    check(f"Eliminar punto base {id_punto[:8]}", status == 204, status)
 
 print("\n" + ("TODO OK" if not fallos else f"FALLOS ({len(fallos)}): {fallos}"))
 sys.exit(1 if fallos else 0)

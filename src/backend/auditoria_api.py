@@ -274,15 +274,34 @@ ok("vehiculo inexistente -> 404", s == 404, s)
 # ---------------------------------------------------------------- RUTAS
 seccion("RUTAS (US-002/004/007)")
 
-s, plist = call("GET", "/puntos-entrega", op)
-ids_puntos = [p["id_punto"] for p in plist["puntos"]]
+# La auditoria no puede tomar los puntos del listado del operador: ese operador es
+# el usuario demo sembrado, que acumula puntos de sesiones anteriores. Residuos con
+# coordenadas invalidas inflarian las distancias y falsearian la comparacion. Aqui se
+# crean tres puntos propios y se usan solo esos.
+ids_ruta_prueba = []
+for nombre, lat, lng in (
+    ("Ruta prueba A", -12.1200000, -77.0300000),
+    ("Ruta prueba B", -12.0900000, -77.0200000),
+    ("Ruta prueba C", -12.1460000, -76.9720000),
+):
+    s, creado = call("POST", "/puntos-entrega", op, body={
+        "direccion": nombre, "latitud": lat, "longitud": lng,
+        "peso_kg": 5.0, "destinatario": "Ruta",
+    })
+    ok(f"crear punto de ruta {nombre} 201", s == 201, creado if s != 201 else "")
+    if s == 201:
+        ids_ruta_prueba.append(creado["id_punto"])
+ok("la auditoria logro 3 puntos propios", len(ids_ruta_prueba) == 3, len(ids_ruta_prueba))
+
 veh_id = audit_veh or vehs[0]["id_vehiculo"]
 
-s, opt = call("POST", "/rutas/optimizar", op, body={"id_vehiculo": veh_id, "punto_ids": ids_puntos[:3]})
+s, opt = call("POST", "/rutas/optimizar", op, body={"id_vehiculo": veh_id, "punto_ids": ids_ruta_prueba})
 ok("POST /rutas/optimizar 200", s == 200, opt if s != 200 else "")
 ok("optimizar devuelve 3 puntos", len(opt.get("puntos", [])) == 3, len(opt.get("puntos", [])))
 ok("optimizar NO persiste (no aparece en GET)", s == 200, "")
 ok("orden es 1..n", [p["orden"] for p in opt.get("puntos", [])] == [1, 2, 3])
+ok("distancia de ruta coherente con Lima", 0 < opt.get("distancia_total_km", 0) < 100,
+   opt.get("distancia_total_km"))
 ok("co2_optimizado <= co2_no_optimizado", opt["co2_estimado_kg"] <= opt["co2_sin_optimizar_kg"] + 0.001,
    (opt["co2_estimado_kg"], opt["co2_sin_optimizar_kg"]))
 ok("dist_opt <= dist_sin_opt", opt["distancia_total_km"] <= opt["distancia_sin_optimizar_km"] + 0.001,
@@ -291,7 +310,7 @@ ok("ahorro_co2_pct no negativo", opt["ahorro_co2_pct"] >= 0, opt["ahorro_co2_pct
 ok("tiempos positivos", opt["tiempo_estimado_min"] > 0 and opt["tiempo_sin_optimizar_min"] > 0)
 ok("estado Confirmada", opt.get("estado") == "Confirmada", opt.get("estado"))
 
-s, conf = call("POST", "/rutas", op, body={"id_vehiculo": veh_id, "punto_ids": ids_puntos[:3]})
+s, conf = call("POST", "/rutas", op, body={"id_vehiculo": veh_id, "punto_ids": ids_ruta_prueba})
 ok("POST /rutas 201", s == 201, conf if s != 201 else "")
 ruta_id = conf.get("id_ruta") if s == 201 else None
 
@@ -317,20 +336,20 @@ ok("uuid invalido -> 422", s == 422, s)
 s, _ = call("GET", "/rutas/00000000-0000-0000-0000-000000000000", op)
 ok("ruta inexistente -> 404", s == 404, s)
 
-s, _ = call("POST", "/rutas/optimizar", op, body={"id_vehiculo": veh_id, "punto_ids": ids_puntos[:1]})
+s, _ = call("POST", "/rutas/optimizar", op, body={"id_vehiculo": veh_id, "punto_ids": ids_ruta_prueba[:1]})
 ok("1 solo punto -> 400/422", s in (400, 422), s)
 
 s, _ = call("POST", "/rutas/optimizar", op, body={"id_vehiculo": veh_id, "punto_ids": []})
 ok("0 puntos -> 400/422", s in (400, 422), s)
 
-s, _ = call("POST", "/rutas/optimizar", op, body={"id_vehiculo": 999999, "punto_ids": ids_puntos[:3]})
+s, _ = call("POST", "/rutas/optimizar", op, body={"id_vehiculo": 999999, "punto_ids": ids_ruta_prueba})
 ok("vehiculo inexistente -> 404", s == 404, s)
 
 s, _ = call("POST", "/rutas/optimizar", op, body={"id_vehiculo": veh_id, "punto_ids": ["00000000-0000-0000-0000-000000000000"] * 2})
 ok("puntos inexistentes -> 400", s == 400, s)
 
 # duplicados en la request
-s, _ = call("POST", "/rutas/optimizar", op, body={"id_vehiculo": veh_id, "punto_ids": [ids_puntos[0], ids_puntos[0], ids_puntos[1]]})
+s, _ = call("POST", "/rutas/optimizar", op, body={"id_vehiculo": veh_id, "punto_ids": [ids_ruta_prueba[0], ids_ruta_prueba[0], ids_ruta_prueba[1]]})
 ok("punto duplicado en la lista -> rechazado o deduplicado", s in (200, 400, 422), s)
 
 # capacidad insuficiente
@@ -340,7 +359,7 @@ s, vmini = call("POST", "/vehiculos", admin, body={
 })
 ok("crea vehiculo de 1 kg para probar capacidad", s == 201, s)
 if s == 201:
-    s, r = call("POST", "/rutas/optimizar", op, body={"id_vehiculo": vmini["id_vehiculo"], "punto_ids": ids_puntos[:3]})
+    s, r = call("POST", "/rutas/optimizar", op, body={"id_vehiculo": vmini["id_vehiculo"], "punto_ids": ids_ruta_prueba})
     ok("RN-014 capacidad insuficiente -> 400", s == 400, s)
     ok("mensaje menciona capacidad", "capacidad" in json.dumps(r).lower(), r)
 
@@ -371,7 +390,7 @@ if s == 201:
     ok("operador nuevo ve 0 rutas ajenas", s == 200 and len(tl_rutas) == 0, len(tl_rutas) if s == 200 else s)
     s, _ = call("GET", f"/rutas/{ruta_id}", op2_token)
     ok("operador nuevo no lee ruta ajena -> 403/404", s in (403, 404), s)
-    s, _ = call("PUT", f"/rutas/{ruta_id}", op2_token, body={"id_vehiculo": veh_id, "punto_ids": ids_puntos[:3]})
+    s, _ = call("PUT", f"/rutas/{ruta_id}", op2_token, body={"id_vehiculo": veh_id, "punto_ids": ids_ruta_prueba})
     ok("operador nuevo no edita ruta ajena -> 403/404", s in (403, 404), s)
     s, _ = call("DELETE", f"/rutas/{ruta_id}", op2_token)
     ok("operador nuevo no borra ruta ajena -> 403/404", s in (403, 404), s)
@@ -433,7 +452,7 @@ if audit_punto:
        (put_libre or {}).get("direccion"))
 
 # El primer punto de la ruta si esta en uso: no se debe poder tocar.
-punto_en_ruta = ids_puntos[0] if ruta_id else None
+punto_en_ruta = ids_ruta_prueba[0] if ruta_id else None
 if punto_en_ruta:
     s, r = call("DELETE", f"/puntos-entrega/{punto_en_ruta}", op)
     ok("DELETE punto en uso en ruta -> 400", s == 400, f"{s} {r}")
@@ -461,6 +480,30 @@ if ruta_id:
 if audit_punto:
     s, _ = call("DELETE", f"/puntos-entrega/{audit_punto}", op)
     ok("DELETE punto no usado -> 204", s == 204, s)
+
+
+def limpiar_puntos_de_ruta(ids):
+    """Borra los puntos que creo la auditoria.
+
+    Sin esto el operador demo sembrado acumula puntos de cada corrida y las
+    verificaciones posteriores dejan de ser reproducibles.
+    """
+    db = SessionLocal()
+    try:
+        for id_punto in ids:
+            p = db.query(PuntoEntrega).filter(PuntoEntrega.id_punto == id_punto).first()
+            if not p:
+                continue
+            en_ruta = db.query(RutaPunto).filter(RutaPunto.id_punto == id_punto).count()
+            if en_ruta:
+                continue
+            db.delete(p)
+        db.commit()
+    finally:
+        db.close()
+
+
+limpiar_puntos_de_ruta(ids_ruta_prueba)
 
 # ---------------------------------------------------------------- RESUMEN
 limpiar_usuarios()

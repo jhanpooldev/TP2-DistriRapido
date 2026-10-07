@@ -11,11 +11,14 @@ export default function ImpactoTab({ rutas, onVerMapa }) {
   if (rutas.length === 0) {
     return (
       <div>
-        <h2>Impacto ambiental</h2>
+        <div className="seccion-titulo">
+          <h2>Impacto ambiental</h2>
+          <p>Comparacion entre la ruta del orden de llegada y la ruta optimizada.</p>
+        </div>
         <div className="card">
-          <p style={{ color: '#666', margin: 0 }}>
-            Todavia no hay rutas confirmadas. Genera y guarda una ruta para ver el impacto
-            ambiental estimado.
+          <p className="vacio" style={{ padding: 0 }}>
+            Todavia no hay rutas guardadas. Arma una en la pestana <strong>Rutas</strong> para ver
+            cuantos kilometos y kilos de CO2 ahorra.
           </p>
         </div>
       </div>
@@ -26,67 +29,92 @@ export default function ImpactoTab({ rutas, onVerMapa }) {
 
   return (
     <div>
-      <h2>Impacto ambiental</h2>
+      <div className="seccion-titulo">
+        <h2>Impacto ambiental</h2>
+        <p>Lo que deja optimizar: menos distancia, menos tiempo y menos emisiones.</p>
+      </div>
 
-      <div className="card" style={{ marginBottom: '20px' }}>
-        <h3>Ruta a evaluar</h3>
-        <select
-          value={idSeleccionada}
-          onChange={e => setIdSeleccionada(e.target.value)}
-          style={{ maxWidth: '460px', width: '100%', padding: '8px', border: '1px solid #ccc', borderRadius: '4px' }}
-        >
-          <option value="">-- Selecciona una ruta --</option>
-          {rutas.map(r => (
-            <option key={r.id_ruta} value={r.id_ruta}>
-              {r.id_ruta.slice(0, 8)}... - {new Date(r.fecha_generacion).toLocaleDateString()} -{' '}
-              {r.co2_estimado_kg} kg CO₂
-            </option>
-          ))}
-        </select>
+      <div className="card">
+        <div className="form-group" style={{ marginBottom: 0 }}>
+          <label htmlFor="ruta-impacto">Ruta a evaluar</label>
+          <select
+            id="ruta-impacto"
+            value={idSeleccionada}
+            onChange={e => setIdSeleccionada(e.target.value)}
+          >
+            <option value="">-- Selecciona una ruta --</option>
+            {rutas.map(r => (
+              <option key={r.id_ruta} value={r.id_ruta}>
+                {r.id_ruta.slice(0, 8)}... · {new Date(r.fecha_generacion).toLocaleDateString()} ·{' '}
+                {r.co2_estimado_kg} kg CO2
+              </option>
+            ))}
+          </select>
+        </div>
       </div>
 
       {ruta && (
         <div className="card">
-          <h3>Comparación de emisiones</h3>
+          <h3>Comparacion de emisiones</h3>
 
-          <table className="table" style={{ marginBottom: '20px' }}>
-            <thead>
-              <tr>
-                <th>Escenario</th>
-                <th>Distancia (km)</th>
-                <th>Tiempo (min)</th>
-                <th>CO₂ (kg)</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>Ruta no optimizada (orden de ingreso)</td>
-                <td>{ruta.distancia_sin_optimizar_km}</td>
-                <td>{ruta.tiempo_sin_optimizar_min}</td>
-                <td>{ruta.co2_sin_optimizar_kg}</td>
-              </tr>
-              <tr>
-                <td><strong>Ruta optimizada</strong></td>
-                <td>{ruta.distancia_total_km}</td>
-                <td>{ruta.tiempo_estimado_min}</td>
-                <td>{ruta.co2_estimado_kg}</td>
-              </tr>
-            </tbody>
-          </table>
+          <div className="tabla-envoltura" style={{ marginBottom: 18 }}>
+            <table className="table">
+              <thead>
+                <tr>
+                  <th>Escenario</th>
+                  <th className="num">Distancia (km)</th>
+                  <th className="num">Tiempo (min)</th>
+                  <th className="num">CO2 (kg)</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Sin optimizar (orden de llegada)</td>
+                  <td className="num">{ruta.distancia_sin_optimizar_km}</td>
+                  <td className="num">{ruta.tiempo_sin_optimizar_min}</td>
+                  <td className="num">{ruta.co2_sin_optimizar_kg}</td>
+                </tr>
+                <tr>
+                  <td><strong>Ruta optimizada</strong></td>
+                  <td className="num"><strong>{ruta.distancia_total_km}</strong></td>
+                  <td className="num"><strong>{ruta.tiempo_estimado_min}</strong></td>
+                  <td className="num"><strong>{ruta.co2_estimado_kg}</strong></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div className="grid">
+            <div className="stat-card">
+              <div className="stat-value">{ruta.ahorro_distancia_pct}%</div>
+              <div className="stat-label">Menos distancia</div>
+            </div>
+            <div className="stat-card">
+              <div className="stat-value">
+                {reduccionSignificativa ? `${ruta.ahorro_co2_pct}%` : '0%'}
+              </div>
+              <div className="stat-label">Menos CO2</div>
+            </div>
+            <div className="stat-card">
+              <div className="stat-value">{reduccionSignificativa ? ruta.ahorro_co2_kg : 0}</div>
+              <div className="stat-label">kg CO2 evitados</div>
+            </div>
+          </div>
 
           {reduccionSignificativa ? (
             <div className="alert alert-success">
-              <strong>Reduccion de CO₂: {ruta.ahorro_co2_pct}%</strong>
-              <br />
-              Se evitaron aproximadamente {ruta.ahorro_co2_kg} kg de CO₂ y{' '}
-              {ruta.ahorro_distancia_pct}% menos de distancia frente a la ruta sin optimizar.
+              <span>
+                <strong>La optimizacion evito {ruta.ahorro_co2_kg} kg de CO2</strong> y recorrio{' '}
+                {ruta.ahorro_distancia_pct}% menos distancia que la ruta por orden de llegada.
+              </span>
             </div>
           ) : (
-            <div className="alert alert-success">
-              <strong>No hubo una reduccion significativa de CO₂.</strong>
-              <br />
-              La ruta optimizada es practicamente igual a la ruta no optimizada, por lo que no se
-              reporta un porcentaje de ahorro. {ruta.sin_reduccion_significativa && ruta.ahorro_co2_pct === 0 && 'El ahorro se reporta en cero y no como un valor negativo.'}
+            <div className="alert alert-info">
+              <span>
+                <strong>No hubo una reduccion significativa de CO2.</strong> La ruta optimizada es
+                practicamente igual a la del orden de llegada, por lo que no se reporta un porcentaje
+                de ahorro.
+              </span>
             </div>
           )}
 

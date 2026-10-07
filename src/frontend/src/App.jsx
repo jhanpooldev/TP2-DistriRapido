@@ -50,19 +50,23 @@ function App() {
 
   if (cargando) {
     return (
-      <div style={{ display: 'grid', placeItems: 'center', minHeight: '100vh' }}>
-        <p>Cargando sesión...</p>
+      <div className="pantalla-centrada">
+        <div className="cargando" />
+        <p>Cargando sesion...</p>
       </div>
     )
   }
 
   if (error || !user) {
     return (
-      <div style={{ display: 'grid', placeItems: 'center', minHeight: '100vh', gap: '12px' }}>
-        <p>{error || 'No se pudo cargar la sesión'}</p>
-        <div style={{ display: 'flex', gap: '8px' }}>
+      <div className="pantalla-centrada">
+        <div>
+          <h2>No se pudo cargar la sesion</h2>
+          <p className="sep">{error || 'Verifica que el backend este corriendo en el puerto 8000.'}</p>
+        </div>
+        <div className="btn-grupo" style={{ justifyContent: 'center' }}>
           <button type="button" onClick={fetchMe}>Reintentar</button>
-          <button type="button" onClick={logout}>Cerrar sesión</button>
+          <button type="button" className="btn-secondary" onClick={logout}>Cerrar sesion</button>
         </div>
       </div>
     )

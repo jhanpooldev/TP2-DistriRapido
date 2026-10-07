@@ -2,8 +2,8 @@ import React, { useState } from 'react'
 import api, { extraerError } from '../api/client'
 
 export default function Login({ onLogin }) {
-  const [correo, setCorreo] = useState('operador@distrirapido.com')
-  const [password, setPassword] = useState('operador123')
+  const [correo, setCorreo] = useState('')
+  const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [enviando, setEnviando] = useState(false)
 
@@ -18,8 +18,8 @@ export default function Login({ onLogin }) {
     } catch (err) {
       setError(
         err?.response?.status === 401 || err?.response?.status === 422
-          ? 'Credenciales inválidas'
-          : extraerError(err, 'No se pudo iniciar sesión')
+          ? 'Credenciales invalidas'
+          : extraerError(err, 'No se pudo iniciar sesion')
       )
     } finally {
       setEnviando(false)
@@ -27,27 +27,52 @@ export default function Login({ onLogin }) {
   }
 
   return (
-    <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#f0f4f8' }}>
-      <div className="card" style={{ width: '100%', maxWidth: '400px' }}>
-        <h1 style={{ textAlign: 'center', marginBottom: '30px' }}>EcoLogística Lima</h1>
+    <div className="login-envoltura">
+      <div className="card login-tarjeta">
+        <div className="login-marca">
+          <div className="app-logo">E</div>
+          <h1>EcoLogistica Lima</h1>
+          <p>Optimizador de rutas sostenibles para DistriRapido S.A.C.</p>
+        </div>
+
+        <div className="login-valor">
+          <strong>Para que sirve</strong>
+          <ul>
+            <li>Ordena los pedidos del dia de menor a mayor distancia.</li>
+            <li>Calcula la ruta mas corta respetando la carga del vehiculo.</li>
+            <li>Muestra cuantos kilometos, minutos y kilos de CO2 ahorra.</li>
+          </ul>
+        </div>
+
         {error && <div className="alert alert-error">{error}</div>}
+
         <form onSubmit={handleSubmit}>
           <div className="form-group">
-            <label>Correo</label>
-            <input type="email" value={correo} onChange={e => setCorreo(e.target.value)} required />
+            <label htmlFor="correo">Correo</label>
+            <input
+              id="correo"
+              type="email"
+              value={correo}
+              onChange={e => setCorreo(e.target.value)}
+              required
+            />
           </div>
           <div className="form-group">
-            <label>Contraseña</label>
-            <input type="password" value={password} onChange={e => setPassword(e.target.value)} required />
+            <label htmlFor="password">Contrasena</label>
+            <input
+              id="password"
+              type="password"
+              value={password}
+              onChange={e => setPassword(e.target.value)}
+              required
+            />
           </div>
-          <button type="submit" style={{ width: '100%' }} disabled={enviando}>
+          <button type="submit" className="btn-block" disabled={enviando}>
             {enviando ? 'Ingresando...' : 'Ingresar'}
           </button>
         </form>
-        <p style={{ marginTop: '20px', fontSize: '12px', color: '#666', textAlign: 'center' }}>
-          Demo: operador@distrirapido.com / operador123
-        </p>
-      </div>
+
+        </div>
     </div>
   )
 }

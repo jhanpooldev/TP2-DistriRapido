@@ -10,18 +10,25 @@ Siempre utilizar una estructura de proyecto modular y mantenible.
 
 El proyecto será desarrollado como un Producto Mínimo Viable (PMV) durante un periodo académico de 12 semanas.
 
-**Estructura raíz:**
+**Estructura raíz (5 estructuras requeridas del PFA):**
 
-/src/backend        # FastAPI (Python)
+/docs               # Estructura 1: Documentación
 
-/src/frontend       # React + Vite
+/src/backend        # Estructura 2: Código - FastAPI (Python)
 
-/docs               # Documentación
+/src/frontend       # Estructura 2: Código - React + Vite
+
+/pruebas            # Estructura 3: Pruebas (plan, evidencias, índice de suites)
+
+/base de datos      # Estructura 4: Scripts SQL (esquema.sql)
+
+/modelos            # Estructura 5: Modelamiento (C4, base de datos, RN)
 
 Las pruebas automatizadas residen dentro de cada aplicación, junto al código
 que verifican: `/src/backend/tests` (pytest) y `/src/frontend/src/**/*.test.jsx` (Vitest).
 No se mantiene una carpeta `/tests` en la raíz para evitar duplicar la suite y
-repartirla entre las aplicaciones que la consumen.
+repartirla entre las aplicaciones que la consumen. La estructura `/pruebas` es el
+índice y repositorio de evidencias del plan de pruebas.
 
 `/docker` y `docker-compose.yml` se consideran **opcionales y no se aplican en el PMV**,
 por no existir Docker en el entorno de desarrollo del equipo y para mantener el
