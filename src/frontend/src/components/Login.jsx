@@ -27,7 +27,7 @@ export default function Login({ onLogin }) {
   }
 
   return (
-    <div className="login-envoltura">
+    <main className="login-envoltura" id="contenido-principal">
       <div className="card login-tarjeta">
         <div className="login-marca">
           <div className="app-logo">E</div>
@@ -44,7 +44,7 @@ export default function Login({ onLogin }) {
           </ul>
         </div>
 
-        {error && <div className="alert alert-error">{error}</div>}
+        {error && <div className="alert alert-error" role="alert" aria-live="assertive">{error}</div>}
 
         <form onSubmit={handleSubmit}>
           <div className="form-group">
@@ -52,6 +52,7 @@ export default function Login({ onLogin }) {
             <input
               id="correo"
               type="email"
+              autoComplete="username"
               value={correo}
               onChange={e => setCorreo(e.target.value)}
               required
@@ -62,6 +63,7 @@ export default function Login({ onLogin }) {
             <input
               id="password"
               type="password"
+              autoComplete="current-password"
               value={password}
               onChange={e => setPassword(e.target.value)}
               required
@@ -72,7 +74,7 @@ export default function Login({ onLogin }) {
           </button>
         </form>
 
-        </div>
-    </div>
+      </div>
+    </main>
   )
 }

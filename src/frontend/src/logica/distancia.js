@@ -12,8 +12,7 @@ export function haversineKm(a, b) {
   const dLat = (Number(b.latitud) - Number(a.latitud)) * rad
   const dLng = (Number(b.longitud) - Number(a.longitud)) * rad
   const h =
-    Math.sin(dLat / 2) ** 2 +
-    Math.cos(Number(a.latitud) * rad) * Math.cos(Number(b.latitud) * rad) * Math.sin(dLng / 2) ** 2
+    Math.sin(dLat / 2) ** 2 + Math.cos(Number(a.latitud) * rad) * Math.cos(Number(b.latitud) * rad) * Math.sin(dLng / 2) ** 2
   return 2 * R * Math.asin(Math.min(1, Math.sqrt(h)))
 }
 

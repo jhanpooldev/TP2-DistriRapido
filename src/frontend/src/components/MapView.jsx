@@ -8,6 +8,57 @@ const DEFAULT_ZOOM = 12
 const OSM_TILE_URL = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
 const OSM_ATTRIBUTION = '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
 
+function tieneCoordenadas(punto) {
+  return (
+    punto?.latitud !== null && punto?.latitud !== undefined && punto?.latitud !== '' &&
+    punto?.longitud !== null && punto?.longitud !== undefined && punto?.longitud !== '' &&
+    Number.isFinite(Number(punto.latitud)) && Number.isFinite(Number(punto.longitud))
+  )
+}
+
+/**
+ * Construye el popup con nodos DOM y textContent. No se interpola HTML con
+ * datos del usuario: una direccion o un destinatario no pueden inyectar
+ * etiquetas ni scripts en el mapa.
+ */
+function crearPopupParada(punto, numero) {
+  const contenedor = document.createElement('div')
+  contenedor.className = 'popup-parada'
+
+  const titulo = document.createElement('strong')
+  titulo.textContent = `Parada ${numero}`
+  contenedor.appendChild(titulo)
+
+  const agregarLinea = (etiqueta, valor) => {
+    const linea = document.createElement('div')
+    linea.className = 'popup-linea'
+
+    const etiquetaEl = document.createElement('span')
+    etiquetaEl.className = 'popup-etiqueta'
+    etiquetaEl.textContent = etiqueta
+
+    const valorEl = document.createElement('span')
+    valorEl.textContent = valor
+
+    linea.append(etiquetaEl, valorEl)
+    contenedor.appendChild(linea)
+  }
+
+  const direccion = String(punto?.direccion ?? '').trim()
+  const destinatario = String(punto?.destinatario ?? '').trim()
+  const lat = Number(punto?.latitud)
+  const lng = Number(punto?.longitud)
+
+  agregarLinea('Direccion', direccion || 'Sin direccion registrada')
+  if (!direccion) {
+    agregarLinea('Coordenadas', `${lat.toFixed(6)}, ${lng.toFixed(6)}`)
+  }
+  agregarLinea('Destinatario', destinatario || 'Sin destinatario registrado')
+  agregarLinea('Peso', `${punto?.peso_kg ?? '—'} kg`)
+
+  return contenedor
+}
+
 export default function MapView({ puntos = [], center = DEFAULT_CENTER, zoom = DEFAULT_ZOOM }) {
   const mapRef = useRef(null)
   const mapInstance = useRef(null)
@@ -91,14 +142,16 @@ export default function MapView({ puntos = [], center = DEFAULT_CENTER, zoom = D
       polylineRef.current = null
     }
 
-    const valid = puntos
-      .filter(p => p.latitud != null && p.longitud != null)
-      .map(p => [Number(p.latitud), Number(p.longitud)])
+    const validos = puntos
+      .map((punto, indice) => ({ punto, indice }))
+      .filter(({ punto }) => tieneCoordenadas(punto))
 
-    if (valid.length === 0) return
+    const coordenadas = validos.map(({ punto }) => [Number(punto.latitud), Number(punto.longitud)])
 
-    if (valid.length > 1) {
-      polylineRef.current = L.polyline(valid, {
+    if (coordenadas.length === 0) return
+
+    if (coordenadas.length > 1) {
+      polylineRef.current = L.polyline(coordenadas, {
         color: '#2f7f68',
         weight: 4,
         opacity: 0.9,
@@ -107,43 +160,55 @@ export default function MapView({ puntos = [], center = DEFAULT_CENTER, zoom = D
       }).addTo(map)
     }
 
-    valid.forEach((coord, i) => {
-      const marker = L.marker(coord, {
+    validos.forEach(({ punto, indice }, posicion) => {
+      const numero = Number.isInteger(punto.orden) ? punto.orden : indice + 1
+      const direccion = String(punto.direccion ?? '').trim()
+      const etiqueta = direccion || `coordenadas ${Number(punto.latitud).toFixed(6)}, ${Number(punto.longitud).toFixed(6)}`
+
+      const marker = L.marker(coordenadas[posicion], {
+        title: `Parada ${numero}: ${etiqueta}`,
+        alt: `Parada ${numero}: ${etiqueta}`,
+        keyboard: true,
+        riseOnHover: true,
         icon: L.divIcon({
           className: '',
-          html: `<div style="background:#2f7f68;color:#fff;border-radius:50%;width:28px;height:28px;display:flex;align-items:center;justify-content:center;font-weight:bold;font-size:12px;border:2px solid #fff;box-shadow:0 2px 4px rgba(0,0,0,.25)">${i + 1}</div>`,
+          html: `<div style="background:#2f7f68;color:#fff;border-radius:50%;width:28px;height:28px;display:flex;align-items:center;justify-content:center;font-weight:bold;font-size:12px;border:2px solid #fff;box-shadow:0 2px 4px rgba(0,0,0,.25)">${numero}</div>`,
           iconSize: [28, 28],
           iconAnchor: [14, 14],
         }),
       })
         .addTo(map)
-        .bindPopup(
-          `<strong>Punto ${i + 1}</strong><br>${puntos[i].direccion || ''}<br>Peso: ${puntos[i].peso_kg} kg<br>Destinatario: ${puntos[i].destinatario || ''}`
-        )
+        .bindPopup(crearPopupParada(punto, numero))
 
       markersRef.current.push(marker)
     })
 
-    if (valid.length > 1) {
-      map.fitBounds(L.latLngBounds(valid), { padding: [50, 50] })
+    if (coordenadas.length > 1) {
+      map.fitBounds(L.latLngBounds(coordenadas), { padding: [50, 50] })
     } else {
-      map.setView(valid[0], 14)
+      map.setView(coordenadas[0], 14)
     }
   }, [puntos])
 
   return (
     <div>
       <div className="mapa-contenedor">
-        <div ref={mapRef} style={{ width: '100%', height: '500px' }} />
+        <div
+          ref={mapRef}
+          role="region"
+          aria-label="Mapa de la ruta: paradas numeradas en orden de entrega"
+          aria-busy={cargando}
+          style={{ width: '100%', height: '500px' }}
+        />
 
         {cargando && !sinTiles && (
-          <div style={capaAviso}>
+          <div style={capaAviso} role="status" aria-live="polite">
             Cargando mapa...
           </div>
         )}
 
         {sinTiles && (
-          <div style={capaAviso}>
+          <div style={capaAviso} role="alert">
             <strong>No se pudo cargar el mapa base.</strong>
             <br />
             El proveedor de mapas no responde en este momento. La ruta y el orden de

@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import api, { extraerError } from '../api/client'
+import { exportarResumenRuta } from '../logica/exportar'
 import SelectorPuntos from './SelectorPuntos'
 
 const ESTADOS = ['Confirmada', 'Borrador', 'En curso', 'Completada']
@@ -9,6 +10,7 @@ export default function RutasTab({ rutas, puntos, vehiculos, onVerMapa, onCambia
   const [editando, setEditando] = useState(null)
   const [formEdicion, setFormEdicion] = useState({ id_vehiculo: 1, punto_ids: [] })
   const [buscando, setBuscando] = useState(false)
+  const [exportando, setExportando] = useState(null)
 
   const hayFiltros = Boolean(filtros.desde || filtros.hasta || filtros.estado)
   const rutaEditando = rutas.find(r => r.id_ruta === editando) || null
@@ -92,6 +94,23 @@ export default function RutasTab({ rutas, puntos, vehiculos, onVerMapa, onCambia
     }
   }
 
+  const exportar = async (ruta) => {
+    if (!ruta?.distancia_total_km && ruta?.distancia_total_km !== 0) {
+      onMensaje({ tipo: 'error', texto: 'Calcula la ruta antes de exportar su resumen.' })
+      return
+    }
+
+    setExportando(ruta.id_ruta)
+    try {
+      const nombre = await exportarResumenRuta(ruta.id_ruta)
+      onMensaje({ tipo: 'ok', texto: `Resumen exportado: ${nombre}` })
+    } catch (err) {
+      onMensaje({ tipo: 'error', texto: err.message || extraerError(err, 'No se pudo exportar el resumen') })
+    } finally {
+      setExportando(null)
+    }
+  }
+
   const vehiculoEdicion = vehiculos.find(v => v.id_vehiculo === Number(formEdicion.id_vehiculo))
   const pesoEdicion = puntos
     .filter(p => formEdicion.punto_ids.includes(p.id_punto))
@@ -130,8 +149,9 @@ export default function RutasTab({ rutas, puntos, vehiculos, onVerMapa, onCambia
 
           <div className="grid">
             <div className="form-group">
-              <label>Vehiculo</label>
+              <label htmlFor="edicion-vehiculo">Vehiculo</label>
               <select
+                id="edicion-vehiculo"
                 value={formEdicion.id_vehiculo}
                 onChange={e => setFormEdicion({ ...formEdicion, id_vehiculo: Number(e.target.value) })}
               >
@@ -237,6 +257,15 @@ export default function RutasTab({ rutas, puntos, vehiculos, onVerMapa, onCambia
                     <div className="btn-grupo">
                       <button type="button" className="btn-secondary btn-sm" onClick={() => onVerMapa(r)}>
                         Mapa
+                      </button>
+                      <button
+                        type="button"
+                        className="btn-secondary btn-sm"
+                        onClick={() => exportar(r)}
+                        disabled={exportando === r.id_ruta}
+                        aria-label={`Exportar resumen de la ruta ${r.id_ruta.slice(0, 8)}`}
+                      >
+                        {exportando === r.id_ruta ? 'Exportando...' : 'Exportar'}
                       </button>
                       <button type="button" className="btn-secondary btn-sm" onClick={() => iniciarEdicion(r)}>
                         Editar

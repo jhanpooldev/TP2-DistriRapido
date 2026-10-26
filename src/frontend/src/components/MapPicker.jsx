@@ -169,7 +169,9 @@ export default function MapPicker({ latitud, longitud, onPick }) {
   return (
     <div>
       <form onSubmit={buscar} className="picker-busqueda">
+        <label htmlFor="mapa-busqueda" className="sr-only">Buscar una direccion en el mapa</label>
         <input
+          id="mapa-busqueda"
           type="text"
           value={query}
           onChange={e => setQuery(e.target.value)}
@@ -184,11 +186,17 @@ export default function MapPicker({ latitud, longitud, onPick }) {
       </form>
 
       {mensaje && (
-        <p className={`mensaje-inline ${mensaje.tipo}`}>{mensaje.texto}</p>
+        <p
+          className={`mensaje-inline ${mensaje.tipo}`}
+          role={mensaje.tipo === 'error' ? 'alert' : 'status'}
+          aria-live={mensaje.tipo === 'error' ? 'assertive' : 'polite'}
+        >
+          {mensaje.texto}
+        </p>
       )}
 
       {resultados.length > 0 && (
-        <ul className="picker-lista">
+        <ul className="picker-lista" aria-label="Resultados de la busqueda">
           {resultados.map((item, i) => (
             <li key={`${item.latitud}-${item.longitud}-${i}`}>
               <button type="button" className="picker-item" onClick={() => elegirResultado(item)}>

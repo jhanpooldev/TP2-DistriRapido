@@ -1,5 +1,6 @@
-﻿import React, { useState, useEffect } from 'react'
+﻿import React, { useState, useEffect, useRef } from 'react'
 import api, { extraerError } from '../api/client'
+import { exportarResumenRuta } from '../logica/exportar'
 import MapView from './MapView'
 import MapPicker from './MapPicker'
 import RutasTab from './RutasTab'
@@ -28,9 +29,24 @@ export default function Dashboard({ user, onLogout }) {
   const [puntoForm, setPuntoForm] = useState({ direccion: '', latitud: '', longitud: '', peso_kg: '', destinatario: '' })
   const [optimizeForm, setOptimizeForm] = useState({ id_vehiculo: 1, punto_ids: [] })
   const [geoLoading, setGeoLoading] = useState(false)
+  const [exportando, setExportando] = useState(false)
+  const tabsRef = useRef([])
 
   const mostrar = (tipo, texto) => setMensaje(texto ? { tipo, texto } : null)
   const cerrarMensaje = () => setMensaje(null)
+
+  const manejarTecladoTab = (evento, indice) => {
+    let destino = null
+    if (evento.key === 'ArrowRight') destino = (indice + 1) % TABS.length
+    else if (evento.key === 'ArrowLeft') destino = (indice - 1 + TABS.length) % TABS.length
+    else if (evento.key === 'Home') destino = 0
+    else if (evento.key === 'End') destino = TABS.length - 1
+
+    if (destino === null) return
+    evento.preventDefault()
+    setActiveTab(TABS[destino].id)
+    tabsRef.current[destino]?.focus()
+  }
 
   useEffect(() => {
     fetchPuntos()
@@ -120,6 +136,23 @@ export default function Dashboard({ user, onLogout }) {
     setActiveTab('rutas')
   }
 
+  const exportarRutaActual = async () => {
+    if (!selectedRoute || previewRoute) {
+      mostrar('error', 'Guarda y calcula la ruta antes de exportar su resumen.')
+      return
+    }
+
+    setExportando(true)
+    try {
+      const nombre = await exportarResumenRuta(selectedRoute.id_ruta)
+      mostrar('ok', `Resumen exportado: ${nombre}`)
+    } catch (err) {
+      mostrar('error', err.message || extraerError(err, 'No se pudo exportar el resumen'))
+    } finally {
+      setExportando(false)
+    }
+  }
+
   const mensajeDeValidacion = () => {
     if (cantidadPuntos === 0) return 'Agrega al menos 2 pedidos para poder calcular la ruta.'
     if (cantidadPuntos === 1) return 'Falta al menos 1 pedido: una ruta necesita 2 puntos.'
@@ -129,7 +162,9 @@ export default function Dashboard({ user, onLogout }) {
   }
 
   return (
-    <div className="container">
+    <>
+      <a className="skip-link" href="#contenido-principal">Saltar al contenido principal</a>
+      <main id="contenido-principal" className="container" tabIndex={-1}>
       <header className="app-header">
         <div className="app-marca">
           <div className="app-logo">E</div>
@@ -145,26 +180,44 @@ export default function Dashboard({ user, onLogout }) {
       </header>
 
       {mensaje && (
-        <div className={`alert alert-${mensaje.tipo === 'error' ? 'error' : mensaje.tipo === 'info' ? 'info' : 'success'}`}>
+        <div
+          className={`alert alert-${mensaje.tipo === 'error' ? 'error' : mensaje.tipo === 'info' ? 'info' : 'success'}`}
+          role={mensaje.tipo === 'error' ? 'alert' : 'status'}
+          aria-live={mensaje.tipo === 'error' ? 'assertive' : 'polite'}
+          aria-atomic="true"
+        >
           <span>{mensaje.texto}</span>
           <button type="button" onClick={cerrarMensaje} aria-label="Cerrar aviso">&times;</button>
         </div>
       )}
 
-      <div className="nav-tabs">
-        {TABS.map(t => (
+      <div className="nav-tabs" role="tablist" aria-label="Secciones del panel">
+        {TABS.map((t, indice) => (
           <button
             key={t.id}
+            ref={elemento => { tabsRef.current[indice] = elemento }}
+            id={`tab-${t.id}`}
             type="button"
+            role="tab"
+            aria-selected={activeTab === t.id}
+            aria-controls={`panel-${t.id}`}
+            tabIndex={activeTab === t.id ? 0 : -1}
             className={`nav-tab ${activeTab === t.id ? 'active' : ''}`}
             onClick={() => setActiveTab(t.id)}
+            onKeyDown={evento => manejarTecladoTab(evento, indice)}
           >
-            <span className="nav-num">{t.num}</span>
+            <span className="nav-num" aria-hidden="true">{t.num}</span>
             {t.label}
           </button>
         ))}
       </div>
 
+      <div
+        id={`panel-${activeTab}`}
+        role="tabpanel"
+        aria-labelledby={`tab-${activeTab}`}
+        tabIndex={0}
+      >
       {activeTab === 'puntos' && (
         <div>
           <div className="card">
@@ -211,8 +264,11 @@ export default function Dashboard({ user, onLogout }) {
           <form onSubmit={crearPunto} className="card">
             <div className="grid">
               <div className="form-group">
-                <label>Direccion {geoLoading && '(buscando...)'}</label>
+                <label htmlFor="punto-direccion">
+                  Direccion {geoLoading && '(buscando...)'}
+                </label>
                 <input
+                  id="punto-direccion"
                   value={puntoForm.direccion}
                   onChange={e => setPuntoForm({ ...puntoForm, direccion: e.target.value })}
                   placeholder="Se completa al hacer click en el mapa"
@@ -220,8 +276,9 @@ export default function Dashboard({ user, onLogout }) {
                 />
               </div>
               <div className="form-group">
-                <label>Latitud</label>
+                <label htmlFor="punto-latitud">Latitud</label>
                 <input
+                  id="punto-latitud"
                   type="number"
                   step="any"
                   value={puntoForm.latitud}
@@ -231,8 +288,9 @@ export default function Dashboard({ user, onLogout }) {
                 />
               </div>
               <div className="form-group">
-                <label>Longitud</label>
+                <label htmlFor="punto-longitud">Longitud</label>
                 <input
+                  id="punto-longitud"
                   type="number"
                   step="any"
                   value={puntoForm.longitud}
@@ -242,8 +300,9 @@ export default function Dashboard({ user, onLogout }) {
                 />
               </div>
               <div className="form-group">
-                <label>Peso (kg)</label>
+                <label htmlFor="punto-peso">Peso (kg)</label>
                 <input
+                  id="punto-peso"
                   type="number"
                   step="0.1"
                   value={puntoForm.peso_kg}
@@ -252,8 +311,9 @@ export default function Dashboard({ user, onLogout }) {
                 />
               </div>
               <div className="form-group">
-                <label>Destinatario</label>
+                <label htmlFor="punto-destinatario">Destinatario</label>
                 <input
+                  id="punto-destinatario"
                   value={puntoForm.destinatario}
                   onChange={e => setPuntoForm({ ...puntoForm, destinatario: e.target.value })}
                   required
@@ -322,8 +382,9 @@ export default function Dashboard({ user, onLogout }) {
             <h3>2. Elige el vehiculo y calcula</h3>
             <div className="grid">
               <div className="form-group">
-                <label>Vehiculo</label>
+                <label htmlFor="ruta-vehiculo">Vehiculo</label>
                 <select
+                  id="ruta-vehiculo"
                   value={optimizeForm.id_vehiculo}
                   onChange={e => setOptimizeForm({ ...optimizeForm, id_vehiculo: Number(e.target.value) })}
                   required
@@ -378,21 +439,25 @@ export default function Dashboard({ user, onLogout }) {
                 No hay rutas guardadas. Armala primero en la pestaña <strong>Rutas</strong>.
               </p>
             ) : (
-              <select
-                value={selectedRoute?.id_ruta || ''}
-                onChange={e => {
-                  const ruta = rutas.find(r => r.id_ruta === e.target.value)
-                  setSelectedRoute(ruta || null)
-                  setPreviewRoute(null)
-                }}
-              >
+              <>
+                <label htmlFor="mapa-ruta" className="sr-only">Ruta guardada</label>
+                <select
+                  id="mapa-ruta"
+                  value={selectedRoute?.id_ruta || ''}
+                  onChange={e => {
+                    const ruta = rutas.find(r => r.id_ruta === e.target.value)
+                    setSelectedRoute(ruta || null)
+                    setPreviewRoute(null)
+                  }}
+                >
                 <option value="">-- Seleccionar una ruta --</option>
                 {rutas.map(r => (
                   <option key={r.id_ruta} value={r.id_ruta}>
                     {r.id_ruta.slice(0, 8)}... · {r.distancia_total_km} km · {r.estado}
                   </option>
                 ))}
-              </select>
+                </select>
+              </>
             )}
           </div>
 
@@ -435,6 +500,20 @@ export default function Dashboard({ user, onLogout }) {
                     </button>
                     <button type="button" className="btn-secondary" onClick={descartarPreview}>
                       Descartar y volver a Rutas
+                    </button>
+                  </div>
+                )}
+
+                {selectedRoute && !previewRoute && (
+                  <div className="btn-grupo sep">
+                    <button
+                      type="button"
+                      className="btn-secondary"
+                      onClick={exportarRutaActual}
+                      disabled={exportando}
+                      aria-label={`Exportar resumen de la ruta ${selectedRoute.id_ruta.slice(0, 8)}`}
+                    >
+                      {exportando ? 'Exportando...' : 'Exportar resumen'}
                     </button>
                   </div>
                 )}
@@ -502,6 +581,8 @@ export default function Dashboard({ user, onLogout }) {
           </div>
         </div>
       )}
-    </div>
+      </div>
+      </main>
+    </>
   )
 }

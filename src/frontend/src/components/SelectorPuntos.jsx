@@ -134,7 +134,7 @@ export default function SelectorPuntos({
         </button>
       </div>
 
-      {aviso && <div className="alert alert-error">{aviso}</div>}
+      {aviso && <div className="alert alert-error" role="alert" aria-live="assertive">{aviso}</div>}
 
       <div className="sel-panel">
         <div>

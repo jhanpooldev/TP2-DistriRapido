@@ -1,5 +1,6 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 from contextlib import asynccontextmanager
 import logging
 import uuid
@@ -79,11 +80,65 @@ app = FastAPI(
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=settings.cors_origins,
     allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allow_headers=["Authorization", "Content-Type", "X-Request-ID"],
+    expose_headers=["Content-Disposition", "X-Request-ID"],
 )
+
+
+@app.middleware("http")
+async def contexto_de_peticion(request: Request, call_next):
+    """Agrega un identificador de correlacion y cabeceras de endurecimiento.
+
+    El identificador se devuelve al cliente y se registra en los errores, de
+    modo que un fallo reportado por el operador se pueda buscar en los logs
+    sin exponer detalles internos en la respuesta.
+    """
+    request_id = request.headers.get("X-Request-ID") or str(uuid.uuid4())
+    request.state.request_id = request_id
+
+    response = await call_next(request)
+
+    response.headers["X-Request-ID"] = request_id
+    response.headers.setdefault("X-Content-Type-Options", "nosniff")
+    response.headers.setdefault("X-Frame-Options", "DENY")
+    response.headers.setdefault("Referrer-Policy", "no-referrer")
+    response.headers.setdefault(
+        "Permissions-Policy",
+        "geolocation=(self), microphone=(), camera=()",
+    )
+
+    esquema = request.headers.get("X-Forwarded-Proto", request.url.scheme)
+    if esquema == "https":
+        response.headers.setdefault(
+            "Strict-Transport-Security",
+            "max-age=31536000; includeSubDomains",
+        )
+
+    return response
+
+
+@app.exception_handler(Exception)
+async def manejar_error_no_controlado(request: Request, exc: Exception):
+    """Registra el detalle y devuelve un 500 sin filtrar informacion interna."""
+    request_id = getattr(request.state, "request_id", "sin-identificador")
+    logger.error(
+        "Error no controlado [%s] en %s %s",
+        request_id,
+        request.method,
+        request.url.path,
+        exc_info=exc,
+    )
+    return JSONResponse(
+        status_code=500,
+        content={
+            "detail": "Error interno del servidor. Intenta de nuevo o contacta al administrador.",
+            "request_id": request_id,
+        },
+    )
+
 
 app.include_router(api_router, prefix="/api/v1")
 

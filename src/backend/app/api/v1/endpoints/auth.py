@@ -1,3 +1,5 @@
+import logging
+
 from fastapi import APIRouter, Depends, HTTPException, status, Form
 from sqlalchemy.orm import Session
 from app.core.database import get_db
@@ -7,6 +9,7 @@ from app.schemas import UsuarioCreate, UsuarioResponse, Token
 from app.api.v1.endpoints.dependencies import get_current_user, get_current_admin
 
 router = APIRouter()
+logger = logging.getLogger(__name__)
 
 @router.post("/register", response_model=UsuarioResponse, status_code=status.HTTP_201_CREATED)
 def register(
@@ -34,6 +37,10 @@ def register(
 def login(correo: str = Form(...), password: str = Form(...), db: Session = Depends(get_db)):
     user = db.query(Usuario).filter(Usuario.correo == correo).first()
     if not user or not verify_password(password, user.contrasena_hash):
+        # Se registra el intento sin incluir la contrasena. El correo se limpia
+        # de saltos de linea para evitar inyeccion de lineas en el log.
+        correo_registrado = correo.replace("\r", " ").replace("\n", " ")[:120]
+        logger.warning("Inicio de sesion fallido para correo=%s", correo_registrado)
         raise HTTPException(status_code=401, detail="Credenciales inválidas")
     token = create_access_token({"sub": str(user.id_usuario), "rol": user.rol.nombre})
     return {"access_token": token, "token_type": "bearer"}

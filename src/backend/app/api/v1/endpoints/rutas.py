@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Response, status
 from sqlalchemy import func
 from sqlalchemy.orm import Session
 from datetime import datetime, time as time_type
@@ -10,6 +10,7 @@ from app.core.config import get_settings
 from app.models import Ruta, RutaPunto, PuntoEntrega, ParametrosVehiculo
 from app.schemas import RutaOptimizarRequest, RutaResponse, ResumenRuta, PuntoRutaResponse, PuntoEntregaResponse
 from app.api.v1.endpoints.dependencies import get_current_operador, get_current_user
+from app.services.exportacion import generar_csv_resumen, nombre_archivo_csv
 from app.services.optimizer import (
     nearest_neighbor, two_opt, route_distance,
     build_route_response, persist_ruta, calcular_ahorro, co2_kg_por_km,
@@ -308,27 +309,21 @@ def get_ruta(ruta_id: uuid.UUID, db: Session = Depends(get_db), user = Depends(g
         raise HTTPException(status_code=403, detail="No autorizado")
     return _ruta_to_response(db, ruta)
 
-@router.get("/{ruta_id}/resumen", response_model=ResumenRuta)
-def get_resumen(ruta_id: uuid.UUID, db: Session = Depends(get_db), user = Depends(get_current_user)):
-    ruta = db.query(Ruta).filter(Ruta.id_ruta == ruta_id).first()
-    if not ruta:
-        raise HTTPException(status_code=404, detail="Ruta no encontrada")
-    if user.rol.nombre != "Administrador" and ruta.id_operador != user.id_usuario:
-        raise HTTPException(status_code=403, detail="No autorizado")
-
-    puntos = db.query(RutaPunto).filter(RutaPunto.id_ruta == ruta_id).order_by(RutaPunto.orden).all()
-    puntos_schema = []
-    for rp in puntos:
-        p = rp.punto
-        puntos_schema.append(PuntoRutaResponse(
-            id_punto=p.id_punto,
+def _resumen_de_ruta(db: Session, ruta) -> ResumenRuta:
+    """Construye el resumen compartido por la vista JSON y la exportacion CSV."""
+    puntos = db.query(RutaPunto).filter(RutaPunto.id_ruta == ruta.id_ruta).order_by(RutaPunto.orden).all()
+    puntos_schema = [
+        PuntoRutaResponse(
+            id_punto=rp.punto.id_punto,
             orden=rp.orden,
-            direccion=p.direccion,
-            latitud=p.latitud,
-            longitud=p.longitud,
-            peso_kg=p.peso_kg,
-            destinatario=p.destinatario,
-        ))
+            direccion=rp.punto.direccion,
+            latitud=rp.punto.latitud,
+            longitud=rp.punto.longitud,
+            peso_kg=rp.punto.peso_kg,
+            destinatario=rp.punto.destinatario,
+        )
+        for rp in puntos
+    ]
 
     ahorro = calcular_ahorro(
         float(ruta.distancia_total_km),
@@ -349,6 +344,40 @@ def get_resumen(ruta_id: uuid.UUID, db: Session = Depends(get_db), user = Depend
         ahorro_co2_pct=ahorro["ahorro_co2_pct"],
         ahorro_distancia_pct=ahorro["ahorro_distancia_pct"],
         sin_reduccion_significativa=ahorro["sin_reduccion_significativa"],
+    )
+
+
+def _ruta_autorizada(db: Session, ruta_id: uuid.UUID, user) -> Ruta:
+    ruta = db.query(Ruta).filter(Ruta.id_ruta == ruta_id).first()
+    if not ruta:
+        raise HTTPException(status_code=404, detail="Ruta no encontrada")
+    if user.rol.nombre != "Administrador" and ruta.id_operador != user.id_usuario:
+        raise HTTPException(status_code=403, detail="No autorizado")
+    return ruta
+
+
+@router.get("/{ruta_id}/resumen", response_model=ResumenRuta)
+def get_resumen(ruta_id: uuid.UUID, db: Session = Depends(get_db), user = Depends(get_current_user)):
+    ruta = _ruta_autorizada(db, ruta_id, user)
+    return _resumen_de_ruta(db, ruta)
+
+
+@router.get(
+    "/{ruta_id}/export",
+    response_class=Response,
+    responses={200: {"content": {"text/csv": {}}, "description": "Resumen de la ruta en CSV"}},
+)
+def exportar_resumen(ruta_id: uuid.UUID, db: Session = Depends(get_db), user = Depends(get_current_user)):
+    """US-008: descarga del resumen con puntos, orden e impacto ambiental."""
+    ruta = _ruta_autorizada(db, ruta_id, user)
+    resumen = _resumen_de_ruta(db, ruta)
+    contenido = generar_csv_resumen(ruta, resumen)
+    nombre = nombre_archivo_csv(ruta)
+
+    return Response(
+        content=contenido,
+        media_type="text/csv; charset=utf-8",
+        headers={"Content-Disposition": f'attachment; filename="{nombre}"'},
     )
 
 @router.delete("/{ruta_id}", status_code=status.HTTP_204_NO_CONTENT)
