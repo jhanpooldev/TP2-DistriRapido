@@ -246,3 +246,21 @@ CREATE INDEX idx_ruta_puntos_orden   ON ruta_puntos(id_ruta, orden);
 | NOT-06 | El factor de emisión de CO₂, el consumo de combustible y la velocidad promedio son atributos configurables por vehículo, lo que permite estimar distancia, tiempo y emisiones según las reglas de cálculo de las Reglas de Negocio (RN-015, RN-016, RN-017). |
 | NOT-07 | El centro de distribución, que actúa como origen y retorno de toda ruta (RN-011), no es una entidad de este modelo: se configura mediante las variables de entorno `HOME_ADDRESS`, `HOME_LAT` y `HOME_LNG`. Su administración gráfica queda para una versión posterior. |
 | NOT-08 | El orden de los puntos se materializa en `ruta_puntos.orden` y comienza en 1, siendo el valor 1 la primera parada después del centro de distribución. La numeración es continua y única por ruta, garantizada mediante la restricción `UNIQUE (id_ruta, orden)`. |
+
+---
+
+## 5. Implementación del DDL y Origen del Esquema
+
+El DDL completo del esquema PostgreSQL versionado se encuentra en **`src/backend/esquema.sql`**, generado a partir de los modelos SQLAlchemy (`src/backend/app/models/__init__.py`).
+
+El proyecto **no usa migraciones** en el PMV (no hay Alembic): las tablas se crean al iniciar la aplicación desde los modelos ORM (`Base.metadata.create_all`, ver `src/backend/app/core/database.py`). El archivo `src/backend/esquema.sql` es la representación SQL versionada de esos mismos modelos.
+
+Fuentes de la definición de datos:
+- Modelos ORM: `src/backend/app/models/__init__.py`
+- Archivo DDL: `src/backend/esquema.sql`
+
+> Regenerar después de cambiar `app/models`:
+> ```bash
+> cd src/backend
+> python -c "from app.core.database import Base; from sqlalchemy.schema import CreateTable; from sqlalchemy.dialects import postgresql; [print(CreateTable(t).compile(dialect=postgresql.dialect())) for t in Base.metadata.sorted_tables]" > esquema.sql
+> ```

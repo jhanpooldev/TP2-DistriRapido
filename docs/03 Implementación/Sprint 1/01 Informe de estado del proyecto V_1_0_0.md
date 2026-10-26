@@ -1,6 +1,6 @@
 # Informe de estado del proyecto
 
-[← Volver al README principal](../../README.md)
+[← Volver al README principal](../../../README.md)
 
 ---
 
@@ -224,4 +224,4 @@ Los entregables del Sprint 2 se encuentran archivados en `docs/03 Implementació
 
 ---
 
-[← Volver al README principal](../../README.md)
+[← Volver al README principal](../../../README.md)

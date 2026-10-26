@@ -1,6 +1,8 @@
-# Estructura 3: Pruebas
+[← Volver al README Principal](../../README.md)
 
-Carpeta de la estructura requerida del PFA dedicada a las pruebas del sistema
+# Documento 12: Plan y Estrategia de Pruebas
+
+Documento dedicado a la planificación y estrategia de pruebas del sistema
 **EcoLogística Lima**.
 
 ## Qué va aquí
@@ -16,9 +18,9 @@ Las suites de pruebas viven junto al código que verifican (no se duplican):
 | Artefacto | Ubicación |
 | :--- | :--- |
 | Suite pytest (51 pruebas) | `src/backend/tests` |
-| Selección de enfoque / trazabilidad | `docs/inicio/06`, `docs/inicio/09` |
+| Selección de enfoque / trazabilidad | [05 Requisitos funcionales](05%20Requisitos%20funcionales%20V_1_0_0.md), [08 Reglas de negocio](08%20Reglas%20de%20negocio%20V_1_0_0.md) |
 | Registro de KPIs y su verificación | `README.md` (sección KPIs) |
-| Impedimentos detectados al probar | `docs/03 Implementación/02 Registro de Impedimentos V_1_0_0.md` |
+| Impedimentos detectados al probar | [Registro de Impedimentos del Sprint 1](../03%20Implementación/Sprint%201/02%20Registro%20de%20Impedimentos%20V_1_0_0.md) |
 
 ## Herramientas de verificación de extremo a extremo
 

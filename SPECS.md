@@ -4,19 +4,19 @@ Especificación técnica del sistema **EcoLogística Lima – Optimizador de Rut
 
 Este documento resume la especificación del sistema. Cuando un detalle normativo
 requiere precisión (criterios de aceptación, fórmulas de cálculo, DDL), la fuente
-de verdad es el documento correspondiente en `docs/inicio/`, referenciado en cada
+de verdad es el documento correspondiente en `docs/02 Planificación/` y `docs/04 Arquitectura/`, referenciado en cada
 sección.
 
 | Documento de referencia | Contenido |
 |---|---|
-| `docs/inicio/06. Requisitos funcionales` | RF-001 a RF-014 con criterios BDD |
-| `docs/inicio/07. Requisitos no funcionales` | RNF-001 a RNF-015 con métricas SMART |
-| `docs/inicio/08. Usuarios` | Actores y matriz de control de acceso |
-| `docs/inicio/09. Reglas de negocio` | RN-001 a RN-020 con matriz de trazabilidad |
-| `docs/inicio/10. Stack tecnológico` | Evaluación y selección del stack |
-| `docs/inicio/11. Base de datos` | Modelo conceptual, lógico y físico (DDL) |
-| `docs/inicio/12. Modelo C4` | Arquitectura por niveles |
-| `docs/inicio/13. Restricciones` | Restricciones multidimensionales del proyecto |
+| [05 Requisitos funcionales](docs/02%20Planificación/05%20Requisitos%20funcionales%20V_1_0_0.md) | RF-001 a RF-014 con criterios BDD |
+| [06 Requisitos no funcionales](docs/02%20Planificación/06%20Requisitos%20no%20funcionales%20V_1_0_0.md) | RNF-001 a RNF-015 con métricas SMART |
+| [07 Usuarios roles y permisos](docs/02%20Planificación/07%20Usuarios%20roles%20y%20permisos%20V_1_0_0.md) | Actores y matriz de control de acceso |
+| [08 Reglas de negocio](docs/02%20Planificación/08%20Reglas%20de%20negocio%20V_1_0_0.md) | RN-001 a RN-020 con matriz de trazabilidad |
+| [09 Evaluación de tecnologías](docs/02%20Planificación/09%20Evaluación%20de%20tecnologías%20V_1_0_0.md) | Evaluación y selección del stack |
+| [10 Base de datos](docs/02%20Planificación/10%20Base%20de%20datos%20V_1_0_0.md) | Modelo conceptual, lógico y físico (DDL) |
+| [01 Modelo C4](docs/04%20Arquitectura/01%20Modelo%20C4%20V_1_0_0.md) | Arquitectura por niveles |
+| [11 Análisis de restricciones](docs/02%20Planificación/11%20Análisis%20de%20restricciones%20V_1_0_0.md) | Restricciones multidimensionales del proyecto |
 
 ---
 
@@ -79,7 +79,7 @@ Exportación de resultados (opcional, fuera del PMV)
 # Actores del Sistema
 
 Los tres actores Directos del PMV se describen en detalle en el documento
-`docs/inicio/08. Usuarios`. Los actores Indirectos (docente, gerencia simulada y
+[07 Usuarios roles y permisos](docs/02%20Planificación/07%20Usuarios%20roles%20y%20permisos%20V_1_0_0.md). Los actores Indirectos (docente, gerencia simulada y
 API de mapas) no tienen credenciales de acceso al sistema.
 
 ## Administrador
@@ -106,21 +106,21 @@ Visualizar reportes
 ## Fuera del alcance del PMV
 
 Las siguientes entidades quedan para versiones posteriores, según la nota NOT-05
-del documento `docs/inicio/11. Base de datos`:
+del documento [10 Base de datos](docs/02%20Planificación/10%20Base%20de%20datos%20V_1_0_0.md):
 
 - **Conductor:** gestión de conductores y asignación conductor–vehículo.
 - **Zona de distribución:** agrupación geográfica de puntos de entrega.
 - **Pedido y Entrega:** trazabilidad comercial del pedido hasta su entrega.
 
 Las reglas de negocio que sí se aplican en el PMV están consolidadas en el
-documento `docs/inicio/09. Reglas de negocio` (RN-001 a RN-020) y son la fuente
+documento [08 Reglas de negocio](docs/02%20Planificación/08%20Reglas%20de%20negocio%20V_1_0_0.md) (RN-001 a RN-020) y son la fuente
 de verdad para el cálculo de distancias, tiempos y emisiones.
 
 ---
 # Reglas de Negocio
 
 La especificación completa y trazable de las reglas de negocio se encuentra en el
-documento `docs/inicio/09. Reglas de negocio` (RN-001 a RN-020). Resumen:
+documento [08 Reglas de negocio](docs/02%20Planificación/08%20Reglas%20de%20negocio%20V_1_0_0.md) (RN-001 a RN-020). Resumen:
 
 ## Seguridad y control de acceso (RN-001 a RN-006)
 Un usuario solo ingresa si su correo existe y la contraseña coincide tras el hash (RN-001).
@@ -195,7 +195,7 @@ Error durante la optimización → mantener los datos existentes y retornar erro
 
 La especificación completa de los requisitos funcionales del PMV, con sus criterios
 de aceptación en formato Gherkin/BDD, se encuentra en el documento
-`docs/inicio/06. Requisitos funcionales` (RF-001 a RF-014). Resumen por rol:
+[05 Requisitos funcionales](docs/02%20Planificación/05%20Requisitos%20funcionales%20V_1_0_0.md) (RF-001 a RF-014). Resumen por rol:
 
 ## Administrador
 RF-002: Registrar usuarios
@@ -318,7 +318,7 @@ responde `404` si la ruta aún no ha sido calculada ni confirmada.
 # Modelo de Datos (Alto Nivel)
 
 El esquema completo, con tipos, restricciones y DDL en SQL, se encuentra en el
-documento `docs/inicio/11. Base de datos`. Las entidades del PMV son:
+documento [10 Base de datos](docs/02%20Planificación/10%20Base%20de%20datos%20V_1_0_0.md). Las entidades del PMV son:
 
 | Tabla | Descripción |
 |---|---|
@@ -338,7 +338,7 @@ Relaciones principales:
 - ruta ↔ punto_entrega (N:M, a través de ruta_puntos, con el campo `orden`)
 
 Las tablas de conductores, zonas, pedidos, entregas e incidencias quedan fuera del
-alcance del PMV (nota NOT-05 de `docs/inicio/11. Base de datos`).
+alcance del PMV (nota NOT-05 de [10 Base de datos](docs/02%20Planificación/10%20Base%20de%20datos%20V_1_0_0.md)).
 
 ---
 # Requisitos de Interfaz (UI)
@@ -362,7 +362,7 @@ Interfaz accesible conforme a WCAG 2.1 nivel AA (etiquetas asociadas y contraste
 ---
 # Requisitos No Funcionales
 
-Detalle completo con escenarios de calidad y métricas SMART en `docs/inicio/07. Requisitos no funcionales` (RNF-001 a RNF-015).
+Detalle completo con escenarios de calidad y métricas SMART en [06 Requisitos no funcionales](docs/02%20Planificación/06%20Requisitos%20no%20funcionales%20V_1_0_0.md) (RNF-001 a RNF-015).
 
 ## Rendimiento
 Tiempo de generación de rutas ≤ 5 segundos (P95) para conjuntos de hasta 20 puntos de entrega.

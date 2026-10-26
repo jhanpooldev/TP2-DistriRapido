@@ -1,6 +1,6 @@
 # Revisión del Sprint
 
-[← Volver al README principal](../../README.md)
+[← Volver al README principal](../../../README.md)
 
 ---
 
@@ -211,7 +211,7 @@ es repetible.
 
 ## 8. Enlaces de Retorno
 
-- [Volver al README principal](../../README.md)
+- [Volver al README principal](../../../README.md)
 - Informe de estado del Sprint 1: `01 Informe de estado del proyecto V_1_0_0.md`
 - Registro de impedimentos del Sprint 1: `02 Registro de Impedimentos V_1_0_0.md`
 - Retrospectiva del Sprint 1: `04 Retrospectiva del Sprint V_1_0_0.md`
@@ -219,4 +219,4 @@ es repetible.
 
 ---
 
-[← Volver al README principal](../../README.md)
+[← Volver al README principal](../../../README.md)

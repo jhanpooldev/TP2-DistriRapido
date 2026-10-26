@@ -10,53 +10,38 @@ Siempre utilizar una estructura de proyecto modular y mantenible.
 
 El proyecto será desarrollado como un Producto Mínimo Viable (PMV) durante un periodo académico de 12 semanas.
 
-**Estructura raíz (5 estructuras requeridas del PFA):**
+**Estructura del Proyecto:**
 
-/docs               # Estructura 1: Documentación
-
-/src/backend        # Estructura 2: Código - FastAPI (Python)
-
-/src/frontend       # Estructura 2: Código - React + Vite
-
-/pruebas            # Estructura 3: Pruebas (plan, evidencias, índice de suites)
-
-/base de datos      # Estructura 4: Índice de Scripts SQL (DDL en src/backend/esquema.sql)
-
-/modelos            # Estructura 5: Modelamiento (C4, base de datos, RN)
+```text
+/docs/01 Inicio             # Documentación de inicio y visión
+/docs/02 Planificación       # Planificación, requisitos, base de datos y plan de pruebas
+/docs/03 Implementación      # Entregables por sprint (Sprint 1, Sprint 2)
+/docs/04 Arquitectura       # Arquitectura del sistema, Modelo C4 y especificaciones
+/docs/05 Evidencias         # Evidencias de pruebas, auditorías y validaciones
+/src/backend                # Backend FastAPI (Python)
+/src/frontend               # Frontend React + Vite
+```
 
 Las pruebas automatizadas residen dentro de cada aplicación, junto al código
 que verifican: `/src/backend/tests` (pytest) y `/src/frontend/src/**/*.test.jsx` (Vitest).
 No se mantiene una carpeta `/tests` en la raíz para evitar duplicar la suite y
-repartirla entre las aplicaciones que la consumen. La estructura `/pruebas` es el
-índice y repositorio de evidencias del plan de pruebas.
+repartirla entre las aplicaciones que la consumen. El plan y registro de evidencias
+se documentan en `/docs/02 Planificación/12 Plan de pruebas V_1_0_0.md` y `/docs/05 Evidencias`.
 
 `/docker` y `docker-compose.yml` se consideran **opcionales y no se aplican en el PMV**,
 por no existir Docker en el entorno de desarrollo del equipo y para mantener el
 costo de infraestructura en S/ 0.00.
 
-**Documentación:**
-
-/docs/inicio
-
-/docs/planificacion
-
-/docs/ejecucion
-
-/docs/seguimiento_control
-
-/docs/cierre
-
-/docs/otros
-
 **Siempre incluir:**
 
 - `README.md` (con Tabla de Contenidos)
+- `DESIGN.md`
+- `AGENTS.md`
 - `.gitignore`
 - `.env.example`
 - `CHANGELOG.md`
 - `CONSTITUTION.md`
 - `SPECS.md`
-- `AGENT.md`
 
 El archivo `.env` no deberá incluirse en el repositorio.
 

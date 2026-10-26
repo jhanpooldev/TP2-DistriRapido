@@ -1,4 +1,4 @@
-﻿# Sistema Web de Optimización de Rutas Sostenibles — EcoLogística Lima
+# Sistema Web de Optimización de Rutas Sostenibles — EcoLogística Lima
 
 Optimizador de rutas de reparto sostenible para **DistriRápido S.A.C.**, desarrollado
 en el curso Taller de Proyectos 2 — Ingeniería de Sistemas e Informática.
@@ -23,6 +23,7 @@ en el curso Taller de Proyectos 2 — Ingeniería de Sistemas e Informática.
 16. [Documentación del Proyecto](#documentación-del-proyecto)
 17. [Integrantes del Equipo](#integrantes-del-equipo)
 18. [Licencia](#licencia)
+19. [Enlaces](#enlaces)
 
 ---
 
@@ -175,7 +176,7 @@ Pendiente:
 - HTTPS (**RNF-02**): no implementado en la aplicación; corresponde al ambiente de
   despliegue.
 - Autenticación multifactor (MFA con TOTP): especificada en
-  [`docs/inicio/14. Especificación MFA y Sesiones`](docs/inicio/14.%20Especificacion%20MFA%20y%20Sesiones%20V_1_0_0.md),
+  [`docs/04 Arquitectura/02 Especificación MFA y Sesiones`](docs/04%20Arquitectura/02%20Especificacion%20MFA%20y%20Sesiones%20V_1_0_0.md),
   no implementada.
 
 ### Limitación conocida del motor de ruteo
@@ -186,7 +187,7 @@ orden en que se envían los puntos resulta mejor que ese, la API puede informar 
 `distancia_total_km` levemente mayor que `distancia_sin_optimizar_km`. El ahorro no llega
 a ser negativo porque se acota en cero. Con cuatro o más puntos la búsqueda actúa con
 normalidad. Registrado como **IMP-10** en el
-[`Registro de Impedimentos del Sprint 1`](docs/03%20Implementación/02%20Registro%20de%20Impedimentos%20V_1_0_0.md).
+[`Registro de Impedimentos del Sprint 1`](docs/03%20Implementación/Sprint%201/02%20Registro%20de%20Impedimentos%20V_1_0_0.md).
 
 ---
 
@@ -210,21 +211,22 @@ La comunicación entre frontend y backend se realiza por HTTP/REST, con CORS con
 para el origen del frontend. En desarrollo, Vite redirige `/api` al backend.
 
 El detalle de la arquitectura por niveles (C4) se encuentra en
-[`docs/inicio/12. Modelo C4`](docs/inicio/12.%20Modelo%20C4%20V_1_0_0.md).
+[`docs/04 Arquitectura/01 Modelo C4`](docs/04%20Arquitectura/01%20Modelo%20C4%20V_1_0_0.md).
 
 ---
 
 ## Estructura del Proyecto
 
-El repositorio cumple las **cinco estructuras requeridas** del PFA:
+El repositorio organiza su documentación y código fuente de acuerdo con el ciclo de vida del proyecto y las etapas de desarrollo:
 
-| # | Estructura | Contenido |
+| # | Directorio | Contenido |
 | :--- | :--- | :--- |
-| 1 | `docs/` | Documentación (Inicio, Planificación, Implementación) |
-| 2 | `src/` | Código fuente (backend y frontend) |
-| 3 | `pruebas/` | Pruebas: plan, evidencias e índice de las suites automatizadas |
-| 4 | `base de datos/` | Scripts SQL (DDL del esquema, en `src/backend/esquema.sql`) |
-| 5 | `modelos/` | Modelamiento (C4, base de datos, reglas de negocio) |
+| 1 | `docs/01 Inicio/` | Constitución, visión, supuestos, restricciones iniciales e interesados |
+| 2 | `docs/02 Planificación/` | Backlog, Jira, riesgos, presupuesto, requisitos (RF/RNF), roles, reglas de negocio, BD y plan de pruebas |
+| 3 | `docs/03 Implementación/` | Entregables y reportes agrupados por sprint (`Sprint 1/`, `Sprint 2/`) |
+| 4 | `docs/04 Arquitectura/` | Arquitectura del sistema, Modelo C4, especificaciones técnicas y seguridad MFA (`specs/`) |
+| 5 | `docs/05 Evidencias/` | Registro de evidencias de validación, auditoría de API y resultados de pruebas |
+| 6 | `src/` | Código fuente del sistema (`backend/` FastAPI y `frontend/` React) |
 
 ```text
 /
@@ -232,23 +234,23 @@ El repositorio cumple las **cinco estructuras requeridas** del PFA:
 |-- .env.example                 # Plantilla de variables de entorno
 |-- .gitattributes
 |-- .gitignore                   # Excluye venv, node_modules, .env, cachés, etc.
-|-- AGENT.md                     # Estándares de codificación
-|-- CHANGELOG.md                 # Historial de cambios
-|-- CONSTITUTION.md              # Decisiones arquitecturales del proyecto
-|-- README.md
-|-- SPECS.md                     # Especificación técnica
+|-- AGENTS.md                    # Estándares e instrucciones para agentes IA
+|-- CHANGELOG.md                 # Historial de cambios y versiones (SemVer)
+|-- CONSTITUTION.md              # Constitución arquitectural y directrices del proyecto
+|-- DESIGN.md                    # Índice de decisiones de diseño y arquitectura
+|-- README.md                    # Descripción general del proyecto
+|-- SPECS.md                     # Especificación técnica del PMV
 |
-|-- docs/                        # Estructura 1: Documentación
-|   |-- inicio/                  # Fase de Inicio (14 documentos)
-|   |-- planificacion/           # Backlog, artefactos Jira, riesgos, presupuesto
-|   `-- 03 Implementación/       # Entregables por sprint
-|       |-- 01 Informe de estado del proyecto V_1_0_0.md
-|       |-- 02 Registro de Impedimentos V_1_0_0.md
-|       |-- 03 Revisión del Sprint V_1_0_0.md
-|       |-- 04 Retrospectiva del Sprint V_1_0_0.md
-|       `-- sprint 2/            # Entregables archivados del Sprint 2 (V_2_0_0)
+|-- docs/
+|   |-- 01 Inicio/               # Fase de Inicio (5 documentos)
+|   |-- 02 Planificación/        # Fase de Planificación y Requisitos (12 documentos)
+|   |-- 03 Implementación/       # Entregables organizados por sprint
+|   |   |-- Sprint 1/            # 4 entregables del Sprint 1 (V_1_0_0)
+|   |   `-- Sprint 2/            # 4 entregables del Sprint 2 (V_2_0_0)
+|   |-- 04 Arquitectura/         # Modelo C4 y especificaciones MFA (con specs/)
+|   `-- 05 Evidencias/           # Inventario de evidencias de pruebas y auditoría
 |
-|-- src/                         # Estructura 2: Código
+|-- src/                         # Código fuente del sistema
 |   |-- backend/                 # FastAPI (Python)
 |   |   |-- app/
 |   |   |   |-- main.py             # Aplicación, CORS, manejador de errores
@@ -486,61 +488,73 @@ El proyecto **no tiene configuradas** herramientas de lint ni de formateo.
   `docs:`, etc.).
 
 El detalle del backlog, los sprints y la Definition of Done se encuentran en
-[`docs/planificacion/01 Transformando a ágil`](docs/planificacion/01%20Transformando%20a%20ágil%20V_1_0_0.md).
+[`docs/02 Planificación/01 Transformando a ágil`](docs/02%20Planificación/01%20Transformando%20a%20ágil%20V_1_0_0.md).
 
 ---
 
 ## Documentación del Proyecto
 
-### Fase de Inicio (`docs/inicio/`)
+### Fase de Inicio (`docs/01 Inicio/`)
 
 | # | Documento |
 | :--- | :--- |
-| 01 | [Selección del enfoque del proyecto](docs/inicio/01.%20Selección%20del%20enfoque%20del%20proyecto%20V_1_0_0.md) |
-| 02 | [Acta de constitución del proyecto](docs/inicio/02.%20Acta%20de%20constitución%20V_1_0_0.md) |
-| 03 | [Declaración de la visión](docs/inicio/03.%20Declaración%20de%20la%20visión%20V_1_0_0.md) |
-| 04 | [Registro de supuestos y restricciones](docs/inicio/04.%20Registro%20de%20supuestos%20y%20restricciones%20V_1_0_0.md) |
-| 05 | [Registro de interesados](docs/inicio/05.%20Registro%20de%20interesados%20V_1_0_0.md) |
-| 06 | [Requisitos funcionales (RF-001 a RF-014)](docs/inicio/06.%20Requisitos%20funcionales%20V_1_0_0.md) |
-| 07 | [Requisitos no funcionales (RNF-001 a RNF-015)](docs/inicio/07.%20Requisitos%20no%20funcionales%20V_1_0_0.md) |
-| 08 | [Identificación y perfiles de usuarios](docs/inicio/08.%20Usuarios%20V_1_0_0.md) |
-| 09 | [Reglas de negocio y trazabilidad (RN-001 a RN-020)](docs/inicio/09.%20Reglas%20de%20negocio%20V_1_0_0.md) |
-| 10 | [Evaluación e identificación del stack tecnológico](docs/inicio/10.%20Stack%20tecnológico%20V_1_0_0.md) |
-| 11 | [Diseño e ingeniería de base de datos](docs/inicio/11.%20Base%20de%20datos%20V_1_0_0.md) |
-| 12 | [Arquitectura de software (modelo C4)](docs/inicio/12.%20Modelo%20C4%20V_1_0_0.md) |
-| 13 | [Análisis multidimensional de restricciones](docs/inicio/13.%20Restricciones%20V_1_0_0.md) |
-| 14 | [Especificación MFA y sesiones (no implementada)](docs/inicio/14.%20Especificacion%20MFA%20y%20Sesiones%20V_1_0_0.md) |
+| 01 | [Selección del enfoque del proyecto](docs/01%20Inicio/01%20Selección%20del%20enfoque%20del%20proyecto%20V_1_0_0.md) |
+| 02 | [Acta de constitución del proyecto](docs/01%20Inicio/02%20Acta%20de%20constitución%20V_1_0_0.md) |
+| 03 | [Declaración de la visión](docs/01%20Inicio/03%20Declaración%20de%20la%20visión%20V_1_0_0.md) |
+| 04 | [Registro de supuestos y restricciones](docs/01%20Inicio/04%20Registro%20de%20supuestos%20y%20restricciones%20V_1_0_0.md) |
+| 05 | [Registro de interesados](docs/01%20Inicio/05%20Registro%20de%20interesados%20V_1_0_0.md) |
 
-### Fase de Planificación (`docs/planificacion/`)
+### Fase de Planificación (`docs/02 Planificación/`)
 
 | # | Documento |
 | :--- | :--- |
-| 01 | [Transformando a ágil (backlog priorizado y Definition of Done)](docs/planificacion/01%20Transformando%20a%20ágil%20V_1_0_0.md) |
-| 02 | [Artefactos Jira](docs/planificacion/02%20Artefactos%20Jira%20V_1_0_0.md) |
-| 03 | [Registro de riesgos](docs/planificacion/03%20Registro%20de%20riesgos%20V_1_0_0.md) |
-| 04 | [Presupuesto del proyecto](docs/planificacion/04%20Presupuesto%20del%20proyecto%20V_1_0_0.md) |
+| 01 | [Transformando a ágil (backlog priorizado y Definition of Done)](docs/02%20Planificación/01%20Transformando%20a%20ágil%20V_1_0_0.md) |
+| 02 | [Artefactos Jira](docs/02%20Planificación/02%20Artefactos%20Jira%20V_1_0_0.md) |
+| 03 | [Registro de riesgos](docs/02%20Planificación/03%20Registro%20de%20riesgos%20V_1_0_0.md) |
+| 04 | [Presupuesto del proyecto](docs/02%20Planificación/04%20Presupuesto%20del%20proyecto%20V_1_0_0.md) |
+| 05 | [Requisitos funcionales (RF-001 a RF-014)](docs/02%20Planificación/05%20Requisitos%20funcionales%20V_1_0_0.md) |
+| 06 | [Requisitos no funcionales (RNF-001 a RNF-015)](docs/02%20Planificación/06%20Requisitos%20no%20funcionales%20V_1_0_0.md) |
+| 07 | [Identificación y perfiles de usuarios (Roles y permisos)](docs/02%20Planificación/07%20Usuarios%20roles%20y%20permisos%20V_1_0_0.md) |
+| 08 | [Reglas de negocio y trazabilidad (RN-001 a RN-020)](docs/02%20Planificación/08%20Reglas%20de%20negocio%20V_1_0_0.md) |
+| 09 | [Evaluación e identificación del stack tecnológico](docs/02%20Planificación/09%20Evaluación%20de%20tecnologías%20V_1_0_0.md) |
+| 10 | [Diseño e ingeniería de base de datos](docs/02%20Planificación/10%20Base%20de%20datos%20V_1_0_0.md) |
+| 11 | [Análisis multidimensional de restricciones](docs/02%20Planificación/11%20Análisis%20de%20restricciones%20V_1_0_0.md) |
+| 12 | [Plan y estrategia de pruebas](docs/02%20Planificación/12%20Plan%20de%20pruebas%20V_1_0_0.md) |
 
 ### Fase de Implementación (`docs/03 Implementación/`)
 
-Entregables del **Sprint 1** (US-001, US-003, EN-01, EN-02 — periodo 05/10/2026 al
-18/10/2026):
+#### Entregables del Sprint 1 (periodo 05/10/2026 al 18/10/2026):
 
 | # | Documento |
 | :--- | :--- |
-| 01 | [Informe de estado del proyecto V_1_0_0.md](docs/03%20Implementación/01%20Informe%20de%20estado%20del%20proyecto%20V_1_0_0.md) |
-| 02 | [Registro de Impedimentos V_1_0_0.md](docs/03%20Implementación/02%20Registro%20de%20Impedimentos%20V_1_0_0.md) |
-| 03 | [Revisión del Sprint V_1_0_0.md](docs/03%20Implementación/03%20Revisión%20del%20Sprint%20V_1_0_0.md) |
-| 04 | [Retrospectiva del Sprint V_1_0_0.md](docs/03%20Implementación/04%20Retrospectiva%20del%20Sprint%20V_1_0_0.md) |
+| 01 | [Informe de estado del proyecto V_1_0_0.md](docs/03%20Implementación/Sprint%201/01%20Informe%20de%20estado%20del%20proyecto%20V_1_0_0.md) |
+| 02 | [Registro de Impedimentos V_1_0_0.md](docs/03%20Implementación/Sprint%201/02%20Registro%20de%20Impedimentos%20V_1_0_0.md) |
+| 03 | [Revisión del Sprint V_1_0_0.md](docs/03%20Implementación/Sprint%201/03%20Revisión%20del%20Sprint%20V_1_0_0.md) |
+| 04 | [Retrospectiva del Sprint V_1_0_0.md](docs/03%20Implementación/Sprint%201/04%20Retrospectiva%20del%20Sprint%20V_1_0_0.md) |
 
-Entregables del **Sprint 2** (US-002, US-004, US-005, US-007 — periodo 19/10/2026 al
-01/11/2026), archivados en [`docs/03 Implementación/sprint 2/`](docs/03%20Implementación/sprint%202/):
+#### Entregables del Sprint 2 (periodo 19/10/2026 al 01/11/2026):
 
 | # | Documento |
 | :--- | :--- |
-| 01 | [Informe de estado del proyecto V_2_0_0.md](docs/03%20Implementación/sprint%202/01%20Informe%20de%20estado%20del%20proyecto%20V_2_0_0.md) |
-| 02 | [Registro de Impedimentos V_2_0_0.md](docs/03%20Implementación/sprint%202/02%20Registro%20de%20Impedimentos%20V_2_0_0.md) |
-| 03 | [Revisión del Sprint V_2_0_0.md](docs/03%20Implementación/sprint%202/03%20Revisión%20del%20Sprint%20V_2_0_0.md) |
-| 04 | [Retrospectiva del Sprint V_2_0_0.md](docs/03%20Implementación/sprint%202/04%20Retrospectiva%20del%20Sprint%20V_2_0_0.md) |
+| 01 | [Informe de estado del proyecto V_2_0_0.md](docs/03%20Implementación/Sprint%202/01%20Informe%20de%20estado%20del%20proyecto%20V_2_0_0.md) |
+| 02 | [Registro de Impedimentos V_2_0_0.md](docs/03%20Implementación/Sprint%202/02%20Registro%20de%20Impedimentos%20V_2_0_0.md) |
+| 03 | [Revisión del Sprint V_2_0_0.md](docs/03%20Implementación/Sprint%202/03%20Revisión%20del%20Sprint%20V_2_0_0.md) |
+| 04 | [Retrospectiva del Sprint V_2_0_0.md](docs/03%20Implementación/Sprint%202/04%20Retrospectiva%20del%20Sprint%20V_2_0_0.md) |
+
+### Fase de Arquitectura (`docs/04 Arquitectura/`)
+
+| # | Documento |
+| :--- | :--- |
+| 01 | [Arquitectura de software (modelo C4)](docs/04%20Arquitectura/01%20Modelo%20C4%20V_1_0_0.md) |
+| 02 | [Especificación MFA y sesiones (OpenSpec)](docs/04%20Arquitectura/02%20Especificacion%20MFA%20y%20Sesiones%20V_1_0_0.md) |
+| — | [OpenSpec borrador](docs/04%20Arquitectura/specs/auth_mfa_borrador.openspec.yaml) |
+| — | [OpenSpec final auditado](docs/04%20Arquitectura/specs/auth_mfa_final.openspec.yaml) |
+
+### Fase de Evidencias (`docs/05 Evidencias/`)
+
+| Documento | Descripción |
+| :--- | :--- |
+| [Registro y Repositorio de Evidencias](docs/05%20Evidencias/README.md) | Inventario de pruebas automatizadas (51 tests pytest), auditoría hermética de API y smoke tests |
 
 ---
 
@@ -554,7 +568,7 @@ Entregables del **Sprint 2** (US-002, US-004, US-005, US-007 — periodo 19/10/2
 | 04 | Vega Reyes, Andrew Steven | QA y DevOps |
 
 El detalle completo de cada integrante se registra en
-[`docs/inicio/05. Registro de interesados`](docs/inicio/05.%20Registro%20de%20interesados%20V_1_0_0.md).
+[`docs/01 Inicio/05. Registro de interesados`](docs/01%20Inicio/05%20Registro%20de%20interesados%20V_1_0_0.md).
 
 ---
 
@@ -569,10 +583,13 @@ Ingeniería de Sistemas e Informática.
 
 - **Repositorio:** https://github.com/jhanpooldev/TP2-DistriRapido
 - **Documentación:** [`docs/`](docs/)
-- **Fase de Inicio:** [`docs/inicio/`](docs/inicio/)
-- **Fase de Planificación:** [`docs/planificacion/`](docs/planificacion/)
+- **Fase de Inicio:** [`docs/01 Inicio/`](docs/01%20Inicio/)
+- **Fase de Planificación:** [`docs/02 Planificación/`](docs/02%20Planificación/)
 - **Fase de Implementación:** [`docs/03 Implementación/`](docs/03%20Implementación/)
+- **Fase de Arquitectura:** [`docs/04 Arquitectura/`](docs/04%20Arquitectura/)
+- **Fase de Evidencias:** [`docs/05 Evidencias/`](docs/05%20Evidencias/)
+- **Decisiones de diseño:** [DESIGN.md](DESIGN.md)
 - **Especificación técnica:** [SPECS.md](SPECS.md)
 - **Constitución del proyecto:** [CONSTITUTION.md](CONSTITUTION.md)
-- **Estándares de codificación:** [AGENT.md](AGENT.md)
+- **Estándares para agentes IA:** [AGENTS.md](AGENTS.md)
 - **Historial de cambios:** [CHANGELOG.md](CHANGELOG.md)

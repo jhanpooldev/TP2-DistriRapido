@@ -1,6 +1,6 @@
 # Registro de impedimentos
 
-[← Volver al README principal](../../README.md)
+[← Volver al README principal](../../../README.md)
 
 ---
 
@@ -62,4 +62,4 @@ detalla en las acciones de la Retrospectiva.
 
 ---
 
-[← Volver al README principal](../../README.md)
+[← Volver al README principal](../../../README.md)

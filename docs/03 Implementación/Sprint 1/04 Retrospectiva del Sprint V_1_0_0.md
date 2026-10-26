@@ -1,6 +1,6 @@
 # Retrospectiva del sprint
 
-[← Volver al README principal](../../README.md)
+[← Volver al README principal](../../../README.md)
 
 ---
 
@@ -219,4 +219,4 @@ distintas.
 
 ---
 
-[← Volver al README principal](../../README.md)
+[← Volver al README principal](../../../README.md)

@@ -14,7 +14,7 @@
 > de acceso por rol. La especificación permanece como trabajo pendiente y no debe
 > interpretarse como funcionalidad disponible. Se recoge como pendiente en los
 > entregables del Sprint 1, en el
-> [`02 Registro de Impedimentos V_1_0_0.md`](../03%20Implementación/02%20Registro%20de%20Impedimentos%20V_1_0_0.md)
+> [`02 Registro de Impedimentos V_1_0_0.md`](../03%20Implementación/Sprint%201/02%20Registro%20de%20Impedimentos%20V_1_0_0.md)
 > (impedimento IMP-08, acción ACT-S1-07).
 
 ---
@@ -29,7 +29,7 @@ Este documento establece la especificación formal del módulo de **Autenticaci�
 
 ## 2. Proceso de Auditoría con IA: Aplicación del Prompt Maestro
 
-Para asegurar que la especificación cumpla con estándares profesionales de arquitectura y ciberseguridad, se sometió el borrador inicial (`docs/inicio/specs/auth_mfa_borrador.openspec.yaml`) al prompt de auditoría técnica.
+Para asegurar que la especificación cumpla con estándares profesionales de arquitectura y ciberseguridad, se sometió el borrador inicial (`docs/04 Arquitectura/specs/auth_mfa_borrador.openspec.yaml`) al prompt de auditoría técnica.
 
 ### 2.1 Prompt Aplicado
 

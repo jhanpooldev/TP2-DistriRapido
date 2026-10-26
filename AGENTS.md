@@ -1,22 +1,26 @@
-# AGENT.md
+# AGENTS.md
 
 ## Estructura del Proyecto
 
 Siempre utiliza una estructura de proyecto modular y mantenible.
 
-**Estructura raíz (5 estructuras requeridas del PFA):**
+**Estructura del Proyecto:**
 
-/docs               # Estructura 1: Documentación (inicio, planificacion, ejecucion, etc.)
-/src/backend        # Estructura 2: Código - FastAPI (Python)
-/src/frontend       # Estructura 2: Código - React + Vite
-/pruebas            # Estructura 3: Pruebas (plan, evidencias, índice de suites)
-/base de datos      # Estructura 4: Índice de Scripts SQL (DDL en src/backend/esquema.sql)
-/modelos            # Estructura 5: Modelamiento (C4, base de datos, RN)
-
+```text
+/docs/01 Inicio             # Documentación de inicio y visión del proyecto
+/docs/02 Planificación       # Planificación, requisitos, base de datos y plan de pruebas
+/docs/03 Implementación      # Entregables por sprint (Sprint 1, Sprint 2)
+/docs/04 Arquitectura       # Arquitectura del sistema, Modelo C4 y especificaciones técnicas
+/docs/05 Evidencias         # Evidencias de pruebas, auditorías y validaciones
+/src/backend                # Backend FastAPI (Python)
+/src/frontend               # Frontend React + Vite
+```
 
 **Siempre incluir:**
 
 - `README.md`
+- `DESIGN.md`
+- `AGENTS.md`
 - `CONSTITUTION.md`
 - `SPECS.md`
 - `CHANGELOG.md`
