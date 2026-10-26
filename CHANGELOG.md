@@ -26,7 +26,7 @@ versionado sigue [SemVer](https://semver.org/lang/es/) (`MAJOR.MINOR.PATCH`).
 - **Pruebas:** nuevo módulo `src/logica/rutaCalles.js` con 8 pruebas (URL de OSRM,
   conversión de coordenadas, caché, errores y cancelación) y una prueba de backend
   para el origen en `RutaResponse`. Resultado local: **65 pruebas de backend**,
-  **24 de frontend**, cobertura backend **60.82 %** y frontend **93.85 %** de
+  **24 de frontend**, cobertura backend **60.82 %** y frontend **93.22 %** de
   sentencias; build con **83 módulos**.
 - **Configuración:** nueva variable opcional `VITE_OSRM_URL`. El servidor público de
   OSRM es de demostración y no ofrece garantía de disponibilidad; para producción
@@ -58,9 +58,8 @@ versionado sigue [SemVer](https://semver.org/lang/es/) (`MAJOR.MINOR.PATCH`).
     `true`.
   - `sonar-project.properties`: rutas de fuentes, pruebas y cobertura.
   - **Limitación:** no existe host de Staging, dominio, credenciales ni *deploy
-    hook*. El despliegue no se realizó ni se verificó, y SonarQube no se ejecutó;
-    no se declara un Quality Gate aprobado.
-- **Accesibilidad (WCAG 2.1 AA, revisión manual):**
+    hook*. El despliegue no se realizó ni se verificó; EN-03 permanece parcial.
+- **Accesibilidad (WCAG 2.1 / 2.2 AA, revisión manual):**
   - `--texto-tenue` cambió de `#8a9993` / `#64746e` a `#5d6c66` para superar
     4.5:1 sobre el fondo de tarjeta.
   - Nuevo `--borde-control: #7d8d87` para campos y botones secundarios, con
@@ -69,23 +68,52 @@ versionado sigue [SemVer](https://semver.org/lang/es/) (`MAJOR.MINOR.PATCH`).
     `<h4>` asociado a un `role="group"` en lugar de una etiqueta sin control.
   - Los botones **Mapa**, **Editar** y **Eliminar** de cada ruta incluyen el
     identificador de la ruta en su nombre accesible.
+  - Las cinco tablas llevan `caption` (solo para lectores de pantalla) y
+    `scope="col"`; el título "Como funciona" pasó de `h3` a `h2` para eliminar el
+    salto de encabezados; `MapPicker.flyTo` respeta `prefers-reduced-motion`.
 - **Calidad y análisis estático:**
   - Corregidos imports sin uso (`F401`) en pruebas y endpoints, y reemplazado
     `datetime.utcnow()` por `datetime.now(timezone.utc)`.
-  - Ruff reporta **109 hallazgos** de estilo/tipado moderno; la verificación
+  - Ruff reporta **112 hallazgos** de estilo/tipado moderno; la verificación
     mínima (`E9`, `F63`, `F7`, `F82`) no tiene hallazgos.
   - Vitest genera también cobertura `lcov`.
-- **Verificación local (26/10/2026):** **64 pruebas** de backend en verde y
-  **59.89 %** de cobertura global; **16 pruebas** de frontend en verde y
-  **98.43 %** de sentencias sobre `src/logica/**`; build de Vite 8.3.5 con 82
+- **Verificación local (26/10/2026):** **65 pruebas** de backend en verde y
+  **60.82 %** de cobertura global; **24 pruebas** de frontend en verde y
+  **93.22 %** de sentencias sobre `src/logica/**`; build de Vite 8.3.5 con 83
   módulos; `npm audit` con **0 vulnerabilidades** en 106 dependencias.
 - **Documentación:** cinco entregables en `docs/03 Implementación/Sprint 03/`:
-  revisión, retrospectiva, calidad de código, OWASP y WCAG. `README.md`,
+  revisión, retrospectiva, calidad de código, OWASP 2025 y WCAG 2.1/2.2. `README.md`,
   `SPECS.md`, el plan de pruebas y el repositorio de evidencias se actualizaron
-  con las cifras reales y los enlaces al Sprint 3.
-- **No ejecutado:** SonarQube/SonarCloud, OWASP ZAP, `pip-audit`, axe/WAVE,
-  pruebas con lector de pantalla, `auditoria_api.py`/`smoke_sprint2.py` (sin
-  PostgreSQL local) y los workflows en GitHub.
+  con las cifras reales y los enlaces al Sprint 3. Los documentos internos suben a
+  la versión **1.1.0** conservando el nombre de archivo `V_1_0_0`.
+- **No ejecutado:** OWASP ZAP, `pip-audit`, axe/WAVE, pruebas con lector de pantalla,
+  despliegue en Staging y los workflows en GitHub (solo se validó su sintaxis YAML).
+
+### Análisis de calidad y seguridad con SonarQube (26/10/2026)
+
+- **Ejecución real:** SonarQube Community en Docker (`localhost:9000`) y
+  SonarScanner CLI sobre `src/backend/app` y `src/frontend/src`; 3 886 líneas de
+  código analizadas.
+- **Resultado inicial:** Quality Gate OK (condiciones de código nuevo ignoradas por
+  ser el primer análisis), cobertura 9.6 %, duplicación 1.4 %, 5 bugs, 2 code smells
+  (1 bloqueante), 0 vulnerabilidades, 0 hotspots y 30 minutos de deuda técnica.
+- **Remediación aplicada:**
+  - `javascript:S9383` (4): `void` explícito en las cargas de `Dashboard.jsx` y
+    `.catch()` en la petición de trazado de `MapView.jsx`.
+  - `javascript:S8786`: la expresión regular con retroceso de `rutaCalles.js` se
+    reemplazó por `quitarBarrasFinales()` con `endsWith`.
+  - `python:S1845` (bloqueante): la propiedad `cors_origins` se renombró a
+    `origenes_cors`; se actualizaron `main.py` y `test_sprint3.py`.
+- **Resultado final:** Quality Gate **OK** (`ignoredConditions: true`), **0 bugs**,
+  **0 vulnerabilidades**, **0 code smells**, **0 Security Hotspots**, deuda técnica
+  **0 min**, ratings **A/A/A**, cobertura 9.8 % (6.6 % de líneas, 85.2 % de ramas),
+  duplicación 1.4 % (66 líneas en 4 bloques) y 0 incidencias abiertas.
+- **Evidencias:** respuestas de la API de SonarQube en
+  `docs/05 Evidencias/sonar-sprint3/` (`measures.json`, `quality-gate.json`,
+  `issues.json`).
+- **Lectura honesta:** la cobertura global de SonarQube es 9.8 % porque incluye todos
+  los componentes React sin pruebas; el backend mide 60.82 % y `src/logica/**` 93.22 %.
+  Ninguna de las dos cifras globales alcanza el objetivo de 70 % del `SPECS.md`.
 
 ### Estructura del repositorio y retiro de índices duplicados
 

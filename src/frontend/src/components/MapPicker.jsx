@@ -44,7 +44,9 @@ export default function MapPicker({ latitud, longitud, onPick }) {
       })
     }
 
-    if (map && mover) map.flyTo(pos, 17, { duration: 0.8 })
+    const movimientoReducido = typeof window !== 'undefined' &&
+      window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
+    if (map && mover) map.flyTo(pos, 17, { duration: movimientoReducido ? 0 : 0.8 })
   }
 
   useEffect(() => {

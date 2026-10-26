@@ -7,6 +7,13 @@ requiere precisión (criterios de aceptación, fórmulas de cálculo, DDL), la f
 de verdad es el documento correspondiente en `docs/02 Planificación/` y `docs/04 Arquitectura/`, referenciado en cada
 sección.
 
+## Control de Versiones del Documento
+
+| Versión | Fecha | Autor | Descripción del Cambio |
+|:---:|:---:|:---|:---|
+| 1.0.0 | 01/11/2026 | Jhunior Harold Cosme Tenorio / Equipo EcoLogística | Especificación técnica inicial del PMV. |
+| 1.1.0 | 26/10/2026 | Jhunior Harold Cosme Tenorio / Equipo EcoLogística | Se alinean las cifras al Sprint 3 (65 pytest, 24 Vitest, 60.82 % backend, 9.8 % global en SonarQube) y se actualizan las referencias a OWASP Top 10:2025, WCAG 2.1/2.2 y el análisis real de SonarQube. |
+
 | Documento de referencia | Contenido |
 |---|---|
 | [05 Requisitos funcionales](docs/02%20Planificación/05%20Requisitos%20funcionales%20V_1_0_0.md) | RF-001 a RF-014 con criterios BDD |
@@ -370,7 +377,7 @@ Indicadores de sostenibilidad.
 Visualización de rutas históricas con filtros por fecha y estado.
 Estados de carga y error visibles en todas las vistas.
 Validación de formularios con mensajes en español.
-Interfaz revisada contra WCAG 2.1 nivel AA (etiquetas asociadas, foco visible y contraste ≥ 4.5:1). La revisión es manual y no cuenta con certificación externa.
+Interfaz revisada contra WCAG 2.1 / 2.2 nivel AA (etiquetas asociadas, foco visible y contraste ≥ 4.5:1). La revisión es manual y no cuenta con certificación externa.
 
 ---
 # Requisitos No Funcionales
@@ -388,7 +395,7 @@ Autenticación mediante JWT con expiración de 8 horas (EN-02).
 Hashing seguro de contraseñas mediante bcrypt (RN-004).
 Bloqueo de 3 intentos fallidos durante 15 minutos (RN-002).
 Control de acceso basado en roles (RN-003).
-Seguridad basada en OWASP Top 10.
+Seguridad basada en OWASP Top 10 (2025) y análisis estático con SonarQube.
 
 ## Calidad
 Validación de datos mediante Pydantic.
@@ -401,7 +408,7 @@ Cobertura de pruebas ≥ 70% (módulos de validación ≥ 80%).
 Cobertura ≥ 80% sobre el código nuevo o modificado según el DoD global.
 
 Estado verificado tras el Sprint 3 y el trazado por calles (26/10/2026): el backend
-alcanza **60.82 %** global (objetivo de 70 % no alcanzado) y el frontend **93.85 %**
+alcanza **60.82 %** global (objetivo de 70 % no alcanzado) y el frontend **93.22 %**
 de sentencias sobre `src/logica/**`. El módulo de exportación CSV alcanza **100 %** y
 el optimizador **90 %**. El trazado por calles es solo visual: las distancias, tiempos
 y emisiones siguen calculándose con la fórmula geodésica (haversine), por lo que los
@@ -486,7 +493,7 @@ El detalle de cada parada puede consultarse en el mapa (US-006).
 El resumen de una ruta calculada puede descargarse en CSV (US-008).
 Los indicadores logísticos y de sostenibilidad pueden visualizarse (RF-012, RF-013).
 Las pruebas automatizadas se ejecutan correctamente.
-La cobertura global alcanza como mínimo el 70% (en el Sprint 3: 59.89 % en el backend, pendiente).
+La cobertura global alcanza como mínimo el 70% (en el Sprint 3: 60.82 % en el backend y 9.8 % global en SonarQube, pendiente).
 El tiempo de generación de ruta para 20 puntos se cumple en el 95% de las ejecuciones (EN-01, RNF-001).
 
 ---

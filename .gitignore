@@ -111,4 +111,15 @@ pnpm-debug.log*
 *.temp
 *.bak
 *.orig
+*.rej
 Thumbs.db
+
+# ----------------------------------------------------------
+# Archivos temporales de editores y respaldos
+# Evita subir .gitignore~ y similares
+# ----------------------------------------------------------
+*~
+.*~
+.gitignore~
+#*#
+.#*

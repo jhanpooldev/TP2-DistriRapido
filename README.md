@@ -126,7 +126,7 @@ alcance del PMV (ver `SPECS.md`).
 | Reducción de distancia frente a la ruta no optimizada | ≥ 15 % | **Pendiente**: requiere prueba comparativa de referencia |
 | Reducción de emisiones frente a la ruta no optimizada | ≥ 10 % | **Pendiente**: requiere prueba comparativa de referencia |
 | Flujo principal de generación de ruta | ≤ 3 pasos y ≤ 3 minutos | **Pendiente**: sin medición formal registrada |
-| Cobertura de pruebas automatizadas | ≥ 70 % global | **Parcial**: backend 60.82 % global; frontend 93.85 % de sentencias sobre `src/logica/**` |
+| Cobertura de pruebas automatizadas | ≥ 70 % global | **Parcial**: backend 60.82 % global; frontend 93.22 % de sentencias sobre `src/logica/**`; SonarQube 9.8 % global |
 
 ---
 
@@ -267,7 +267,7 @@ El repositorio organiza su documentación y código fuente de acuerdo con el cic
 |-- DESIGN.md                    # Índice de decisiones de diseño y arquitectura
 |-- README.md                    # Descripción general del proyecto
 |-- SPECS.md                     # Especificación técnica del PMV
-|-- sonar-project.properties     # Configuración de SonarQube/SonarCloud (no ejecutado)
+|-- sonar-project.properties     # Configuración de SonarQube/SonarCloud (analizado localmente)
 |
 |-- .github/
 |   `-- workflows/
@@ -489,9 +489,9 @@ python smoke_sprint2.py 8099      # Verificación del flujo completo
 
 Ambos scripts son **herméticos**: crean sus propios datos de prueba, los eliminan al
 terminar y dejan la base de datos en el mismo estado en que la encontraron, por lo que
-pueden repetirse cuantas veces sea necesario. En el Sprint 3 **no se reejecutaron**
-porque el entorno local no tenía PostgreSQL en ejecución; su última ejecución
-satisfactoria corresponde al Sprint 2.
+pueden repetirse cuantas veces sea necesario. En el Sprint 3 se reejecutaron el
+26/10/2026 contra PostgreSQL 18 local: `auditoria_api.py` devolvió **SIN ANOMALÍAS** y
+`smoke_sprint2.py` devolvió **TODO OK**, sin alterar los datos existentes.
 
 > La auditoría cubre el aislamiento entre operadores, la validación de entrada y la
 > consignación de las transacciones de escritura. No mide la calidad del resultado del
@@ -506,8 +506,8 @@ npm run coverage      # Vitest + cobertura V8
 npm run build         # Compilación de producción
 ```
 
-Resultado actual: **24 pruebas en verde** en 3 archivos, con **93.85 %** de sentencias,
-**86.44 %** de ramas, **90.9 %** de funciones y **97.77 %** de líneas sobre
+Resultado actual: **24 pruebas en verde** en 3 archivos, con **93.22 %** de sentencias,
+**85.24 %** de ramas, **91.3 %** de funciones y **97.84 %** de líneas sobre
 `src/logica/**`. La compilación produce 83 módulos con Vite 8.3.5.
 
 La cobertura se limita a la lógica de distancias, exportación y trazado por calles; **no
@@ -535,9 +535,15 @@ Staging no se realizó.
   formato automático ni `ruff format` aplicado al repositorio.
 - **Frontend:** no hay ESLint ni Prettier configurados.
 
-La verificación local de Ruff reporta **109 hallazgos** de estilo y tipado moderno,
+La verificación local de Ruff reporta **112 hallazgos** de estilo y tipado moderno,
 ninguno de la familia `E9`, `F63`, `F7` o `F82`. El detalle está en
 [`03 Calidad de código`](docs/03%20Implementación/Sprint%2003/03%20Calidad%20de%20c%C3%B3digo%20V_1_0_0.md).
+
+El análisis real de **SonarQube Community** (contenedor Docker local, 26/10/2026) cerró
+con Quality Gate **OK**, 0 bugs, 0 vulnerabilidades, 0 code smells y 0 Security
+Hotspots después de corregir 7 hallazgos. Las respuestas de la API de SonarQube se
+conservan en
+[`docs/05 Evidencias/sonar-sprint3/`](docs/05%20Evidencias/sonar-sprint3/).
 
 ---
 
@@ -546,8 +552,8 @@ ninguno de la familia `E9`, `F63`, `F7` o `F82`. El detalle está en
 | Estándar | Aplicación |
 | :--- | :--- |
 | ISO/IEC 25010 | Calidad del software |
-| OWASP Top 10 (2021) | Revisión de seguridad con controles y brechas documentados; sin certificación |
-| WCAG 2.1 AA | Revisión manual de accesibilidad; sin certificación externa |
+| OWASP Top 10 (2025) | Revisión con SonarQube, controles y brechas documentados; sin certificación |
+| WCAG 2.1 / 2.2 AA | Revisión manual de accesibilidad; sin certificación externa |
 | Git Flow | Control de versiones |
 | Scrum | Gestión ágil |
 | Convenciones | Semantic Versioning (SemVer) |
@@ -639,7 +645,7 @@ El detalle del backlog, los sprints y la Definition of Done se encuentran en
 
 | Documento | Descripción |
 | :--- | :--- |
-| [Registro y Repositorio de Evidencias](docs/05%20Evidencias/README.md) | Inventario de pruebas automatizadas (64 pytest + 16 Vitest), cobertura, auditoría hermética de API y smoke tests |
+| [Registro y Repositorio de Evidencias](docs/05%20Evidencias/README.md) | Inventario de pruebas automatizadas (65 pytest + 24 Vitest), cobertura, auditoría hermética de API, smoke tests y evidencias de SonarQube |
 
 ---
 

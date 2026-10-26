@@ -227,15 +227,16 @@ export default function RutasTab({ rutas, puntos, vehiculos, onVerMapa, onCambia
           </p>
         ) : (
           <table className="table">
+            <caption className="sr-only">Rutas guardadas que coinciden con el filtro</caption>
             <thead>
               <tr>
-                <th>Ruta</th>
-                <th>Fecha</th>
-                <th className="num">Distancia (km)</th>
-                <th className="num">CO2 (kg)</th>
-                <th className="num">Ahorro</th>
-                <th>Estado</th>
-                <th>Acciones</th>
+                <th scope="col">Ruta</th>
+                <th scope="col">Fecha</th>
+                <th scope="col" className="num">Distancia (km)</th>
+                <th scope="col" className="num">CO2 (kg)</th>
+                <th scope="col" className="num">Ahorro</th>
+                <th scope="col">Estado</th>
+                <th scope="col">Acciones</th>
               </tr>
             </thead>
             <tbody>

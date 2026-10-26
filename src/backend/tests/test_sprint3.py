@@ -127,7 +127,7 @@ def test_endpoint_de_exportacion_esta_registrado():
 # --- Endurecimiento de configuracion y respuestas ---------------------------
 
 def test_cors_no_usa_comodin_por_defecto():
-    origenes = get_settings().cors_origins
+    origenes = get_settings().origenes_cors
     assert "*" not in origenes
     assert "http://localhost:5173" in origenes
 

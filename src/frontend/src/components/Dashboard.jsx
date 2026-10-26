@@ -49,9 +49,9 @@ export default function Dashboard({ user, onLogout }) {
   }
 
   useEffect(() => {
-    fetchPuntos()
-    fetchRutas()
-    fetchVehiculos()
+    void fetchPuntos()
+    void fetchRutas()
+    void fetchVehiculos()
   }, [])
 
   const fetchPuntos = async () => {
@@ -69,7 +69,7 @@ export default function Dashboard({ user, onLogout }) {
     try {
       await api.post('/puntos-entrega', puntoForm)
       setPuntoForm({ direccion: '', latitud: '', longitud: '', peso_kg: '', destinatario: '' })
-      fetchPuntos()
+      void fetchPuntos()
       mostrar('ok', 'Pedido registrado. Ya aparece en la pestaña Rutas para armar la ruta.')
     } catch (err) { mostrar('error', extraerError(err)) }
   }
@@ -221,7 +221,7 @@ export default function Dashboard({ user, onLogout }) {
       {activeTab === 'puntos' && (
         <div>
           <div className="card">
-            <h3>Como funciona</h3>
+            <h2>Como funciona</h2>
             <div className="como-funciona">
               <div className="paso">
                 <span className="paso-num">1</span>
@@ -333,13 +333,14 @@ export default function Dashboard({ user, onLogout }) {
               <p className="vacio">Todavia no hay pedidos. Registra el primero con el formulario de arriba.</p>
             ) : (
               <table className="table">
+                <caption className="sr-only">Pedidos de entrega registrados</caption>
                 <thead>
                   <tr>
-                    <th>Destinatario</th>
-                    <th>Direccion</th>
-                    <th className="num">Lat</th>
-                    <th className="num">Lng</th>
-                    <th className="num">Peso (kg)</th>
+                    <th scope="col">Destinatario</th>
+                    <th scope="col">Direccion</th>
+                    <th scope="col" className="num">Lat</th>
+                    <th scope="col" className="num">Lng</th>
+                    <th scope="col" className="num">Peso (kg)</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -530,12 +531,13 @@ export default function Dashboard({ user, onLogout }) {
                 <h3 className="sep">Orden de entrega</h3>
                 <div className="tabla-envoltura">
                   <table className="table">
+                    <caption className="sr-only">Orden de entrega de la ruta seleccionada</caption>
                     <thead>
                       <tr>
-                        <th>#</th>
-                        <th>Direccion</th>
-                        <th>Destinatario</th>
-                        <th className="num">Peso (kg)</th>
+                        <th scope="col">#</th>
+                        <th scope="col">Direccion</th>
+                        <th scope="col">Destinatario</th>
+                        <th scope="col" className="num">Peso (kg)</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -564,13 +566,14 @@ export default function Dashboard({ user, onLogout }) {
           </div>
           <div className="tabla-envoltura">
             <table className="table">
+              <caption className="sr-only">Vehiculos registrados y sus parametros</caption>
               <thead>
                 <tr>
-                  <th>Placa</th>
-                  <th className="num">Capacidad (kg)</th>
-                  <th className="num">Consumo (L/km)</th>
-                  <th className="num">Velocidad (km/h)</th>
-                  <th>Combustible</th>
+                  <th scope="col">Placa</th>
+                  <th scope="col" className="num">Capacidad (kg)</th>
+                  <th scope="col" className="num">Consumo (L/km)</th>
+                  <th scope="col" className="num">Velocidad (km/h)</th>
+                  <th scope="col">Combustible</th>
                 </tr>
               </thead>
               <tbody>

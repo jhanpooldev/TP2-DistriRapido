@@ -187,11 +187,19 @@ export default function MapView({
     setTrazadoCalles(null)
     setEstadoTrazado('cargando')
 
-    obtenerTrazadoCalles(recorrido, { signal: controlador.signal }).then(resultado => {
-      if (!vigente) return
-      setTrazadoCalles(resultado)
-      setEstadoTrazado(resultado ? 'calles' : 'aproximado')
-    })
+    obtenerTrazadoCalles(recorrido, { signal: controlador.signal })
+      .then(resultado => {
+        if (!vigente) return
+        setTrazadoCalles(resultado)
+        setEstadoTrazado(resultado ? 'calles' : 'aproximado')
+      })
+      .catch(() => {
+        // obtenerTrazadoCalles ya devuelve null ante fallos, pero se cubre
+        // cualquier rechazo inesperado para no dejar el aviso en "cargando".
+        if (!vigente) return
+        setTrazadoCalles(null)
+        setEstadoTrazado('aproximado')
+      })
 
     return () => {
       vigente = false

@@ -42,7 +42,12 @@ class Settings(BaseSettings):
     MAX_PUNTOS_POR_RUTA: int = 20
 
     @property
-    def cors_origins(self) -> list[str]:
+    def origenes_cors(self) -> list[str]:
+        """Lista normalizada de origenes permitidos.
+
+        El nombre no repite el del campo CORS_ORIGINS para evitar la ambiguedad
+        que SonarQube marca como bloqueante (python:S1845).
+        """
         return [origen.strip() for origen in self.CORS_ORIGINS.split(",") if origen.strip()]
 
     @model_validator(mode="after")

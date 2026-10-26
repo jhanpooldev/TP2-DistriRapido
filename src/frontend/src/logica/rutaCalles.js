@@ -8,9 +8,16 @@
 // servicio de demostracion: si no responde, el mapa cae a una linea recta
 // aproximada en lugar de romperse.
 
-const OSRM_BASE = String(
+/** Quita las barras finales sin una expresion regular con retroceso. */
+function quitarBarrasFinales(valor) {
+  let texto = String(valor ?? '')
+  while (texto.endsWith('/')) texto = texto.slice(0, -1)
+  return texto
+}
+
+const OSRM_BASE = quitarBarrasFinales(
   import.meta.env?.VITE_OSRM_URL || 'https://router.project-osrm.org'
-).replace(/\/+$/, '')
+)
 
 const PERFIL = 'driving'
 const TIEMPO_MAXIMO_MS = 8000

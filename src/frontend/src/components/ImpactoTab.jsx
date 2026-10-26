@@ -59,12 +59,13 @@ export default function ImpactoTab({ rutas, onVerMapa }) {
 
           <div className="tabla-envoltura" style={{ marginBottom: 18 }}>
             <table className="table">
+              <caption className="sr-only">Comparacion de emisiones entre el recorrido optimizado y el original</caption>
               <thead>
                 <tr>
-                  <th>Escenario</th>
-                  <th className="num">Distancia (km)</th>
-                  <th className="num">Tiempo (min)</th>
-                  <th className="num">CO2 (kg)</th>
+                  <th scope="col">Escenario</th>
+                  <th scope="col" className="num">Distancia (km)</th>
+                  <th scope="col" className="num">Tiempo (min)</th>
+                  <th scope="col" className="num">CO2 (kg)</th>
                 </tr>
               </thead>
               <tbody>
