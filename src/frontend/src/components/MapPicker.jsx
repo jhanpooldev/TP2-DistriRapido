@@ -208,7 +208,12 @@ export default function MapPicker({ latitud, longitud, onPick }) {
         </ul>
       )}
 
-      <div ref={mapRef} className="mapa-mini" />
+      <div
+        ref={mapRef}
+        className="mapa-mini"
+        role="region"
+        aria-label="Mapa para seleccionar el punto de entrega; haz clic sobre la ubicación o arrastra el marcador"
+      />
       <p className="mapa-ayuda">
         Busca una direccion, usa tu ubicacion o haz click en el mapa. Arrastra el marcador para
         ajustar la posicion.

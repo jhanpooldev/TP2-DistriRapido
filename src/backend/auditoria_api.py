@@ -3,7 +3,6 @@
 Uso:  python auditoria_api.py [puerto]
 """
 import json
-import os
 import sys
 import urllib.error
 import urllib.parse

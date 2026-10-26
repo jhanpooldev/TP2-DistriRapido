@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
+import { obtenerTrazadoCalles } from '../logica/rutaCalles'
 
 const DEFAULT_CENTER = [-12.115, -76.97]
 const DEFAULT_ZOOM = 12
@@ -59,16 +60,55 @@ function crearPopupParada(punto, numero) {
   return contenedor
 }
 
-export default function MapView({ puntos = [], center = DEFAULT_CENTER, zoom = DEFAULT_ZOOM }) {
+function crearPopupOrigen(direccion) {
+  const contenedor = document.createElement('div')
+  contenedor.className = 'popup-parada'
+
+  const titulo = document.createElement('strong')
+  titulo.textContent = 'Centro de distribucion'
+  contenedor.appendChild(titulo)
+
+  const linea = document.createElement('div')
+  linea.className = 'popup-linea'
+  linea.textContent = String(direccion ?? '').trim() || 'Punto de partida y retorno de la ruta'
+  contenedor.appendChild(linea)
+
+  return contenedor
+}
+
+/** Recorrido completo: centro de distribucion -> paradas -> centro. */
+function coordenadasDeRecorrido(puntos, origenLat, origenLng) {
+  const paradas = puntos
+    .filter(tieneCoordenadas)
+    .map(punto => [Number(punto.latitud), Number(punto.longitud)])
+
+  if (paradas.length === 0 || !tieneCoordenadas({ latitud: origenLat, longitud: origenLng })) {
+    return paradas
+  }
+
+  const origen = [Number(origenLat), Number(origenLng)]
+  return [origen, ...paradas, origen]
+}
+
+export default function MapView({
+  puntos = [],
+  origenLat = null,
+  origenLng = null,
+  origenDireccion = '',
+  center = DEFAULT_CENTER,
+  zoom = DEFAULT_ZOOM,
+}) {
   const mapRef = useRef(null)
   const mapInstance = useRef(null)
   const capaRef = useRef(null)
-  const polylineRef = useRef(null)
+  const capasRecorridoRef = useRef([])
   const markersRef = useRef([])
   const fallosRef = useRef(0)
 
   const [sinTiles, setSinTiles] = useState(false)
   const [cargando, setCargando] = useState(true)
+  const [trazadoCalles, setTrazadoCalles] = useState(null)
+  const [estadoTrazado, setEstadoTrazado] = useState('inactivo')
 
   // Crea (o recrea) la capa de tiles. Se separa del efecto de montaje para que
   // "Reintentar" no necesite recargar toda la aplicacion.
@@ -125,10 +165,39 @@ export default function MapView({ puntos = [], center = DEFAULT_CENTER, zoom = D
       map.remove()
       mapInstance.current = null
       capaRef.current = null
-      polylineRef.current = null
+      capasRecorridoRef.current = []
       markersRef.current = []
     }
   }, [])
+
+  // Pide a OSRM el trazado real por calles. Si el servicio no responde, el
+  // mapa conserva el trazado recto como respaldo visible.
+  useEffect(() => {
+    const recorrido = coordenadasDeRecorrido(puntos, origenLat, origenLng)
+
+    if (recorrido.length < 2) {
+      setTrazadoCalles(null)
+      setEstadoTrazado('inactivo')
+      return
+    }
+
+    const controlador = new AbortController()
+    let vigente = true
+
+    setTrazadoCalles(null)
+    setEstadoTrazado('cargando')
+
+    obtenerTrazadoCalles(recorrido, { signal: controlador.signal }).then(resultado => {
+      if (!vigente) return
+      setTrazadoCalles(resultado)
+      setEstadoTrazado(resultado ? 'calles' : 'aproximado')
+    })
+
+    return () => {
+      vigente = false
+      controlador.abort()
+    }
+  }, [puntos, origenLat, origenLng])
 
   useEffect(() => {
     const map = mapInstance.current
@@ -137,27 +206,75 @@ export default function MapView({ puntos = [], center = DEFAULT_CENTER, zoom = D
     markersRef.current.forEach(marker => marker.remove())
     markersRef.current = []
 
-    if (polylineRef.current) {
-      polylineRef.current.remove()
-      polylineRef.current = null
-    }
+    capasRecorridoRef.current.forEach(capa => capa.remove())
+    capasRecorridoRef.current = []
 
     const validos = puntos
       .map((punto, indice) => ({ punto, indice }))
       .filter(({ punto }) => tieneCoordenadas(punto))
 
-    const coordenadas = validos.map(({ punto }) => [Number(punto.latitud), Number(punto.longitud)])
+    if (validos.length === 0) return
 
-    if (coordenadas.length === 0) return
+    const coordenadasParadas = validos.map(({ punto }) => [
+      Number(punto.latitud),
+      Number(punto.longitud),
+    ])
 
-    if (coordenadas.length > 1) {
-      polylineRef.current = L.polyline(coordenadas, {
-        color: '#2f7f68',
-        weight: 4,
-        opacity: 0.9,
-        lineCap: 'round',
-        lineJoin: 'round',
-      }).addTo(map)
+    const origenValido = tieneCoordenadas({ latitud: origenLat, longitud: origenLng })
+    const recorrido = origenValido
+      ? [[Number(origenLat), Number(origenLng)], ...coordenadasParadas, [Number(origenLat), Number(origenLng)]]
+      : coordenadasParadas
+
+    if (trazadoCalles?.trazado?.length > 1) {
+      // Halo blanco debajo del trazado para que se lea sobre cualquier calle.
+      capasRecorridoRef.current.push(
+        L.polyline(trazadoCalles.trazado, {
+          color: '#ffffff',
+          weight: 9,
+          opacity: 0.9,
+          lineCap: 'round',
+          lineJoin: 'round',
+          interactive: false,
+        }).addTo(map),
+        L.polyline(trazadoCalles.trazado, {
+          color: '#2f7f68',
+          weight: 5,
+          opacity: 0.95,
+          lineCap: 'round',
+          lineJoin: 'round',
+        }).addTo(map)
+      )
+    } else if (recorrido.length > 1) {
+      // Respaldo honesto: linea discontinua cuando no hay trazado por calles.
+      capasRecorridoRef.current.push(
+        L.polyline(recorrido, {
+          color: '#2f7f68',
+          weight: 4,
+          opacity: 0.9,
+          dashArray: '7 9',
+          lineCap: 'round',
+          lineJoin: 'round',
+        }).addTo(map)
+      )
+    }
+
+    if (origenValido) {
+      markersRef.current.push(
+        L.marker([Number(origenLat), Number(origenLng)], {
+          title: 'Centro de distribucion',
+          alt: 'Centro de distribucion: punto de partida y retorno de la ruta',
+          keyboard: true,
+          riseOnHover: true,
+          icon: L.divIcon({
+            className: '',
+            html: '<div style="background:#1e2a26;color:#fff;border-radius:6px;width:30px;height:30px;display:flex;align-items:center;justify-content:center;font-weight:bold;font-size:11px;border:2px solid #fff;box-shadow:0 2px 4px rgba(0,0,0,.25)">CD</div>',
+            iconSize: [30, 30],
+            iconAnchor: [15, 15],
+          }),
+        })
+          .addTo(map)
+          .bindPopup(crearPopupOrigen(origenDireccion))
+      )
     }
 
     validos.forEach(({ punto, indice }, posicion) => {
@@ -165,7 +282,7 @@ export default function MapView({ puntos = [], center = DEFAULT_CENTER, zoom = D
       const direccion = String(punto.direccion ?? '').trim()
       const etiqueta = direccion || `coordenadas ${Number(punto.latitud).toFixed(6)}, ${Number(punto.longitud).toFixed(6)}`
 
-      const marker = L.marker(coordenadas[posicion], {
+      const marker = L.marker(coordenadasParadas[posicion], {
         title: `Parada ${numero}: ${etiqueta}`,
         alt: `Parada ${numero}: ${etiqueta}`,
         keyboard: true,
@@ -183,12 +300,15 @@ export default function MapView({ puntos = [], center = DEFAULT_CENTER, zoom = D
       markersRef.current.push(marker)
     })
 
-    if (coordenadas.length > 1) {
-      map.fitBounds(L.latLngBounds(coordenadas), { padding: [50, 50] })
+    const referencia = trazadoCalles?.trazado?.length > 1 ? trazadoCalles.trazado : recorrido
+    if (referencia.length > 1) {
+      map.fitBounds(L.latLngBounds(referencia), { padding: [50, 50] })
     } else {
-      map.setView(coordenadas[0], 14)
+      map.setView(referencia[0], 14)
     }
-  }, [puntos])
+  }, [puntos, trazadoCalles, origenLat, origenLng, origenDireccion])
+
+  const kilometrosCalles = trazadoCalles?.distanciaKm
 
   return (
     <div>
@@ -196,7 +316,7 @@ export default function MapView({ puntos = [], center = DEFAULT_CENTER, zoom = D
         <div
           ref={mapRef}
           role="region"
-          aria-label="Mapa de la ruta: paradas numeradas en orden de entrega"
+          aria-label="Mapa de la ruta: recorrido por calles y paradas numeradas en orden de entrega"
           aria-busy={cargando}
           style={{ width: '100%', height: '500px' }}
         />
@@ -225,6 +345,25 @@ export default function MapView({ puntos = [], center = DEFAULT_CENTER, zoom = D
           </div>
         )}
       </div>
+
+      {estadoTrazado !== 'inactivo' && (
+        <p className="texto-suave" role="status" aria-live="polite" style={{ marginTop: 8 }}>
+          {estadoTrazado === 'cargando' && 'Calculando el trazado por calles...'}
+          {estadoTrazado === 'calles' && (
+            <>
+              Trazado por calles: {Number(kilometrosCalles).toFixed(1)} km
+              {' '}(OSRM / OpenStreetMap). La distancia planificada del resumen se
+              estima en linea recta.
+            </>
+          )}
+          {estadoTrazado === 'aproximado' && (
+            <>
+              Trazado aproximado en linea recta: el servicio de calles no respondio.
+              Los puntos y su orden siguen siendo validos.
+            </>
+          )}
+        </p>
+      )}
     </div>
   )
 }

@@ -5,10 +5,8 @@ import uuid
 from datetime import datetime
 
 import pytest
-from fastapi import HTTPException
 from pydantic import ValidationError
 
-from app.api.v1.endpoints import rutas as rutas_module
 from app.core.config import Settings, get_settings
 from app.main import app
 from app.schemas import PuntoRutaResponse, ResumenRuta

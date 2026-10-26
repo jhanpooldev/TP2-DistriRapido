@@ -255,7 +255,12 @@ export default function RutasTab({ rutas, puntos, vehiculos, onVerMapa, onCambia
                   <td><span className={`badge ${estadoBadge(r.estado)}`}>{r.estado}</span></td>
                   <td>
                     <div className="btn-grupo">
-                      <button type="button" className="btn-secondary btn-sm" onClick={() => onVerMapa(r)}>
+                      <button
+                        type="button"
+                        className="btn-secondary btn-sm"
+                        onClick={() => onVerMapa(r)}
+                        aria-label={`Ver la ruta ${r.id_ruta.slice(0, 8)} en el mapa`}
+                      >
                         Mapa
                       </button>
                       <button
@@ -267,10 +272,20 @@ export default function RutasTab({ rutas, puntos, vehiculos, onVerMapa, onCambia
                       >
                         {exportando === r.id_ruta ? 'Exportando...' : 'Exportar'}
                       </button>
-                      <button type="button" className="btn-secondary btn-sm" onClick={() => iniciarEdicion(r)}>
+                      <button
+                        type="button"
+                        className="btn-secondary btn-sm"
+                        onClick={() => iniciarEdicion(r)}
+                        aria-label={`Editar la ruta ${r.id_ruta.slice(0, 8)}`}
+                      >
                         Editar
                       </button>
-                      <button type="button" className="btn-secondary btn-sm btn-eliminar" onClick={() => eliminar(r)}>
+                      <button
+                        type="button"
+                        className="btn-secondary btn-sm btn-eliminar"
+                        onClick={() => eliminar(r)}
+                        aria-label={`Eliminar la ruta ${r.id_ruta.slice(0, 8)}`}
+                      >
                         Eliminar
                       </button>
                     </div>

@@ -9,24 +9,101 @@ versionado sigue [SemVer](https://semver.org/lang/es/) (`MAJOR.MINOR.PATCH`).
 
 ## [No publicado]
 
-### Estructura del PFA alineada a las 5 estructuras de la pauta
+### Trazado de rutas por calles (26/10/2026)
 
-- El repositorio cumple ahora las cinco estructuras requeridas del PFA a nivel de
-  raíz: `docs/` (Documentación), `src/` (Código), `pruebas/` (Pruebas),
-  `base de datos/` (Scripts SQL) y `modelos/` (Modelamiento).
+- **Mapa:** el recorrido ya no se dibuja como una línea recta entre paradas. El
+  frontend consulta el servidor público de **OSRM** (`VITE_OSRM_URL`) y dibuja la
+  geometría real por calles, incluyendo la salida y el retorno al centro de
+  distribución, que ahora se marca como `CD`.
+- **API:** `RutaResponse` incorpora `origen_lat`, `origen_lng` y `origen_direccion`
+  para que el mapa pueda representar el recorrido completo sin duplicar la
+  configuración `HOME_*` en el frontend.
+- **Respaldo:** si OSRM no responde en 8 segundos, el mapa usa una línea discontinua
+  entre paradas y lo advierte; la aplicación nunca se queda sin mapa por este motivo.
+- **Honestidad de indicadores:** los kilómetros, minutos y emisiones del resumen se
+  siguen calculando con haversine. El mapa muestra aparte la distancia real del
+  trazado por calles (OSRM / OpenStreetMap) para no mezclar ambas mediciones.
+- **Pruebas:** nuevo módulo `src/logica/rutaCalles.js` con 8 pruebas (URL de OSRM,
+  conversión de coordenadas, caché, errores y cancelación) y una prueba de backend
+  para el origen en `RutaResponse`. Resultado local: **65 pruebas de backend**,
+  **24 de frontend**, cobertura backend **60.82 %** y frontend **93.85 %** de
+  sentencias; build con **83 módulos**.
+- **Configuración:** nueva variable opcional `VITE_OSRM_URL`. El servidor público de
+  OSRM es de demostración y no ofrece garantía de disponibilidad; para producción
+  debe desplegarse una instancia propia o contratarse un proveedor con SLA.
+
+### Sprint 3 implementado (US-006, US-008 y EN-03 parcial)
+
+- **US-006 — detalle de paradas en el mapa:** `MapView.jsx` genera un popup por
+  marcador con número de parada, dirección, destinatario y peso. Si el punto no
+  tiene dirección textual, muestra las coordenadas con seis decimales. El popup se
+  construye con nodos DOM y `textContent`, sin interpolar HTML con datos del
+  usuario. Los marcadores incluyen `title`, `alt` y `keyboard: true`; el contenedor
+  del mapa tiene `role="region"`, etiqueta descriptiva y `aria-busy`.
+- **US-008 — exportación del resumen de una ruta:** nuevo endpoint
+  `GET /api/v1/rutas/{id}/export` que devuelve un CSV UTF-8 con BOM con los datos
+  generales, el impacto ambiental y los puntos en orden de visita. Las celdas se
+  neutralizan contra inyección de fórmulas (`=`, `+`, `-`, `@`) sin alterar las
+  coordenadas negativas; el nombre del archivo es ASCII y predecible. La interfaz
+  bloquea la exportación si la ruta no tiene distancia calculada. Ocho pruebas
+  nuevas en `tests/test_sprint3.py`; cobertura de `app/services/exportacion.py`
+  del **100 %**.
+- **EN-03 — pipeline CI/CD (parcial):**
+  - `.github/workflows/ci.yml`: backend con PostgreSQL 16, pytest, cobertura y
+    verificación mínima de Ruff; frontend con `npm ci`, Vitest con cobertura y
+    build; job opcional de SonarQube.
+  - `.github/workflows/codeql.yml`: análisis de Python y JavaScript/TypeScript.
+  - `.github/workflows/deploy-staging.yml`: despliegue por *deploy hook* y
+    verificación de salud, desactivado mientras `STAGING_DEPLOY_ENABLED` no sea
+    `true`.
+  - `sonar-project.properties`: rutas de fuentes, pruebas y cobertura.
+  - **Limitación:** no existe host de Staging, dominio, credenciales ni *deploy
+    hook*. El despliegue no se realizó ni se verificó, y SonarQube no se ejecutó;
+    no se declara un Quality Gate aprobado.
+- **Accesibilidad (WCAG 2.1 AA, revisión manual):**
+  - `--texto-tenue` cambió de `#8a9993` / `#64746e` a `#5d6c66` para superar
+    4.5:1 sobre el fondo de tarjeta.
+  - Nuevo `--borde-control: #7d8d87` para campos y botones secundarios, con
+    3.48:1 sobre blanco y 3.10:1 sobre `--surface-2`.
+  - `MapPicker` y `MapView` tienen región etiquetada; `SelectorPuntos` usa un
+    `<h4>` asociado a un `role="group"` en lugar de una etiqueta sin control.
+  - Los botones **Mapa**, **Editar** y **Eliminar** de cada ruta incluyen el
+    identificador de la ruta en su nombre accesible.
+- **Calidad y análisis estático:**
+  - Corregidos imports sin uso (`F401`) en pruebas y endpoints, y reemplazado
+    `datetime.utcnow()` por `datetime.now(timezone.utc)`.
+  - Ruff reporta **109 hallazgos** de estilo/tipado moderno; la verificación
+    mínima (`E9`, `F63`, `F7`, `F82`) no tiene hallazgos.
+  - Vitest genera también cobertura `lcov`.
+- **Verificación local (26/10/2026):** **64 pruebas** de backend en verde y
+  **59.89 %** de cobertura global; **16 pruebas** de frontend en verde y
+  **98.43 %** de sentencias sobre `src/logica/**`; build de Vite 8.3.5 con 82
+  módulos; `npm audit` con **0 vulnerabilidades** en 106 dependencias.
+- **Documentación:** cinco entregables en `docs/03 Implementación/Sprint 03/`:
+  revisión, retrospectiva, calidad de código, OWASP y WCAG. `README.md`,
+  `SPECS.md`, el plan de pruebas y el repositorio de evidencias se actualizaron
+  con las cifras reales y los enlaces al Sprint 3.
+- **No ejecutado:** SonarQube/SonarCloud, OWASP ZAP, `pip-audit`, axe/WAVE,
+  pruebas con lector de pantalla, `auditoria_api.py`/`smoke_sprint2.py` (sin
+  PostgreSQL local) y los workflows en GitHub.
+
+### Estructura del repositorio y retiro de índices duplicados
+
+- La estructura vigente del repositorio es `docs/` (documentación), `src/`
+  (código), `.github/` (CI/CD) y los archivos de configuración de la raíz. Las
+  carpetas `pruebas/`, `base de datos/` y `modelos/` se retiraron para no duplicar
+  contenido: las pruebas viven en `src/backend/tests` y
+  `src/frontend/src/**/*.test.js`, el DDL vive en `src/backend/esquema.sql` y el
+  modelamiento en `docs/04 Arquitectura/` y `docs/02 Planificación/`.
 - **`src/backend/esquema.sql`**: DDL completo de PostgreSQL, generado
   automáticamente desde los modelos SQLAlchemy (`src/backend/app/models`) e
   incluyendo constraints, checks e índices. Vive dentro del backend, junto al
   código que lo usa, para mantener limpia la raíz del proyecto. Complementa la
   ausencia de migraciones (el proyecto crea el esquema con
   `Base.metadata.create_all` al arrancar).
-- **`pruebas/`**: índice que consigna el plan de pruebas y las evidencias, y
-  referencia las suites automatizadas (`src/backend/tests`) y las herramientas de
-  verificación de extremo a extremo (`auditoria_api.py`, `smoke_sprint2.py`).
-- **`modelos/`**: índice que consigna el modelamiento del PMV (C4, diseño de base
-  de datos y reglas de negocio) residente en la fase de Inicio.
-- `README.md` (sección Estructura del Proyecto) actualizado para reflejar las
-  cinco estructuras y la ubicación real de `auditoria_api.py` y `smoke_sprint2.py`.
+- `README.md` (sección Estructura del Proyecto) actualizado para reflejar la
+  estructura real, la ubicación de `auditoria_api.py` y `smoke_sprint2.py`, y los
+  entregables de los tres sprints.
 
 ### Experiencia de uso (UX) y seleccion de pedidos por cercania
 
@@ -77,7 +154,8 @@ versionado sigue [SemVer](https://semver.org/lang/es/) (`MAJOR.MINOR.PATCH`).
 - **README corregido** para que refleje el repositorio real: se retiraron Tailwind,
   Alembic, Vitest, Testing Library y GitHub Actions, que no existen en el proyecto; se
   documentó que no hay migraciones, ni lint, ni pruebas de frontend; y se añadieron los
-  enlaces a los entregables de ambos sprints.
+  enlaces a los entregables de ambos sprints. Esta situación cambió en el Sprint 3:
+  se incorporaron Vitest, Ruff y GitHub Actions (ver la entrada superior).
 - `docs/inicio/14. Especificacion MFA y Sesiones` incluye ahora una nota de estado que
   aclara que el módulo de MFA **no está implementado**, y se corrigió la ruta interna
   del borrador OpenSpec.

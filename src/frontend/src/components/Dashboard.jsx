@@ -518,7 +518,14 @@ export default function Dashboard({ user, onLogout }) {
                   </div>
                 )}
 
-                <MapView puntos={ruta.puntos} center={[-12.115, -76.97]} zoom={12} />
+                <MapView
+                  puntos={ruta.puntos}
+                  origenLat={ruta.origen_lat}
+                  origenLng={ruta.origen_lng}
+                  origenDireccion={ruta.origen_direccion}
+                  center={[-12.115, -76.97]}
+                  zoom={12}
+                />
 
                 <h3 className="sep">Orden de entrega</h3>
                 <div className="tabla-envoltura">

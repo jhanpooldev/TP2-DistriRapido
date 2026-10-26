@@ -176,6 +176,9 @@ def _ruta_to_response(db: Session, ruta) -> RutaResponse:
         sin_reduccion_significativa=ahorro["sin_reduccion_significativa"],
         estado=ruta.estado,
         fecha_generacion=ruta.fecha_generacion,
+        origen_lat=settings.HOME_LAT,
+        origen_lng=settings.HOME_LNG,
+        origen_direccion=settings.HOME_ADDRESS,
         puntos=puntos_schema,
     )
 

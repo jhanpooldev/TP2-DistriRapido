@@ -11,11 +11,15 @@
 
   --texto: #1e2a26;
   --texto-suave: #52625d;
-  /* Antes #8a9993: no alcanzaba 4.5:1 sobre blanco ni sobre --surface-2. */
-  --texto-tenue: #64746e;
+  /* Antes #8a9993 y #64746e: no alcanzaban 4.5:1 sobre --surface-2 (#eef3f1).
+     #5d6c66 alcanza 4.92:1 sobre ese fondo y 5.52:1 sobre blanco. */
+  --texto-tenue: #5d6c66;
 
   --borde: #e1e8e5;
   --borde-fuerte: #cbd6d2;
+  /* Borde de controles: 3.48:1 sobre blanco y 3.10:1 sobre --surface-2,
+     conforme a WCAG 2.1 criterio 1.4.11 (contraste de elementos no textuales). */
+  --borde-control: #7d8d87;
 
   --primario: #2f7f68;
   --primario-oscuro: #256754;
@@ -224,9 +228,9 @@ button:disabled { background: var(--borde-fuerte); border-color: var(--borde-fue
 .btn-secondary {
   background: var(--surface);
   color: var(--texto-suave);
-  border: 1px solid var(--borde-fuerte);
+  border: 1px solid var(--borde-control);
 }
-.btn-secondary:hover { background: var(--surface-2); border-color: var(--borde-fuerte); color: var(--texto); }
+.btn-secondary:hover { background: var(--surface-2); border-color: var(--borde-control); color: var(--texto); }
 .btn-secondary:disabled { background: var(--surface-2); border-color: var(--borde); color: var(--texto-tenue); }
 
 .btn-ghost {
@@ -261,7 +265,7 @@ label {
 input, select, textarea {
   width: 100%;
   padding: 9px 11px;
-  border: 1px solid var(--borde-fuerte);
+  border: 1px solid var(--borde-control);
   border-radius: var(--radio-sm);
   font-size: 14px;
   font-family: inherit;

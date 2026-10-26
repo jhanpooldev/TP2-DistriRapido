@@ -1,0 +1,56 @@
+name: Deploy Staging
+
+on:
+  workflow_run:
+    workflows: [CI]
+    types: [completed]
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: staging-deploy
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: Desplegar en Staging
+    runs-on: ubuntu-latest
+    # Desactivado por defecto: sin un host de Staging ni sus credenciales no
+    # debe existir un despliegue real. Se activa con la variable
+    # STAGING_DEPLOY_ENABLED=true y el secreto STAGING_DEPLOY_HOOK.
+    if: >-
+      vars.STAGING_DEPLOY_ENABLED == 'true' &&
+      (github.event_name == 'workflow_dispatch' ||
+       (github.event.workflow_run.conclusion == 'success' &&
+        github.event.workflow_run.head_branch == 'main'))
+    steps:
+      - name: Verificar configuracion del ambiente
+        env:
+          STAGING_DEPLOY_HOOK: ${{ secrets.STAGING_DEPLOY_HOOK }}
+          STAGING_HEALTH_URL: ${{ vars.STAGING_HEALTH_URL }}
+        run: |
+          if [ -z "$STAGING_DEPLOY_HOOK" ]; then
+            echo "::error::Falta el secreto STAGING_DEPLOY_HOOK del proveedor de Staging."
+            exit 1
+          fi
+          if [ -z "$STAGING_HEALTH_URL" ]; then
+            echo "::error::Falta la variable STAGING_HEALTH_URL para verificar el despliegue."
+            exit 1
+          fi
+
+      - name: Disparar el despliegue
+        env:
+          STAGING_DEPLOY_HOOK: ${{ secrets.STAGING_DEPLOY_HOOK }}
+        run: curl --fail --silent --show-error --request POST "$STAGING_DEPLOY_HOOK"
+
+      - name: Verificar la salud de Staging
+        env:
+          STAGING_HEALTH_URL: ${{ vars.STAGING_HEALTH_URL }}
+        run: >-
+          curl --fail --silent --show-error
+          --retry 12 --retry-all-errors --retry-delay 10
+          "$STAGING_HEALTH_URL"

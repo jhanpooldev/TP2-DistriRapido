@@ -126,7 +126,7 @@ alcance del PMV (ver `SPECS.md`).
 | Reducción de distancia frente a la ruta no optimizada | ≥ 15 % | **Pendiente**: requiere prueba comparativa de referencia |
 | Reducción de emisiones frente a la ruta no optimizada | ≥ 10 % | **Pendiente**: requiere prueba comparativa de referencia |
 | Flujo principal de generación de ruta | ≤ 3 pasos y ≤ 3 minutos | **Pendiente**: sin medición formal registrada |
-| Cobertura de pruebas automatizadas | ≥ 70 % global | **No verificado**: no hay herramienta de cobertura configurada |
+| Cobertura de pruebas automatizadas | ≥ 70 % global | **Parcial**: backend 60.82 % global; frontend 93.85 % de sentencias sobre `src/logica/**` |
 
 ---
 
@@ -157,8 +157,21 @@ alcance del PMV (ver `SPECS.md`).
 ### Indicadores y Visualización
 
 - Mapa interactivo con la ruta generada (Leaflet + OpenStreetMap).
+- Trazado por calles reales mediante OSRM, con salida y retorno al centro de
+  distribución. Si el servicio no responde, el mapa muestra la línea recta entre
+  paradas y lo advierte en pantalla.
+- Detalle de cada parada en un popup: orden de visita, dirección, destinatario y peso (**US-006**).
 - Selección de coordenadas sobre el mapa al registrar un punto.
 - Dashboard con los indicadores calculados.
+
+### Exportación de rutas
+
+- Descarga del resumen de una ruta en CSV UTF-8 desde
+  `GET /api/v1/rutas/{id}/export` (**US-008**).
+- El archivo incluye los datos generales, el impacto ambiental estimado y la tabla de
+  puntos en orden de visita.
+- Las celdas se neutralizan contra inyección de fórmulas en hojas de cálculo y el nombre
+  del archivo es ASCII y predecible.
 
 ### Seguridad
 
@@ -169,6 +182,13 @@ Implementado y verificado:
 - Control de acceso basado en roles: Administrador, Operador Logístico y Gerente
   (**RN-003**).
 - Validación de firma y caducidad del token en cada petición protegida.
+- Aislamiento de puntos y rutas por operador, con acceso de administrador cuando
+  corresponde.
+- Cabeceras de endurecimiento (`X-Content-Type-Options`, `X-Frame-Options`,
+  `Referrer-Policy`, `Permissions-Policy`, `Strict-Transport-Security` cuando la
+  petición llega por HTTPS).
+- Neutralización de fórmulas en la exportación CSV y uso de `textContent` en los popups
+  del mapa.
 
 Pendiente:
 
@@ -210,6 +230,12 @@ El sistema sigue una arquitectura por capas con separación de responsabilidades
 La comunicación entre frontend y backend se realiza por HTTP/REST, con CORS configurado
 para el origen del frontend. En desarrollo, Vite redirige `/api` al backend.
 
+La integración continua se define en `.github/workflows/ci.yml` (pruebas, cobertura y
+build), `.github/workflows/codeql.yml` (análisis estático de Python y
+JavaScript/TypeScript) y `.github/workflows/deploy-staging.yml` (despliegue a Staging
+desactivado por defecto). El despliegue real en Staging **no está verificado** porque el
+repositorio no dispone de host ni credenciales para ese ambiente.
+
 El detalle de la arquitectura por niveles (C4) se encuentra en
 [`docs/04 Arquitectura/01 Modelo C4`](docs/04%20Arquitectura/01%20Modelo%20C4%20V_1_0_0.md).
 
@@ -223,10 +249,11 @@ El repositorio organiza su documentación y código fuente de acuerdo con el cic
 | :--- | :--- | :--- |
 | 1 | `docs/01 Inicio/` | Constitución, visión, supuestos, restricciones iniciales e interesados |
 | 2 | `docs/02 Planificación/` | Backlog, Jira, riesgos, presupuesto, requisitos (RF/RNF), roles, reglas de negocio, BD y plan de pruebas |
-| 3 | `docs/03 Implementación/` | Entregables y reportes agrupados por sprint (`Sprint 1/`, `Sprint 2/`) |
+| 3 | `docs/03 Implementación/` | Entregables y reportes agrupados por sprint (`Sprint 1/`, `Sprint 2/`, `Sprint 03/`) |
 | 4 | `docs/04 Arquitectura/` | Arquitectura del sistema, Modelo C4, especificaciones técnicas y seguridad MFA (`specs/`) |
 | 5 | `docs/05 Evidencias/` | Registro de evidencias de validación, auditoría de API y resultados de pruebas |
 | 6 | `src/` | Código fuente del sistema (`backend/` FastAPI y `frontend/` React) |
+| 7 | `.github/workflows/` | Integración continua, CodeQL y despliegue a Staging (desactivado por defecto) |
 
 ```text
 /
@@ -240,26 +267,35 @@ El repositorio organiza su documentación y código fuente de acuerdo con el cic
 |-- DESIGN.md                    # Índice de decisiones de diseño y arquitectura
 |-- README.md                    # Descripción general del proyecto
 |-- SPECS.md                     # Especificación técnica del PMV
+|-- sonar-project.properties     # Configuración de SonarQube/SonarCloud (no ejecutado)
+|
+|-- .github/
+|   `-- workflows/
+|       |-- ci.yml               # pytest + cobertura, Vitest + build y Ruff mínimo
+|       |-- codeql.yml           # Análisis CodeQL de Python y JavaScript/TypeScript
+|       `-- deploy-staging.yml   # Despliegue a Staging, desactivado por defecto
 |
 |-- docs/
 |   |-- 01 Inicio/               # Fase de Inicio (5 documentos)
 |   |-- 02 Planificación/        # Fase de Planificación y Requisitos (12 documentos)
 |   |-- 03 Implementación/       # Entregables organizados por sprint
 |   |   |-- Sprint 1/            # 4 entregables del Sprint 1 (V_1_0_0)
-|   |   `-- Sprint 2/            # 4 entregables del Sprint 2 (V_2_0_0)
+|   |   |-- Sprint 2/            # 4 entregables del Sprint 2 (V_2_0_0)
+|   |   `-- Sprint 03/           # 5 entregables del Sprint 3 (V_1_0_0)
 |   |-- 04 Arquitectura/         # Modelo C4 y especificaciones MFA (con specs/)
 |   `-- 05 Evidencias/           # Inventario de evidencias de pruebas y auditoría
 |
 |-- src/                         # Código fuente del sistema
 |   |-- backend/                 # FastAPI (Python)
 |   |   |-- app/
-|   |   |   |-- main.py             # Aplicación, CORS, manejador de errores
+|   |   |   |-- main.py             # Aplicación, CORS, cabeceras y errores
 |   |   |   |-- core/               # Configuración, seguridad, conexión a BD
 |   |   |   |-- models/             # Modelos SQLAlchemy (ORM)
-|   |   |   |-- schemas/            # Modeles Pydantic de entrada y salida
+|   |   |   |-- schemas/            # Modelos Pydantic de entrada y salida
 |   |   |   |-- api/v1/endpoints/   # Controladores (rutas de la API)
-|   |   |   `-- services/           # Lógica de negocio (incluye optimizer/)
-|   |   |-- tests/                 # Pruebas pytest
+|   |   |   `-- services/           # Lógica de negocio y exportación CSV
+|   |   |       `-- optimizer/      # Haversine + Vecino Más Cercano + 2-opt
+|   |   |-- tests/                  # Pruebas pytest
 |   |   |-- auditoria_api.py        # Auditoría de extremo a extremo de la API
 |   |   |-- smoke_sprint2.py        # Verificación de flujo completo
 |   |   |-- esquema.sql             # DDL PostgreSQL (generado de los modelos ORM)
@@ -267,27 +303,22 @@ El repositorio organiza su documentación y código fuente de acuerdo con el cic
 |   `-- frontend/                # React + Vite
 |       |-- src/
 |       |   |-- api/                 # Cliente HTTP (axios)
-|       |   |-- context/             # Estado global (Context API)
 |       |   |-- components/          # Componentes de interfaz
-|       |   |-- pages/               # Páginas
-|       |   `-- styles/              # CSS plano
+|       |   |-- logica/              # Distancias y exportación (con pruebas)
+|       |   |-- styles/              # CSS plano
+|       |   `-- main.jsx
+|       |-- index.html
 |       |-- package.json
-|       `-- vite.config.js
-|
-|-- pruebas/                    # Estructura 3: Pruebas
-|   `-- README.md               # Índice: plan, evidencias y suites automatizadas
-|-- base de datos/              # Estructura 4: Índice de Scripts SQL
-|   `-- README.md               # Índice de contenidos (DDL en src/backend/esquema.sql)
-`-- modelos/                    # Estructura 5: Modelamiento
-    `-- README.md               # Índice de modelos (C4, base de datos, RN)
+|       |-- vite.config.js
+|       `-- vitest.config.js
 ```
 
 El archivo `.env` vive en la **raíz del repositorio** y el backend lo carga desde allí;
 el frontend lo lee mediante `envDir` en Vite. Nunca se versiona.
 
-**Pruebas automatizadas:** solo el backend tiene suite de pruebas, en
-`src/backend/tests`. El frontend **no incluye pruebas automatizadas**. La estructura
-`pruebas/` es el índice y repositorio de evidencias; no duplica la suite.
+**Pruebas automatizadas:** el backend usa pytest en `src/backend/tests` y el frontend
+usa Vitest en `src/frontend/src/**/*.test.js`. Las pruebas viven junto al código que
+verifican; no se duplican en una carpeta de pruebas separada.
 
 ---
 
@@ -296,7 +327,7 @@ el frontend lo lee mediante `envDir` en Vite. Nunca se versiona.
 | Capa | Tecnología | Versión |
 | :--- | :--- | :--- |
 | Frontend | React | 18.3.1 |
-| Empaquetador | Vite | 5.4.8 |
+| Empaquetador | Vite | 8.3.5 |
 | Cliente HTTP (frontend) | axios | 1.7.7 |
 | Mapas | Leaflet + OpenStreetMap / Nominatim | 1.9.4 |
 | Estilos | CSS plano | — |
@@ -308,11 +339,14 @@ el frontend lo lee mediante `envDir` en Vite. Nunca se versiona.
 | Autenticación | PyJWT + bcrypt | 2.10.1 / 4.2.1 |
 | Optimización | Heurística propia (Haversine + NN + 2-opt) | — |
 | Base de datos | PostgreSQL | 16 |
-| Pruebas backend | pytest | 8.3.4 |
+| Pruebas backend | pytest + pytest-cov | 8.3.4 / 7.1.0 |
+| Pruebas frontend | Vitest + @vitest/coverage-v8 | 5.0.5 |
+| Análisis estático | Ruff | 0.17.2 en CI |
+| Integración continua | GitHub Actions + CodeQL | — |
 | Control de versiones | Git + GitHub | — |
 
-**No se utilizan:** Tailwind CSS, Alembic, Vitest, Testing Library, Ruff, ESLint,
-Prettier ni GitHub Actions.
+**No se utilizan:** Tailwind CSS, Alembic, ESLint, Prettier ni Testing Library. El
+proyecto sí usa Vitest, Ruff y GitHub Actions.
 
 ---
 
@@ -404,6 +438,7 @@ es el único lugar donde se configura el backend y el frontend.
 | `MAP_PROVIDER` | Proveedor de distancias | `haversine` |
 | `MAX_PUNTOS_POR_RUTA` | Límite de puntos por ruta | `20` |
 | `VITE_API_URL` | URL base del backend (frontend) | `http://localhost:8000` |
+| `VITE_OSRM_URL` | Servidor OSRM para el trazado por calles | `https://router.project-osrm.org` |
 
 Nunca incluyas el archivo `.env` en el repositorio: está excluido por `.gitignore`. La
 plantilla `.env.example` nunca debe contener credenciales reales.
@@ -425,8 +460,22 @@ source venv/bin/activate          # Windows: venv\Scripts\activate
 pytest
 ```
 
-Resultado actual: **51 pruebas en verde**. Las pruebas usan la base `DB_NAME_TEST`,
+Resultado actual: **65 pruebas en verde**. Las pruebas usan la base `DB_NAME_TEST`,
 separada de la base de trabajo para no destruir datos.
+
+Para obtener la cobertura:
+
+```bash
+pytest --cov=app --cov-report=term-missing --cov-report=xml
+```
+
+Cobertura actual: **60.82 % global** (883 sentencias, 346 sin cubrir). El módulo de
+exportación del Sprint 3 (`app/services/exportacion.py`) alcanza **100 %** y el
+optimizador **90 %**.
+
+> La verificación local se ejecutó con Python 3.14.6 y una versión de pydantic más
+> reciente que la fijada en `requirements.txt`, porque el pin `2.10.4` no compila en
+> 3.14. No se modificó el archivo de dependencias; el pipeline usa Python 3.12.
 
 ### Verificación de extremo a extremo
 
@@ -438,31 +487,57 @@ python auditoria_api.py 8099      # Auditoría de cada endpoint y aislamiento po
 python smoke_sprint2.py 8099      # Verificación del flujo completo
 ```
 
-Ambos scripts terminan sin anomalías y son **herméticos**: crean sus propios datos de
-prueba, los eliminan al terminar y dejan la base de datos en el mismo estado en que la
-encontraron, por lo que pueden repetirse cuantas veces sea necesario.
+Ambos scripts son **herméticos**: crean sus propios datos de prueba, los eliminan al
+terminar y dejan la base de datos en el mismo estado en que la encontraron, por lo que
+pueden repetirse cuantas veces sea necesario. En el Sprint 3 **no se reejecutaron**
+porque el entorno local no tenía PostgreSQL en ejecución; su última ejecución
+satisfactoria corresponde al Sprint 2.
 
 > La auditoría cubre el aislamiento entre operadores, la validación de entrada y la
 > consignación de las transacciones de escritura. No mide la calidad del resultado del
 > algoritmo de ruteo más allá de que la distancia calculada sea coherente con el área
 > geográfica de los puntos.
 
-### Frontend
-
-`src/frontend` **no incluye pruebas automatizadas**. La verificación disponible es la
-compilación de producción:
+### Frontend (Vitest)
 
 ```bash
 cd src/frontend
-npm run build
+npm run coverage      # Vitest + cobertura V8
+npm run build         # Compilación de producción
 ```
 
-Las pruebas del frontend son una acción pendiente registrada en la Retrospectiva del
-Sprint 1 (ACT-S1-05).
+Resultado actual: **24 pruebas en verde** en 3 archivos, con **93.85 %** de sentencias,
+**86.44 %** de ramas, **90.9 %** de funciones y **97.77 %** de líneas sobre
+`src/logica/**`. La compilación produce 83 módulos con Vite 8.3.5.
+
+La cobertura se limita a la lógica de distancias, exportación y trazado por calles; **no
+hay pruebas de componentes React ni de los popups del mapa**.
+
+### Integración continua
+
+El flujo `.github/workflows/ci.yml` ejecuta:
+
+- backend con Python 3.12, PostgreSQL 16 como servicio, `pytest` con cobertura y la
+  verificación mínima de Ruff (`E9`, `F63`, `F7`, `F82`);
+- frontend con Node.js 22, `npm ci`, `npm run coverage` y `npm run build`;
+- un job opcional de SonarQube que solo corre con `SONAR_ENABLED=true` y
+  `SONAR_TOKEN`.
+
+`.github/workflows/codeql.yml` analiza Python y JavaScript/TypeScript, y
+`.github/workflows/deploy-staging.yml` queda preparado para un *deploy hook* de
+Staging, desactivado mientras `STAGING_DEPLOY_ENABLED` no sea `true`. **Ninguno de
+estos workflows se ejecutó en GitHub desde el entorno local** y el despliegue en
+Staging no se realizó.
 
 ### Lint y formato
 
-El proyecto **no tiene configuradas** herramientas de lint ni de formateo.
+- **Backend:** Ruff se usa como verificación mínima en CI; no hay configuración de
+  formato automático ni `ruff format` aplicado al repositorio.
+- **Frontend:** no hay ESLint ni Prettier configurados.
+
+La verificación local de Ruff reporta **109 hallazgos** de estilo y tipado moderno,
+ninguno de la familia `E9`, `F63`, `F7` o `F82`. El detalle está en
+[`03 Calidad de código`](docs/03%20Implementación/Sprint%2003/03%20Calidad%20de%20c%C3%B3digo%20V_1_0_0.md).
 
 ---
 
@@ -471,8 +546,8 @@ El proyecto **no tiene configuradas** herramientas de lint ni de formateo.
 | Estándar | Aplicación |
 | :--- | :--- |
 | ISO/IEC 25010 | Calidad del software |
-| OWASP Top 10 | Seguridad |
-| WCAG 2.1 AA | Accesibilidad |
+| OWASP Top 10 (2021) | Revisión de seguridad con controles y brechas documentados; sin certificación |
+| WCAG 2.1 AA | Revisión manual de accesibilidad; sin certificación externa |
 | Git Flow | Control de versiones |
 | Scrum | Gestión ágil |
 | Convenciones | Semantic Versioning (SemVer) |
@@ -541,6 +616,16 @@ El detalle del backlog, los sprints y la Definition of Done se encuentran en
 | 03 | [Revisión del Sprint V_2_0_0.md](docs/03%20Implementación/Sprint%202/03%20Revisión%20del%20Sprint%20V_2_0_0.md) |
 | 04 | [Retrospectiva del Sprint V_2_0_0.md](docs/03%20Implementación/Sprint%202/04%20Retrospectiva%20del%20Sprint%20V_2_0_0.md) |
 
+#### Entregables del Sprint 3 (periodo 02/11/2026 al 08/11/2026):
+
+| # | Documento |
+| :--- | :--- |
+| 01 | [Revisión del Sprint V_1_0_0.md](docs/03%20Implementación/Sprint%2003/01%20Revisión%20del%20Sprint%20V_1_0_0.md) |
+| 02 | [Retrospectiva del Sprint V_1_0_0.md](docs/03%20Implementación/Sprint%2003/02%20Retrospectiva%20del%20Sprint%20V_1_0_0.md) |
+| 03 | [Calidad de código V_1_0_0.md](docs/03%20Implementación/Sprint%2003/03%20Calidad%20de%20código%20V_1_0_0.md) |
+| 04 | [OWASP V_1_0_0.md](docs/03%20Implementación/Sprint%2003/04%20OWASP%20V_1_0_0.md) |
+| 05 | [WCAG V_1_0_0.md](docs/03%20Implementación/Sprint%2003/05%20WCAG%20V_1_0_0.md) |
+
 ### Fase de Arquitectura (`docs/04 Arquitectura/`)
 
 | # | Documento |
@@ -554,7 +639,7 @@ El detalle del backlog, los sprints y la Definition of Done se encuentran en
 
 | Documento | Descripción |
 | :--- | :--- |
-| [Registro y Repositorio de Evidencias](docs/05%20Evidencias/README.md) | Inventario de pruebas automatizadas (51 tests pytest), auditoría hermética de API y smoke tests |
+| [Registro y Repositorio de Evidencias](docs/05%20Evidencias/README.md) | Inventario de pruebas automatizadas (64 pytest + 16 Vitest), cobertura, auditoría hermética de API y smoke tests |
 
 ---
 
@@ -586,6 +671,7 @@ Ingeniería de Sistemas e Informática.
 - **Fase de Inicio:** [`docs/01 Inicio/`](docs/01%20Inicio/)
 - **Fase de Planificación:** [`docs/02 Planificación/`](docs/02%20Planificación/)
 - **Fase de Implementación:** [`docs/03 Implementación/`](docs/03%20Implementación/)
+- **Sprint 3:** [`docs/03 Implementación/Sprint 03/`](docs/03%20Implementación/Sprint%2003/)
 - **Fase de Arquitectura:** [`docs/04 Arquitectura/`](docs/04%20Arquitectura/)
 - **Fase de Evidencias:** [`docs/05 Evidencias/`](docs/05%20Evidencias/)
 - **Decisiones de diseño:** [DESIGN.md](DESIGN.md)

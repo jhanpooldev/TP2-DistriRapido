@@ -1,9 +1,9 @@
 from math import radians, sin, cos, sqrt, asin
 from typing import List, Tuple
 import uuid
-from datetime import datetime
+from datetime import datetime, timezone
 
-from app.schemas import PuntoEntregaResponse, PuntoRutaResponse, RutaResponse, ResumenRuta
+from app.schemas import PuntoEntregaResponse, PuntoRutaResponse, RutaResponse
 from app.core.config import get_settings
 from app.models import ParametrosVehiculo, Ruta, RutaPunto
 from sqlalchemy.orm import Session
@@ -157,7 +157,10 @@ def build_route_response(
         ahorro_distancia_pct=ahorro["ahorro_distancia_pct"],
         sin_reduccion_significativa=ahorro["sin_reduccion_significativa"],
         estado="Confirmada",
-        fecha_generacion=datetime.utcnow(),
+        fecha_generacion=datetime.now(timezone.utc).replace(tzinfo=None),
+        origen_lat=settings.HOME_LAT,
+        origen_lng=settings.HOME_LNG,
+        origen_direccion=settings.HOME_ADDRESS,
         puntos=puntos_ruta,
     )
 

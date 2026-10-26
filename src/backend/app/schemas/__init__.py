@@ -120,6 +120,11 @@ class RutaResponse(BaseModel):
     sin_reduccion_significativa: bool = False
     estado: str
     fecha_generacion: datetime
+    # Centro de distribucion (RN-011). El mapa dibuja el recorrido completo
+    # saliendo y volviendo a este punto, igual que el calculo de distancias.
+    origen_lat: Optional[float] = None
+    origen_lng: Optional[float] = None
+    origen_direccion: Optional[str] = None
     puntos: List[PuntoRutaResponse] = Field(default_factory=list)
 
 class ResumenRuta(BaseModel):

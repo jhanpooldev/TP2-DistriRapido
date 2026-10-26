@@ -172,8 +172,8 @@ export default function SelectorPuntos({
           </div>
         </div>
 
-        <div>
-          <label>Ruta en construccion</label>
+        <div role="group" aria-labelledby="ruta-construccion-titulo">
+          <h4 id="ruta-construccion-titulo">Ruta en construccion</h4>
           <div className="sel-lista" style={{ marginTop: 10 }}>
             {seleccion.length === 0 ? (
               <div className="sel-vacio">Aun no agregaste ningun pedido.</div>

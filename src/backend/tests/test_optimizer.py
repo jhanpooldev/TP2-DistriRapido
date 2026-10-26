@@ -1,10 +1,12 @@
 """Pruebas del motor de ruteo. Cubre US-003 y EN-01."""
 import time
+import uuid
 
 import pytest
 
 from app.core.config import get_settings
 from app.services.optimizer import (
+    build_route_response,
     haversine,
     nearest_neighbor,
     route_distance,
@@ -99,3 +101,17 @@ def test_calculo_de_co2_y_tiempo():
     assert minutos == pytest.approx(10.0 / 30.0 * 60)
     assert co2 > 0
     assert minutos > 0
+
+
+def test_respuesta_de_ruta_incluye_el_centro_de_distribucion(punto_factory):
+    """El mapa necesita el origen para dibujar el recorrido completo (RN-011)."""
+    puntos = [punto_factory(-12.10, -76.95, "1"), punto_factory(-12.12, -76.98, "2")]
+
+    respuesta = build_route_response(
+        None, uuid.uuid4(), 1, puntos, 5.0, 7.0, VehiculoFalso()
+    )
+
+    assert respuesta.origen_lat == settings.HOME_LAT
+    assert respuesta.origen_lng == settings.HOME_LNG
+    assert respuesta.origen_direccion == settings.HOME_ADDRESS
+    assert [p.orden for p in respuesta.puntos] == [1, 2]

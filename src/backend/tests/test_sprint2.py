@@ -1,6 +1,4 @@
 """Pruebas de Sprint 2: US-004 (ahorro de CO2) y US-007 (rangos de fechas)."""
-import uuid
-from datetime import datetime, timedelta
 
 import pytest
 

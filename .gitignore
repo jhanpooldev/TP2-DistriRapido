@@ -72,6 +72,10 @@ coverage/
 .dmypy.json
 dmypy.json
 
+# Analisis de SonarQube / SonarScanner
+.scannerwork/
+.sonar/
+
 # Bases de datos locales de desarrollo
 *.db
 *.sqlite

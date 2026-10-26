@@ -6,7 +6,7 @@ export default defineConfig({
     include: ['src/**/*.test.js'],
     coverage: {
       provider: 'v8',
-      reporter: ['text', 'json-summary'],
+      reporter: ['text', 'json-summary', 'lcov'],
       include: ['src/logica/**/*.js'],
     },
   },

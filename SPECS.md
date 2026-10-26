@@ -31,12 +31,13 @@ El sistema permitirá generar rutas optimizadas para las entregas, mejorar el us
 PostgreSQL (Base de datos)
 FastAPI (Backend en Python)
 React + Vite (Frontend)
-SQLAlchemy (ORM)
-Alembic (Migraciones)
-Tailwind CSS (Interfaz)
+SQLAlchemy (ORM, sin migraciones: el esquema se crea con `Base.metadata.create_all`)
+CSS plano responsive (Interfaz)
 Axios (Comunicación Frontend-Backend)
 pytest + pytest-cov (Pruebas Backend)
-Vitest (Pruebas Frontend)
+Vitest + @vitest/coverage-v8 (Pruebas Frontend)
+Ruff (Análisis estático mínimo del backend)
+GitHub Actions + CodeQL (Integración continua y análisis estático)
 
 ---
 
@@ -73,7 +74,8 @@ Ahorro estimado de distancia y de emisiones frente a la ruta no optimizada
 Puntos pendientes por capacidad insuficiente
 Estado de la ruta
 Visualización de rutas en mapa (o formato tabular degradado)
-Exportación de resultados (opcional, fuera del PMV)
+Detalle de cada parada en el mapa (orden, dirección, destinatario y peso)
+Exportación del resumen de una ruta en CSV (US-008)
 ---
 
 # Actores del Sistema
@@ -247,13 +249,14 @@ Estado de cada funcionalidad del sistema respecto al alcance del Producto Mínim
 | Panel de gestión del operador (listado y búsqueda) | RF-011, US-007 | Requerido |
 | Indicadores logísticos del gerente | RF-013, RN-020 | Requerido |
 | Indicadores de sostenibilidad | RF-012, RN-019 | Requerido |
+| Exportación del resumen de una ruta en CSV | RF-010, US-008 | Requerido |
+| Integración continua y análisis CodeQL | EN-03 | Parcial: Staging no verificado |
 | Cierre de sesión | RF-014 | Requerido |
 | Gestión de conductores | — | Fuera del PMV |
 | Gestión de zonas de distribución | — | Fuera del PMV |
 | Gestión de pedidos y entregas | — | Fuera del PMV |
 | Reporte de incidencias | — | Fuera del PMV |
 | Seguimiento GPS en tiempo real | — | Fuera del PMV |
-| Exportación de reportes | — | Deseado (post-PMV) |
 | Historial avanzado de rutas | — | Deseado (post-PMV) |
 
 ---
@@ -293,6 +296,7 @@ GET  /api/v1/rutas/{id}/puntos
 PUT  /api/v1/rutas/{id}
 DELETE /api/v1/rutas/{id}
 GET  /api/v1/rutas/{id}/resumen
+GET  /api/v1/rutas/{id}/export
 
 ## Vehículos (solo lectura en el PMV)
 GET /api/v1/vehiculos
@@ -308,11 +312,18 @@ recalcula la secuencia optimizada sobre esa nueva configuración (US-002), por l
 que requiere al menos dos puntos válidos (RN-010). Las operaciones de edición y
 eliminación se rechazan si la ruta ya tiene entregas completadas (RN-009, RN-013).
 
-`GET /api/v1/rutas/{id}/resumen` devuelve el resumen exportable de la ruta
-(puntos, orden de visita e impacto ambiental estimado) con los mismos datos que
-`GET /api/v1/rutas/{id}/puntos` más los indicadores de la ruta; el formateo a PDF
-o CSV se resuelve en el cliente a partir de esa respuesta (US-008). El endpoint
-responde `404` si la ruta aún no ha sido calculada ni confirmada.
+`GET /api/v1/rutas/{id}/resumen` devuelve el resumen de la ruta en JSON (puntos,
+orden de visita e impacto ambiental estimado) con los mismos datos que
+`GET /api/v1/rutas/{id}/puntos` más los indicadores de la ruta.
+
+`GET /api/v1/rutas/{id}/export` devuelve el resumen en **CSV UTF-8 con BOM**
+(US-008), generado en el backend. Incluye los datos generales de la ruta, el
+impacto ambiental estimado y la tabla de puntos en orden de visita. Las celdas se
+neutralizan contra inyección de fórmulas (`=`, `+`, `-`, `@`) sin alterar las
+coordenadas negativas, y el archivo se descarga con un nombre ASCII predecible
+(`ruta-<8 caracteres>-<AAAAMMDD>.csv`). La autorización es la misma que la de la
+ruta: el operador propietario o un administrador. Ambos endpoints responden `404`
+si la ruta no existe y `403` si el usuario no está autorizado.
 
 ---
 # Modelo de Datos (Alto Nivel)
@@ -343,7 +354,7 @@ alcance del PMV (nota NOT-05 de [10 Base de datos](docs/02%20Planificación/10%2
 ---
 # Requisitos de Interfaz (UI)
 
-Diseño responsive utilizando Tailwind CSS.
+Diseño responsive con CSS plano.
 Panel principal según el rol del usuario autenticado.
 Gestión mediante tablas y formularios.
 Formulario de registro de puntos de entrega.
@@ -351,13 +362,15 @@ Formulario de inicio de sesión.
 Vista de la ruta optimizada (secuencia de paradas, distancia, tiempo y CO₂).
 Comparación lado a lado de la ruta optimizada y la no optimizada.
 Visualización de rutas mediante mapa (con degradación a formato tabular si el servicio de mapas no responde).
+Detalle de cada parada en un popup del mapa (orden, dirección, destinatario y peso).
 Visualización de las paradas de una ruta.
+Descarga del resumen de una ruta en CSV desde la interfaz.
 Indicadores logísticos.
 Indicadores de sostenibilidad.
 Visualización de rutas históricas con filtros por fecha y estado.
 Estados de carga y error visibles en todas las vistas.
 Validación de formularios con mensajes en español.
-Interfaz accesible conforme a WCAG 2.1 nivel AA (etiquetas asociadas y contraste ≥ 4.5:1).
+Interfaz revisada contra WCAG 2.1 nivel AA (etiquetas asociadas, foco visible y contraste ≥ 4.5:1). La revisión es manual y no cuenta con certificación externa.
 
 ---
 # Requisitos No Funcionales
@@ -386,6 +399,13 @@ Documentación automática mediante Swagger/OpenAPI.
 Diseño responsive.
 Cobertura de pruebas ≥ 70% (módulos de validación ≥ 80%).
 Cobertura ≥ 80% sobre el código nuevo o modificado según el DoD global.
+
+Estado verificado tras el Sprint 3 y el trazado por calles (26/10/2026): el backend
+alcanza **60.82 %** global (objetivo de 70 % no alcanzado) y el frontend **93.85 %**
+de sentencias sobre `src/logica/**`. El módulo de exportación CSV alcanza **100 %** y
+el optimizador **90 %**. El trazado por calles es solo visual: las distancias, tiempos
+y emisiones siguen calculándose con la fórmula geodésica (haversine), por lo que los
+indicadores del resumen no cambian.
 
 ---
 
@@ -462,9 +482,11 @@ El sistema muestra la comparación entre la ruta optimizada y la no optimizada s
 Las rutas confirmadas se registran y pueden consultarse; las rutas con entregas completadas no pueden eliminarse (RF-010, RN-012, RN-013).
 Las rutas generadas pueden visualizarse en un mapa o degradarse a formato tabular si el servicio externo no responde (RF-009).
 Las entregas pueden consultarse por ruta en su orden de visita.
+El detalle de cada parada puede consultarse en el mapa (US-006).
+El resumen de una ruta calculada puede descargarse en CSV (US-008).
 Los indicadores logísticos y de sostenibilidad pueden visualizarse (RF-012, RF-013).
 Las pruebas automatizadas se ejecutan correctamente.
-La cobertura global alcanza como mínimo el 70%.
+La cobertura global alcanza como mínimo el 70% (en el Sprint 3: 59.89 % en el backend, pendiente).
 El tiempo de generación de ruta para 20 puntos se cumple en el 95% de las ejecuciones (EN-01, RNF-001).
 
 ---
