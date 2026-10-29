@@ -66,7 +66,9 @@ jobs:
         run: ruff check app tests --select E9,F63,F7,F82
 
       - name: Ejecutar pruebas y cobertura
-        run: pytest --cov=app --cov-report=term-missing --cov-report=xml
+        # `python -m pytest` agrega el directorio actual (src/backend) a sys.path,
+        # por lo que el paquete `app` es importable sin tocar codigo ni tests.
+        run: python -m pytest --cov=app --cov-report=term-missing --cov-report=xml
 
       - name: Publicar reporte de cobertura
         if: always()
