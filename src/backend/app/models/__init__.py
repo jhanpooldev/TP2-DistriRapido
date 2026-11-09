@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, ForeignKey, DECIMAL, TIMESTAMP, func, CheckConstraint, UniqueConstraint
+from sqlalchemy import Column, Integer, String, ForeignKey, DECIMAL, TIMESTAMP, func, CheckConstraint, UniqueConstraint, Index
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
 import uuid
@@ -17,7 +17,7 @@ class Usuario(Base):
     nombre = Column(String(100), nullable=False)
     correo = Column(String(150), nullable=False, unique=True)
     contrasena_hash = Column(String(255), nullable=False)
-    id_rol = Column(Integer, ForeignKey("roles.id_rol"), nullable=False)
+    id_rol = Column(Integer, ForeignKey("roles.id_rol"), nullable=False, index=True)
     fecha_creacion = Column(TIMESTAMP(timezone=True), server_default=func.now())
     rol = relationship("Rol", back_populates="usuarios")
     puntos = relationship("PuntoEntrega", back_populates="operador")
@@ -36,6 +36,11 @@ class PuntoEntrega(Base):
     operador = relationship("Usuario", back_populates="puntos")
     ruta_puntos = relationship("RutaPunto", back_populates="punto")
 
+    # El listado siempre filtra por operador y ordena por fecha de registro.
+    __table_args__ = (
+        Index("ix_puntos_entrega_operador_fecha", "id_operador", "fecha_registro"),
+    )
+
 class ParametrosVehiculo(Base):
     __tablename__ = "parametros_vehiculo"
     id_vehiculo = Column(Integer, primary_key=True, autoincrement=True)
@@ -51,7 +56,7 @@ class Ruta(Base):
     __tablename__ = "rutas"
     id_ruta = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     id_operador = Column(UUID(as_uuid=True), ForeignKey("usuarios.id_usuario"), nullable=False)
-    id_vehiculo = Column(Integer, ForeignKey("parametros_vehiculo.id_vehiculo"), nullable=False)
+    id_vehiculo = Column(Integer, ForeignKey("parametros_vehiculo.id_vehiculo"), nullable=False, index=True)
     distancia_total_km = Column(DECIMAL(10, 3), nullable=False, default=0)
     tiempo_estimado_min = Column(DECIMAL(10, 2), nullable=False, default=0)
     co2_estimado_kg = Column(DECIMAL(10, 3), nullable=False, default=0)
@@ -63,6 +68,12 @@ class Ruta(Base):
     operador = relationship("Usuario", back_populates="rutas")
     vehiculo = relationship("ParametrosVehiculo", back_populates="rutas")
     puntos = relationship("RutaPunto", back_populates="ruta", order_by="RutaPunto.orden")
+
+    # Filtros del listado: operador + rango de fechas, y estado por separado.
+    __table_args__ = (
+        Index("ix_rutas_operador_fecha", "id_operador", "fecha_generacion"),
+        Index("ix_rutas_estado", "estado"),
+    )
 
 class RutaPunto(Base):
     __tablename__ = "ruta_puntos"
@@ -76,4 +87,6 @@ class RutaPunto(Base):
     __table_args__ = (
         UniqueConstraint("id_ruta", "orden", name="uq_ruta_puntos_orden"),
         CheckConstraint("orden > 0", name="ck_orden_positivo"),
+        # Evita escanear toda la tabla al comprobar si un punto ya esta en uso.
+        Index("ix_ruta_puntos_punto", "id_punto"),
     )

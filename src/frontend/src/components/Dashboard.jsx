@@ -1,11 +1,24 @@
-﻿import React, { useState, useEffect, useRef } from 'react'
+﻿import React, { useState, useEffect, useRef, lazy, Suspense } from 'react'
 import api, { extraerError } from '../api/client'
 import { exportarResumenRuta } from '../logica/exportar'
-import MapView from './MapView'
-import MapPicker from './MapPicker'
-import RutasTab from './RutasTab'
-import ImpactoTab from './ImpactoTab'
-import SelectorPuntos from './SelectorPuntos'
+import Paginacion from './Paginacion'
+
+// Cada pestaña pesada se descarga solo cuando se abre. Leaflet y los mapas
+// quedan fuera del bundle inicial del panel.
+const MapView = lazy(() => import('./MapView'))
+const MapPicker = lazy(() => import('./MapPicker'))
+const RutasTab = lazy(() => import('./RutasTab'))
+const ImpactoTab = lazy(() => import('./ImpactoTab'))
+const SelectorPuntos = lazy(() => import('./SelectorPuntos'))
+
+const PUNTOS_POR_PAGINA = 12
+const RUTAS_POR_PAGINA = 12
+
+const CargandoPanel = ({ texto = 'Cargando sección...' }) => (
+  <div className="cargando" role="status" aria-live="polite">
+    <span className="sr-only">{texto}</span>
+  </div>
+)
 
 const TABS = [
   { id: 'puntos', num: 1, label: 'Pedidos' },
@@ -20,7 +33,15 @@ const MAX_PUNTOS = 20
 export default function Dashboard({ user, onLogout }) {
   const [activeTab, setActiveTab] = useState('puntos')
   const [puntos, setPuntos] = useState([])
+  const [totalPuntos, setTotalPuntos] = useState(0)
+  const [paginaPuntos, setPaginaPuntos] = useState(1)
+  const [puntosTodos, setPuntosTodos] = useState([])
+  const [puntosTodosCargados, setPuntosTodosCargados] = useState(false)
   const [rutas, setRutas] = useState([])
+  const [totalRutas, setTotalRutas] = useState(0)
+  const [paginaRutas, setPaginaRutas] = useState(1)
+  const [rutasTodas, setRutasTodas] = useState([])
+  const [rutasTodasCargadas, setRutasTodasCargadas] = useState(false)
   const [vehiculos, setVehiculos] = useState([])
   const [mensaje, setMensaje] = useState(null)
   const [selectedRoute, setSelectedRoute] = useState(null)
@@ -49,19 +70,64 @@ export default function Dashboard({ user, onLogout }) {
   }
 
   useEffect(() => {
-    void fetchPuntos()
-    void fetchRutas()
+    void fetchPuntos(1)
+    void fetchRutas(1)
     void fetchVehiculos()
   }, [])
 
-  const fetchPuntos = async () => {
-    try { const r = await api.get('/puntos-entrega'); setPuntos(r.data.puntos) } catch (e) { mostrar('error', extraerError(e)) }
+  // Los selectores necesitan el catalogo completo, pero la tabla solo muestra
+  // una pagina. Se pide el resto solo al entrar a la pestaña que lo usa.
+  useEffect(() => {
+    if (activeTab === 'rutas' && !puntosTodosCargados) void fetchTodosLosPuntos()
+    if ((activeTab === 'mapa' || activeTab === 'impacto') && !rutasTodasCargadas) {
+      void fetchRutasTodas()
+    }
+  }, [activeTab, puntosTodosCargados, rutasTodasCargadas])
+
+  const fetchPuntos = async (page = 1) => {
+    try {
+      const r = await api.get('/puntos-entrega', {
+        params: { page, limit: PUNTOS_POR_PAGINA },
+      })
+      setPuntos(r.data.puntos)
+      setTotalPuntos(r.data.total ?? r.data.puntos.length)
+      setPaginaPuntos(r.data.page ?? page)
+    } catch (e) { mostrar('error', extraerError(e)) }
   }
-  const fetchRutas = async () => {
-    try { const r = await api.get('/rutas'); setRutas(r.data) } catch (e) { mostrar('error', extraerError(e)) }
+
+  const fetchTodosLosPuntos = async () => {
+    try {
+      const r = await api.get('/puntos-entrega', { params: { limit: 100 } })
+      setPuntosTodos(r.data.puntos)
+      setPuntosTodosCargados(true)
+    } catch (e) { mostrar('error', extraerError(e)) }
   }
-  const fetchVehiculos = async () => {
-    try { const r = await api.get('/vehiculos'); setVehiculos(r.data) } catch (e) { mostrar('error', extraerError(e)) }
+
+  const fetchRutas = async (page = 1) => {
+    try {
+      const r = await api.get('/rutas', {
+        params: { page, limit: RUTAS_POR_PAGINA },
+      })
+      setRutas(r.data)
+      setTotalRutas(Number(r.headers['x-total-count'] ?? r.data.length))
+      setPaginaRutas(Number(r.headers['x-page'] ?? page))
+      setRutasTodasCargadas(false)
+    } catch (e) { mostrar('error', extraerError(e)) }
+  }
+
+  const fetchRutasTodas = async () => {
+    try {
+      const r = await api.get('/rutas', { params: { limit: 100 } })
+      setRutasTodas(r.data)
+      setRutasTodasCargadas(true)
+    } catch (e) { mostrar('error', extraerError(e)) }
+  }
+
+  const actualizarRutas = (data, meta = {}) => {
+    setRutas(data)
+    setTotalRutas(meta.total ?? data.length)
+    setPaginaRutas(meta.page ?? 1)
+    setRutasTodasCargadas(false)
   }
 
   const crearPunto = async (e) => {
@@ -69,7 +135,8 @@ export default function Dashboard({ user, onLogout }) {
     try {
       await api.post('/puntos-entrega', puntoForm)
       setPuntoForm({ direccion: '', latitud: '', longitud: '', peso_kg: '', destinatario: '' })
-      void fetchPuntos()
+      setPuntosTodosCargados(false)
+      await fetchPuntos(1)
       mostrar('ok', 'Pedido registrado. Ya aparece en la pestaña Rutas para armar la ruta.')
     } catch (err) { mostrar('error', extraerError(err)) }
   }
@@ -93,9 +160,10 @@ export default function Dashboard({ user, onLogout }) {
     }
   }
 
+  const puntosDisponibles = puntosTodosCargados ? puntosTodos : puntos
   const cantidadPuntos = new Set(optimizeForm.punto_ids).size
   const vehiculoSel = vehiculos.find(v => v.id_vehiculo === Number(optimizeForm.id_vehiculo))
-  const pesoTotal = puntos
+  const pesoTotal = puntosDisponibles
     .filter(p => optimizeForm.punto_ids.includes(p.id_punto))
     .reduce((suma, p) => suma + Number(p.peso_kg || 0), 0)
   const excedeCapacidad = Boolean(vehiculoSel) && pesoTotal > Number(vehiculoSel.capacidad_kg)
@@ -118,7 +186,7 @@ export default function Dashboard({ user, onLogout }) {
       const r = await api.post('/rutas', optimizeForm)
       mostrar('ok', 'Ruta confirmada y guardada.')
       setPreviewRoute(null)
-      await fetchRutas()
+      await fetchRutas(1)
       setSelectedRoute(r.data)
       setActiveTab('mapa')
     } catch (err) { mostrar('error', extraerError(err)) }
@@ -160,6 +228,16 @@ export default function Dashboard({ user, onLogout }) {
     if (excedeCapacidad) return `La carga de ${pesoTotal.toFixed(1)} kg supera la capacidad de ${vehiculoSel.placa} (${vehiculoSel.capacidad_kg} kg).`
     return `${cantidadPuntos} pedidos seleccionados · ${pesoTotal.toFixed(1)} kg de ${vehiculoSel?.capacidad_kg ?? '—'} kg disponibles.`
   }
+
+  // El mapa y el impacto necesitan el historico completo, no solo la pagina
+  // visible de la tabla de rutas.
+  const rutasParaMapa = (() => {
+    const base = rutasTodasCargadas ? rutasTodas : rutas
+    if (selectedRoute && !base.some(r => r.id_ruta === selectedRoute.id_ruta)) {
+      return [selectedRoute, ...base]
+    }
+    return base
+  })()
 
   return (
     <>
@@ -254,11 +332,13 @@ export default function Dashboard({ user, onLogout }) {
           </div>
 
           <div className="card">
-            <MapPicker
-              latitud={puntoForm.latitud}
-              longitud={puntoForm.longitud}
-              onPick={handlePickLocation}
-            />
+            <Suspense fallback={<CargandoPanel texto="Cargando mapa de seleccion..." />}>
+              <MapPicker
+                latitud={puntoForm.latitud}
+                longitud={puntoForm.longitud}
+                onPick={handlePickLocation}
+              />
+            </Suspense>
           </div>
 
           <form onSubmit={crearPunto} className="card">
@@ -325,7 +405,7 @@ export default function Dashboard({ user, onLogout }) {
 
           <div className="seccion-titulo">
             <h2>Pedidos registrados</h2>
-            <p>{puntos.length} pedido(s) disponibles para planificar.</p>
+            <p>{totalPuntos} pedido(s) registrados. La tabla muestra {PUNTOS_POR_PAGINA} por pagina.</p>
           </div>
 
           <div className="tabla-envoltura">
@@ -357,6 +437,14 @@ export default function Dashboard({ user, onLogout }) {
               </table>
             )}
           </div>
+
+          <Paginacion
+            page={paginaPuntos}
+            pages={Math.ceil(totalPuntos / PUNTOS_POR_PAGINA)}
+            total={totalPuntos}
+            onChange={fetchPuntos}
+            etiqueta="pedidos"
+          />
         </div>
       )}
 
@@ -370,14 +458,16 @@ export default function Dashboard({ user, onLogout }) {
             </p>
           </div>
 
-          <SelectorPuntos
-            puntos={puntos}
-            seleccionados={optimizeForm.punto_ids}
-            onChange={ids => setOptimizeForm({ ...optimizeForm, punto_ids: ids })}
-            vehiculos={vehiculos}
-            idVehiculo={optimizeForm.id_vehiculo}
-            maxPuntos={MAX_PUNTOS}
-          />
+          <Suspense fallback={<CargandoPanel texto="Cargando selector de pedidos..." />}>
+            <SelectorPuntos
+              puntos={puntosDisponibles}
+              seleccionados={optimizeForm.punto_ids}
+              onChange={ids => setOptimizeForm({ ...optimizeForm, punto_ids: ids })}
+              vehiculos={vehiculos}
+              idVehiculo={optimizeForm.id_vehiculo}
+              maxPuntos={MAX_PUNTOS}
+            />
+          </Suspense>
 
           <form onSubmit={optimizeRuta} className="card">
             <h3>2. Elige el vehiculo y calcula</h3>
@@ -411,19 +501,25 @@ export default function Dashboard({ user, onLogout }) {
             </div>
           </form>
 
-          <RutasTab
-            rutas={rutas}
-            puntos={puntos}
-            vehiculos={vehiculos}
-            onVerMapa={verEnMapa}
-            onCambiado={setRutas}
-            onMensaje={(m) => mostrar(m.tipo, m.texto)}
-          />
+          <Suspense fallback={<CargandoPanel texto="Cargando rutas guardadas..." />}>
+            <RutasTab
+              rutas={rutas}
+              puntos={puntosDisponibles}
+              vehiculos={vehiculos}
+              total={totalRutas}
+              page={paginaRutas}
+              onVerMapa={verEnMapa}
+              onCambiado={actualizarRutas}
+              onMensaje={(m) => mostrar(m.tipo, m.texto)}
+            />
+          </Suspense>
         </div>
       )}
 
       {activeTab === 'impacto' && (
-        <ImpactoTab rutas={rutas} onVerMapa={verEnMapa} />
+        <Suspense fallback={<CargandoPanel texto="Cargando impacto ambiental..." />}>
+          <ImpactoTab rutas={rutasParaMapa} onVerMapa={verEnMapa} />
+        </Suspense>
       )}
 
       {activeTab === 'mapa' && (
@@ -435,7 +531,7 @@ export default function Dashboard({ user, onLogout }) {
 
           <div className="card">
             <h3>Seleccionar ruta</h3>
-            {rutas.length === 0 ? (
+            {rutasParaMapa.length === 0 ? (
               <p className="texto-suave">
                 No hay rutas guardadas. Armala primero en la pestaña <strong>Rutas</strong>.
               </p>
@@ -446,13 +542,13 @@ export default function Dashboard({ user, onLogout }) {
                   id="mapa-ruta"
                   value={selectedRoute?.id_ruta || ''}
                   onChange={e => {
-                    const ruta = rutas.find(r => r.id_ruta === e.target.value)
+                    const ruta = rutasParaMapa.find(r => r.id_ruta === e.target.value)
                     setSelectedRoute(ruta || null)
                     setPreviewRoute(null)
                   }}
                 >
                 <option value="">-- Seleccionar una ruta --</option>
-                {rutas.map(r => (
+                {rutasParaMapa.map(r => (
                   <option key={r.id_ruta} value={r.id_ruta}>
                     {r.id_ruta.slice(0, 8)}... · {r.distancia_total_km} km · {r.estado}
                   </option>
@@ -519,14 +615,16 @@ export default function Dashboard({ user, onLogout }) {
                   </div>
                 )}
 
-                <MapView
-                  puntos={ruta.puntos}
-                  origenLat={ruta.origen_lat}
-                  origenLng={ruta.origen_lng}
-                  origenDireccion={ruta.origen_direccion}
-                  center={[-12.115, -76.97]}
-                  zoom={12}
-                />
+                <Suspense fallback={<CargandoPanel texto="Cargando mapa de la ruta..." />}>
+                  <MapView
+                    puntos={ruta.puntos}
+                    origenLat={ruta.origen_lat}
+                    origenLng={ruta.origen_lng}
+                    origenDireccion={ruta.origen_direccion}
+                    center={[-12.115, -76.97]}
+                    zoom={12}
+                  />
+                </Suspense>
 
                 <h3 className="sep">Orden de entrega</h3>
                 <div className="tabla-envoltura">

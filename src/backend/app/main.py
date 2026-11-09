@@ -1,5 +1,6 @@
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.middleware.gzip import GZipMiddleware
 from fastapi.responses import JSONResponse
 from contextlib import asynccontextmanager
 import logging
@@ -7,6 +8,7 @@ import uuid
 
 from sqlalchemy.exc import SQLAlchemyError
 
+from app.core.compression import BrotliMiddleware
 from app.core.database import init_db
 from app.api.v1.router import api_router
 from app.core.config import get_settings
@@ -84,8 +86,21 @@ app.add_middleware(
     allow_credentials=True,
     allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allow_headers=["Authorization", "Content-Type", "X-Request-ID"],
-    expose_headers=["Content-Disposition", "X-Request-ID"],
+    expose_headers=[
+        "Content-Disposition",
+        "X-Request-ID",
+        # Metadatos de paginacion de /rutas.
+        "X-Total-Count",
+        "X-Total-Pages",
+        "X-Page",
+        "X-Page-Size",
+    ],
 )
+
+# GZip queda dentro de Brotli: si el cliente acepta "br" se usa Brotli y GZip
+# no duplica el trabajo; si no, GZip sigue siendo el respaldo universal.
+app.add_middleware(GZipMiddleware, minimum_size=500)
+app.add_middleware(BrotliMiddleware, minimum_size=500)
 
 
 @app.middleware("http")
@@ -109,6 +124,17 @@ async def contexto_de_peticion(request: Request, call_next):
         "Permissions-Policy",
         "geolocation=(self), microphone=(), camera=()",
     )
+
+    # El cliente (client.js) mantiene su propia cache TTL con invalidacion
+    # explicita. A nivel HTTP solo se marca como cacheable el catalogo de
+    # vehiculos, que cambia con muy poca frecuencia y no depende del usuario.
+    # Las respuestas de autenticacion nunca se cachean, incluido el POST de
+    # login, que contiene el token.
+    if request.url.path.startswith("/api/v1/auth/"):
+        response.headers.setdefault("Cache-Control", "no-store")
+    elif request.method == "GET" and response.status_code == 200:
+        if request.url.path == "/api/v1/vehiculos":
+            response.headers.setdefault("Cache-Control", "private, max-age=300")
 
     esquema = request.headers.get("X-Forwarded-Proto", request.url.scheme)
     if esquema == "https":

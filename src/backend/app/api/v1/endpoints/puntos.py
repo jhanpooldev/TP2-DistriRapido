@@ -1,5 +1,7 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Query, status
+from sqlalchemy import func
 from sqlalchemy.orm import Session
+from typing import Optional
 import uuid
 
 from app.core.database import get_db
@@ -8,6 +10,11 @@ from app.schemas import PuntoEntregaCreate, PuntoEntregaResponse, PuntoEntregaLi
 from app.api.v1.endpoints.dependencies import get_current_operador
 
 router = APIRouter()
+
+# Tamano de pagina por defecto. El maximo evita que un cliente pida toda la
+# tabla y anule el beneficio de la paginacion.
+PAGE_SIZE_DEFAULT = 12
+PAGE_SIZE_MAX = 100
 
 @router.post("", response_model=PuntoEntregaResponse, status_code=status.HTTP_201_CREATED)
 def create_punto(punto: PuntoEntregaCreate, db: Session = Depends(get_db), operador = Depends(get_current_operador)):
@@ -25,9 +32,38 @@ def create_punto(punto: PuntoEntregaCreate, db: Session = Depends(get_db), opera
     return db_punto
 
 @router.get("", response_model=PuntoEntregaList)
-def list_puntos(skip: int = 0, limit: int = 100, db: Session = Depends(get_db), operador = Depends(get_current_operador)):
-    puntos = db.query(PuntoEntrega).filter(PuntoEntrega.id_operador == operador.id_usuario).offset(skip).limit(limit).all()
-    return {"puntos": puntos}
+def list_puntos(
+    page: int = Query(1, ge=1),
+    limit: int = Query(PAGE_SIZE_DEFAULT, ge=1, le=PAGE_SIZE_MAX),
+    skip: Optional[int] = Query(None, ge=0, description="Offset explicito; reemplaza a page si se envia"),
+    db: Session = Depends(get_db),
+    operador = Depends(get_current_operador),
+):
+    """Listado paginado por operador.
+
+    `page`/`limit` son la interfaz recomendada. `skip` se conserva para los
+    scripts existentes que ya lo usaban.
+    """
+    filtro = PuntoEntrega.id_operador == operador.id_usuario
+    total = db.query(func.count(PuntoEntrega.id_punto)).filter(filtro).scalar() or 0
+    offset = skip if skip is not None else (page - 1) * limit
+
+    puntos = (
+        db.query(PuntoEntrega)
+        .filter(filtro)
+        .order_by(PuntoEntrega.fecha_registro.desc(), PuntoEntrega.id_punto)
+        .offset(offset)
+        .limit(limit)
+        .all()
+    )
+
+    return {
+        "puntos": puntos,
+        "total": total,
+        "page": page,
+        "limit": limit,
+        "pages": (total + limit - 1) // limit,
+    }
 
 @router.get("/{punto_id}", response_model=PuntoEntregaResponse)
 def get_punto(punto_id: uuid.UUID, db: Session = Depends(get_db), operador = Depends(get_current_operador)):

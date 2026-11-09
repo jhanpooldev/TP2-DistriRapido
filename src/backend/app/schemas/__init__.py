@@ -70,6 +70,12 @@ class PuntoEntregaResponse(BaseModel):
 
 class PuntoEntregaList(BaseModel):
     puntos: List[PuntoEntregaResponse]
+    # Metadatos de paginacion. Se mantienen con valores por defecto para no
+    # romper a los clientes que solo leian la clave "puntos".
+    total: int = 0
+    page: int = 1
+    limit: int = 12
+    pages: int = 0
 
 class VehiculoCreate(BaseModel):
     placa: str = Field(..., min_length=1, max_length=20)

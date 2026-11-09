@@ -1,7 +1,10 @@
-import React, { useState, useEffect, useCallback } from 'react'
-import api, { extraerError } from './api/client'
+import React, { useState, useEffect, useCallback, lazy, Suspense } from 'react'
+import api, { extraerError, limpiarCache } from './api/client'
 import Login from './components/Login'
-import Dashboard from './components/Dashboard'
+
+// El panel completo (mapas, rutas e impacto) solo se descarga despues del
+// login. Asi el primer render no carga Leaflet ni el resto de pestañas.
+const Dashboard = lazy(() => import('./components/Dashboard'))
 
 function App() {
   const [token, setToken] = useState(localStorage.getItem('token'))
@@ -10,6 +13,8 @@ function App() {
   const [error, setError] = useState('')
 
   const logout = useCallback(() => {
+    // Evita que el siguiente usuario vea respuestas cacheadas de la sesion anterior.
+    limpiarCache()
     localStorage.removeItem('token')
     setToken(null)
     setUser(null)
@@ -74,7 +79,20 @@ function App() {
     )
   }
 
-  return <Dashboard user={user} onLogout={logout} />
+  return (
+    <Suspense
+      fallback={(
+        <main className="pantalla-centrada" id="contenido-principal">
+          <div className="cargando" role="status" aria-live="polite">
+            <span className="sr-only">Cargando panel...</span>
+          </div>
+          <p>Cargando panel...</p>
+        </main>
+      )}
+    >
+      <Dashboard user={user} onLogout={logout} />
+    </Suspense>
+  )
 }
 
 export default App

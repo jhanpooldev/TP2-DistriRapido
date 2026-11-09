@@ -1,7 +1,7 @@
 import logging
 
 from fastapi import APIRouter, Depends, HTTPException, status, Form
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 from app.core.database import get_db
 from app.core.security import hash_password, verify_password, create_access_token
 from app.models import Usuario, Rol
@@ -35,7 +35,12 @@ def register(
 
 @router.post("/login", response_model=Token)
 def login(correo: str = Form(...), password: str = Form(...), db: Session = Depends(get_db)):
-    user = db.query(Usuario).filter(Usuario.correo == correo).first()
+    user = (
+        db.query(Usuario)
+        .options(joinedload(Usuario.rol))
+        .filter(Usuario.correo == correo)
+        .first()
+    )
     if not user or not verify_password(password, user.contrasena_hash):
         # Se registra el intento sin incluir la contrasena. El correo se limpia
         # de saltos de linea para evitar inyeccion de lineas en el log.

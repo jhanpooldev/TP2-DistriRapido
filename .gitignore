@@ -99,6 +99,9 @@ dist-ssr/
 coverage/
 .nyc_output/
 
+# Reportes generados por Lighthouse CI
+.lighthouseci/
+
 # ----------------------------------------------------------
 # Sistema operativo: archivos temporales generales
 # ----------------------------------------------------------

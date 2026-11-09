@@ -1,6 +1,6 @@
-from fastapi import APIRouter, Depends, HTTPException, Response, status
-from sqlalchemy import func
-from sqlalchemy.orm import Session
+from fastapi import APIRouter, Depends, HTTPException, Query, Response, status
+from sqlalchemy import func, inspect
+from sqlalchemy.orm import Session, joinedload, selectinload
 from datetime import datetime, time as time_type
 from typing import List, Optional
 import uuid
@@ -20,6 +20,8 @@ router = APIRouter()
 settings = get_settings()
 
 MIN_PUNTOS = 2
+PAGE_SIZE_DEFAULT = 12
+PAGE_SIZE_MAX = 100
 
 # RN-013: estados que implican entregas ya realizadas o en marcha.
 ESTADOS_CON_ENTREGAS = ("En curso", "Completada", "Cancelada")
@@ -132,17 +134,44 @@ def confirmar_ruta(request: RutaOptimizarRequest, db: Session = Depends(get_db),
     persist_ruta(db, response, opt_route)
     return response
 
-def _factor_co2_de_ruta(db: Session, ruta) -> float:
-    """Emisiones de CO₂ por km del vehículo asignado a la ruta."""
-    vehiculo = (
-        db.query(ParametrosVehiculo)
-        .filter(ParametrosVehiculo.id_vehiculo == ruta.id_vehiculo)
+def _opciones_de_ruta():
+    """Carga en pocas consultas los puntos y el vehiculo de cada ruta.
+
+    Sin esto el listado hacia una consulta por ruta, otra por cada punto y una
+    mas por el factor de emision del vehiculo (patron N+1).
+    """
+    return (
+        selectinload(Ruta.puntos).selectinload(RutaPunto.punto),
+        joinedload(Ruta.vehiculo),
+    )
+
+def _cargar_ruta(db: Session, ruta_id: uuid.UUID):
+    return (
+        db.query(Ruta)
+        .options(*_opciones_de_ruta())
+        .filter(Ruta.id_ruta == ruta_id)
         .first()
     )
+
+def _factor_co2_de_ruta(db: Session, ruta, vehiculo=None) -> float:
+    """Emisiones de CO₂ por km del vehículo asignado a la ruta."""
+    if vehiculo is None:
+        if "vehiculo" in inspect(ruta).unloaded:
+            vehiculo = (
+                db.query(ParametrosVehiculo)
+                .filter(ParametrosVehiculo.id_vehiculo == ruta.id_vehiculo)
+                .first()
+            )
+        else:
+            vehiculo = ruta.vehiculo
     return co2_kg_por_km(vehiculo) if vehiculo else 0.0
 
 def _ruta_to_response(db: Session, ruta) -> RutaResponse:
-    puntos = db.query(RutaPunto).filter(RutaPunto.id_ruta == ruta.id_ruta).order_by(RutaPunto.orden).all()
+    # Si la ruta llega sin relaciones cargadas se resuelve con eager loading,
+    # de modo que la funcion siga siendo segura para cualquier llamador.
+    if "puntos" in inspect(ruta).unloaded:
+        ruta = _cargar_ruta(db, ruta.id_ruta)
+    puntos = ruta.puntos
     puntos_schema = [
         PuntoRutaResponse(
             id_punto=rp.punto.id_punto,
@@ -258,22 +287,28 @@ def editar_ruta(
         db.add(RutaPunto(id_ruta=ruta_id, id_punto=punto.id_punto, orden=i))
 
     db.commit()
-    db.refresh(ruta)
 
-    return _ruta_to_response(db, ruta)
+    return _ruta_to_response(db, _cargar_ruta(db, ruta_id))
 
 
 @router.get("", response_model=List[RutaResponse])
 def list_rutas(
+    response: Response,
     desde: Optional[str] = None,
     hasta: Optional[str] = None,
     estado: Optional[str] = None,
-    skip: int = 0,
-    limit: int = 100,
+    page: int = Query(1, ge=1),
+    limit: int = Query(PAGE_SIZE_DEFAULT, ge=1, le=PAGE_SIZE_MAX),
+    skip: Optional[int] = Query(None, ge=0, description="Offset explicito; reemplaza a page si se envia"),
     db: Session = Depends(get_db),
     user = Depends(get_current_user),
 ):
-    """US-007: listado con filtros por rango de fechas y estado."""
+    """US-007: listado con filtros y paginacion.
+
+    Se conserva el cuerpo como lista para no romper a los clientes existentes;
+    los metadatos viajan en cabeceras (X-Total-Count, X-Total-Pages, X-Page,
+    X-Page-Size), expuestas por CORS.
+    """
     query = db.query(Ruta)
 
     if user.rol.nombre != "Administrador":
@@ -300,12 +335,28 @@ def list_rutas(
     if estado:
         query = query.filter(func.lower(Ruta.estado) == estado.strip().lower())
 
-    rutas = query.order_by(Ruta.fecha_generacion.desc()).offset(skip).limit(limit).all()
+    total = query.order_by(None).count()
+    offset = skip if skip is not None else (page - 1) * limit
+    pages = (total + limit - 1) // limit
+
+    rutas = (
+        query.options(*_opciones_de_ruta())
+        .order_by(Ruta.fecha_generacion.desc())
+        .offset(offset)
+        .limit(limit)
+        .all()
+    )
+
+    response.headers["X-Total-Count"] = str(total)
+    response.headers["X-Total-Pages"] = str(pages)
+    response.headers["X-Page"] = str(page)
+    response.headers["X-Page-Size"] = str(limit)
+
     return [_ruta_to_response(db, r) for r in rutas]
 
 @router.get("/{ruta_id}", response_model=RutaResponse)
 def get_ruta(ruta_id: uuid.UUID, db: Session = Depends(get_db), user = Depends(get_current_user)):
-    ruta = db.query(Ruta).filter(Ruta.id_ruta == ruta_id).first()
+    ruta = _cargar_ruta(db, ruta_id)
     if not ruta:
         raise HTTPException(status_code=404, detail="Ruta no encontrada")
     if user.rol.nombre != "Administrador" and ruta.id_operador != user.id_usuario:
@@ -314,7 +365,9 @@ def get_ruta(ruta_id: uuid.UUID, db: Session = Depends(get_db), user = Depends(g
 
 def _resumen_de_ruta(db: Session, ruta) -> ResumenRuta:
     """Construye el resumen compartido por la vista JSON y la exportacion CSV."""
-    puntos = db.query(RutaPunto).filter(RutaPunto.id_ruta == ruta.id_ruta).order_by(RutaPunto.orden).all()
+    if "puntos" in inspect(ruta).unloaded:
+        ruta = _cargar_ruta(db, ruta.id_ruta)
+    puntos = ruta.puntos
     puntos_schema = [
         PuntoRutaResponse(
             id_punto=rp.punto.id_punto,
@@ -351,7 +404,7 @@ def _resumen_de_ruta(db: Session, ruta) -> ResumenRuta:
 
 
 def _ruta_autorizada(db: Session, ruta_id: uuid.UUID, user) -> Ruta:
-    ruta = db.query(Ruta).filter(Ruta.id_ruta == ruta_id).first()
+    ruta = _cargar_ruta(db, ruta_id)
     if not ruta:
         raise HTTPException(status_code=404, detail="Ruta no encontrada")
     if user.rol.nombre != "Administrador" and ruta.id_operador != user.id_usuario:
@@ -418,7 +471,13 @@ def get_ruta_puntos(ruta_id: uuid.UUID, db: Session = Depends(get_db), user = De
         raise HTTPException(status_code=404, detail="Ruta no encontrada")
     if user.rol.nombre != "Administrador" and ruta.id_operador != user.id_usuario:
         raise HTTPException(status_code=403, detail="No autorizado")
-    puntos = db.query(RutaPunto).filter(RutaPunto.id_ruta == ruta_id).order_by(RutaPunto.orden).all()
+    puntos = (
+        db.query(RutaPunto)
+        .options(selectinload(RutaPunto.punto))
+        .filter(RutaPunto.id_ruta == ruta_id)
+        .order_by(RutaPunto.orden)
+        .all()
+    )
     return [
         PuntoRutaResponse(
             id_punto=rp.punto.id_punto,

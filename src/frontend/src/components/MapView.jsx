@@ -125,7 +125,13 @@ export default function MapView({
     setSinTiles(false)
     setCargando(true)
 
-    const capa = L.tileLayer(OSM_TILE_URL, { attribution: OSM_ATTRIBUTION, maxZoom: 19 })
+    const capa = L.tileLayer(OSM_TILE_URL, {
+      attribution: OSM_ATTRIBUTION,
+      maxZoom: 19,
+      // Carga menos tiles durante el paneo: solo pide la vista final.
+      updateWhenIdle: true,
+      keepBuffer: 2,
+    })
 
     capa.on('loading', () => setCargando(true))
 

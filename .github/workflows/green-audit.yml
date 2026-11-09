@@ -1,0 +1,60 @@
+name: Green Audit
+
+on:
+  push:
+    branches: [main, develop]
+    paths:
+      - "src/frontend/**"
+      - ".lighthouserc.js"
+      - ".github/workflows/green-audit.yml"
+  pull_request:
+    branches: [main, develop]
+    paths:
+      - "src/frontend/**"
+      - ".lighthouserc.js"
+      - ".github/workflows/green-audit.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: green-audit-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  lighthouse:
+    name: Lighthouse CI - rendimiento y sostenibilidad
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: src/frontend
+    steps:
+      - name: Descargar el repositorio
+        uses: actions/checkout@v4
+
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: src/frontend/package-lock.json
+
+      - name: Instalar dependencias
+        run: npm ci
+
+      - name: Compilar para produccion
+        run: npm run build
+
+      - name: Ejecutar Lighthouse CI
+        # `--config` apunta a la raiz del repositorio. Sin `|| true`: si una
+        # categoria baja del umbral, el job falla y protege la rama.
+        run: npx --yes @lhci/cli@0.15.1 autorun --config=../../.lighthouserc.js
+
+      - name: Publicar resultados de Lighthouse
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lighthouse-report
+          path: src/frontend/.lighthouseci
+          if-no-files-found: warn

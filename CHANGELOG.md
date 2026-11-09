@@ -9,6 +9,28 @@ versionado sigue [SemVer](https://semver.org/lang/es/) (`MAJOR.MINOR.PATCH`).
 
 ## [No publicado]
 
+### Optimización Green IT y auditoría Lighthouse (09/11/2026)
+
+- **Consultas:** índices para los filtros del API, carga anticipada de puntos y
+  vehículo de cada ruta (`selectinload`/`joinedload`) y eliminación del patrón
+  N+1 en listados y autorizaciones.
+- **Paginación:** `GET /puntos-entrega` y `GET /rutas` aceptan `page`/`limit`
+  (12 por defecto, máximo 100) y conservan `skip`. El primer endpoint mantiene
+  la clave `puntos`; el segundo mantiene una lista y publica los totales en
+  cabeceras `X-Total-*`, expuestas por CORS.
+- **Frontend:** carga diferida del panel, mapas y pestañas; separación de los
+  chunks de React y Leaflet; caché TTL de 60 s con deduplicación de GET e
+  invalidación al escribir; controles de paginación reutilizables.
+- **Red:** compresión Brotli/GZip en el backend, `Cache-Control` para el
+  catálogo de vehículos y `no-store` para autenticación; `preconnect` a los
+  servicios de mapas y ajuste de carga de tiles.
+- **Calidad:** 66 pruebas de backend y 24 de frontend aprobadas; build de
+  producción con 85 módulos; Lighthouse CI mide el login público con umbrales
+  de 90 en las cuatro categorías.
+- **Documentación:** informes en `docs/03 Implementación/reduccion del impacto
+  ambiental/`; el detalle de límites (sin PostgreSQL local y sin auditoría del
+  panel autenticado) queda registrado en el informe.
+
 ### Trazado de rutas por calles (26/10/2026)
 
 - **Mapa:** el recorrido ya no se dibuja como una línea recta entre paradas. El

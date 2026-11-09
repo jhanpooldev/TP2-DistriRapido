@@ -248,6 +248,9 @@ button:disabled { background: var(--borde-fuerte); border-color: var(--borde-fue
 
 .btn-grupo { display: flex; gap: 9px; flex-wrap: wrap; align-items: center; }
 
+.paginacion { justify-content: center; margin-top: 14px; }
+.paginacion .texto-suave { margin: 0; }
+
 /* --- formularios --------------------------------------------------------- */
 
 .form-group { margin-bottom: 14px; }

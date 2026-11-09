@@ -78,3 +78,11 @@ CREATE TABLE ruta_puntos (
 	FOREIGN KEY(id_ruta) REFERENCES rutas (id_ruta), 
 	FOREIGN KEY(id_punto) REFERENCES puntos_entrega (id_punto)
 );
+
+-- Indices agregados para evitar escaneos completos en los filtros del API.
+CREATE INDEX IF NOT EXISTS ix_usuarios_id_rol ON usuarios (id_rol);
+CREATE INDEX IF NOT EXISTS ix_puntos_entrega_operador_fecha ON puntos_entrega (id_operador, fecha_registro);
+CREATE INDEX IF NOT EXISTS ix_rutas_id_vehiculo ON rutas (id_vehiculo);
+CREATE INDEX IF NOT EXISTS ix_rutas_operador_fecha ON rutas (id_operador, fecha_generacion);
+CREATE INDEX IF NOT EXISTS ix_rutas_estado ON rutas (estado);
+CREATE INDEX IF NOT EXISTS ix_ruta_puntos_punto ON ruta_puntos (id_punto);

@@ -312,6 +312,13 @@ GET /api/v1/vehiculos
 GET /api/v1/indicadores
 GET /api/v1/indicadores/sostenibilidad
 
+Paginación: `GET /api/v1/puntos-entrega` y `GET /api/v1/rutas` aceptan
+`page` (desde 1) y `limit` (12 por defecto, máximo 100); `skip` se conserva como
+offset explícito para clientes anteriores. El primer endpoint mantiene la clave
+`puntos` y agrega `total`, `page`, `limit` y `pages`. El segundo mantiene una
+lista y publica `X-Total-Count`, `X-Total-Pages`, `X-Page` y `X-Page-Size` en
+cabeceras expuestas por CORS.
+
 Nota: `POST /api/v1/rutas/optimizar` devuelve la ruta calculada **sin persistirla**
 (cálculo stateless). `POST /api/v1/rutas` la confirma y la registra (RN-012).
 `PUT /api/v1/rutas/{id}` reemplaza el conjunto de puntos de una ruta guardada y

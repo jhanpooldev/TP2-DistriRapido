@@ -1,6 +1,6 @@
 from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 from typing import Optional
 import uuid
 
@@ -42,7 +42,14 @@ def get_current_user(
             detail="Token mal formado",
             headers={"WWW-Authenticate": "Bearer"},
         )
-    user = db.query(Usuario).filter(Usuario.id_usuario == uuid_user).first()
+    # El rol se usa en cada autorizacion; cargarlo en la misma consulta evita
+    # una consulta extra por peticion autenticada.
+    user = (
+        db.query(Usuario)
+        .options(joinedload(Usuario.rol))
+        .filter(Usuario.id_usuario == uuid_user)
+        .first()
+    )
     if not user:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,

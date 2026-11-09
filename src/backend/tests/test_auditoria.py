@@ -138,3 +138,13 @@ def test_health_503_por_http():
         assert r_raiz.json()["base_datos"] == "error"
     finally:
         app.dependency_overrides.clear()
+
+
+def test_auth_no_se_cachea_ni_en_errores_de_validacion():
+    from fastapi.testclient import TestClient
+
+    # La validacion falla antes de tocar la BD, pero la cabecera debe estar.
+    cliente = TestClient(app)
+    r = cliente.post("/api/v1/auth/login")
+    assert r.status_code == 422
+    assert r.headers["cache-control"] == "no-store"

@@ -59,7 +59,12 @@ export default function MapPicker({ latitud, longitud, onPick }) {
 
     const map = L.map(mapRef.current, { center, zoom: latitud ? 16 : 12 })
 
-    L.tileLayer(OSM_TILE_URL, { attribution: OSM_ATTRIBUTION, maxZoom: 19 }).addTo(map)
+    L.tileLayer(OSM_TILE_URL, {
+      attribution: OSM_ATTRIBUTION,
+      maxZoom: 19,
+      updateWhenIdle: true,
+      keepBuffer: 2,
+    }).addTo(map)
 
     map.on('click', e => {
       ponerMarcador(e.latlng.lat, e.latlng.lng, false)

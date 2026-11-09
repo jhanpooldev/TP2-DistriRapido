@@ -1,12 +1,24 @@
 import React, { useState } from 'react'
 import api, { extraerError } from '../api/client'
 import { exportarResumenRuta } from '../logica/exportar'
+import Paginacion from './Paginacion'
 import SelectorPuntos from './SelectorPuntos'
 
 const ESTADOS = ['Confirmada', 'Borrador', 'En curso', 'Completada']
+const RUTAS_POR_PAGINA = 12
 
-export default function RutasTab({ rutas, puntos, vehiculos, onVerMapa, onCambiado, onMensaje }) {
+export default function RutasTab({
+  rutas,
+  puntos,
+  vehiculos,
+  total = 0,
+  page = 1,
+  onVerMapa,
+  onCambiado,
+  onMensaje,
+}) {
   const [filtros, setFiltros] = useState({ desde: '', hasta: '', estado: '' })
+  const [filtrosAplicados, setFiltrosAplicados] = useState({})
   const [editando, setEditando] = useState(null)
   const [formEdicion, setFormEdicion] = useState({ id_vehiculo: 1, punto_ids: [] })
   const [buscando, setBuscando] = useState(false)
@@ -15,9 +27,15 @@ export default function RutasTab({ rutas, puntos, vehiculos, onVerMapa, onCambia
   const hayFiltros = Boolean(filtros.desde || filtros.hasta || filtros.estado)
   const rutaEditando = rutas.find(r => r.id_ruta === editando) || null
 
-  const recargar = async (params = {}) => {
-    const r = await api.get('/rutas', { params })
-    onCambiado(r.data)
+  const recargar = async (params = filtrosAplicados, pagina = page) => {
+    const r = await api.get('/rutas', {
+      params: { ...params, page: pagina, limit: RUTAS_POR_PAGINA },
+    })
+    onCambiado(r.data, {
+      total: Number(r.headers['x-total-count'] ?? r.data.length),
+      page: Number(r.headers['x-page'] ?? pagina),
+      pages: Number(r.headers['x-total-pages'] ?? 1),
+    })
     return r.data
   }
 
@@ -29,7 +47,8 @@ export default function RutasTab({ rutas, puntos, vehiculos, onVerMapa, onCambia
       if (filtros.desde) params.desde = filtros.desde
       if (filtros.hasta) params.hasta = filtros.hasta
       if (filtros.estado) params.estado = filtros.estado
-      const resultados = await recargar(params)
+      setFiltrosAplicados(params)
+      const resultados = await recargar(params, 1)
       onMensaje(
         resultados.length === 0
           ? { tipo: 'info', texto: 'Ninguna ruta coincide con el filtro aplicado.' }
@@ -44,8 +63,9 @@ export default function RutasTab({ rutas, puntos, vehiculos, onVerMapa, onCambia
 
   const limpiar = async () => {
     setFiltros({ desde: '', hasta: '', estado: '' })
+    setFiltrosAplicados({})
     try {
-      await recargar()
+      await recargar({}, 1)
       onMensaje({ tipo: 'ok', texto: 'Filtros limpiados.' })
     } catch (e) {
       onMensaje({ tipo: 'error', texto: extraerError(e, 'No se pudo recargar las rutas') })
@@ -72,7 +92,7 @@ export default function RutasTab({ rutas, puntos, vehiculos, onVerMapa, onCambia
       await api.put(`/rutas/${editando}`, formEdicion)
       onMensaje({ tipo: 'ok', texto: 'Ruta actualizada y recalculada con los puntos seleccionados.' })
       cancelarEdicion()
-      await recargar()
+      await recargar(filtrosAplicados, page)
     } catch (err) {
       onMensaje({ tipo: 'error', texto: extraerError(err, 'No se pudo actualizar la ruta') })
     }
@@ -88,7 +108,7 @@ export default function RutasTab({ rutas, puntos, vehiculos, onVerMapa, onCambia
       await api.delete(`/rutas/${ruta.id_ruta}`)
       if (editando === ruta.id_ruta) cancelarEdicion()
       onMensaje({ tipo: 'ok', texto: 'Ruta eliminada.' })
-      await recargar()
+      await recargar(filtrosAplicados, page)
     } catch (err) {
       onMensaje({ tipo: 'error', texto: extraerError(err, 'No se pudo eliminar la ruta') })
     }
@@ -297,6 +317,14 @@ export default function RutasTab({ rutas, puntos, vehiculos, onVerMapa, onCambia
           </table>
         )}
       </div>
+
+      <Paginacion
+        page={page}
+        pages={Math.ceil(total / RUTAS_POR_PAGINA)}
+        total={total}
+        onChange={(pagina) => recargar(filtrosAplicados, pagina)}
+        etiqueta="rutas"
+      />
     </div>
   )
 }
