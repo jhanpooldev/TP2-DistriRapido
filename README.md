@@ -1,7 +1,17 @@
 # Sistema Web de Optimización de Rutas Sostenibles — EcoLogística Lima
 
+[![CI](https://github.com/jhanpooldev/TP2-DistriRapido/actions/workflows/ci.yml/badge.svg)](https://github.com/jhanpooldev/TP2-DistriRapido/actions/workflows/ci.yml)
+[![Tests](https://github.com/jhanpooldev/TP2-DistriRapido/actions/workflows/tests.yml/badge.svg)](https://github.com/jhanpooldev/TP2-DistriRapido/actions/workflows/tests.yml)
+[![CodeQL](https://github.com/jhanpooldev/TP2-DistriRapido/actions/workflows/codeql.yml/badge.svg)](https://github.com/jhanpooldev/TP2-DistriRapido/actions/workflows/codeql.yml)
+[![Green Audit](https://github.com/jhanpooldev/TP2-DistriRapido/actions/workflows/green-audit.yml/badge.svg)](https://github.com/jhanpooldev/TP2-DistriRapido/actions/workflows/green-audit.yml)
+
 Optimizador de rutas de reparto sostenible para **DistriRápido S.A.C.**, desarrollado
 en el curso Taller de Proyectos 2 — Ingeniería de Sistemas e Informática.
+
+> Los badges reflejan el estado de los workflows en GitHub. Si un workflow todavía no
+> tiene una corrida registrada, GitHub muestra el badge sin estado; eso **no** significa
+> que la suite haya pasado. Los resultados locales verificados están en
+> [`docs/05 Evidencias/`](docs/05%20Evidencias/).
 
 ## Tabla de Contenidos (TOC)
 
@@ -126,7 +136,7 @@ alcance del PMV (ver `SPECS.md`).
 | Reducción de distancia frente a la ruta no optimizada | ≥ 15 % | **Pendiente**: requiere prueba comparativa de referencia |
 | Reducción de emisiones frente a la ruta no optimizada | ≥ 10 % | **Pendiente**: requiere prueba comparativa de referencia |
 | Flujo principal de generación de ruta | ≤ 3 pasos y ≤ 3 minutos | **Pendiente**: sin medición formal registrada |
-| Cobertura de pruebas automatizadas | ≥ 70 % global | **Parcial**: backend 60.82 % global; frontend 93.22 % de sentencias sobre `src/logica/**`; SonarQube 9.8 % global |
+| Cobertura de pruebas automatizadas | ≥ 70 % global | **Parcial**: backend 61 % global; frontend 93.22 % de sentencias sobre `src/logica/**`; SonarQube 9.8 % global |
 
 ---
 
@@ -142,6 +152,7 @@ alcance del PMV (ver `SPECS.md`).
 
 ### Gestión de Flota
 
+- Alta de vehículos con sus parámetros de cálculo desde el panel (solo Administrador).
 - Parámetros de cálculo por vehículo: capacidad, consumo, emisión y velocidad.
 - Asignación de vehículos a rutas.
 - Control de capacidad de carga (**RN-014**).
@@ -230,11 +241,13 @@ El sistema sigue una arquitectura por capas con separación de responsabilidades
 La comunicación entre frontend y backend se realiza por HTTP/REST, con CORS configurado
 para el origen del frontend. En desarrollo, Vite redirige `/api` al backend.
 
-La integración continua se define en `.github/workflows/ci.yml` (pruebas, cobertura y
-build), `.github/workflows/codeql.yml` (análisis estático de Python y
-JavaScript/TypeScript) y `.github/workflows/deploy-staging.yml` (despliegue a Staging
-desactivado por defecto). El despliegue real en Staging **no está verificado** porque el
-repositorio no dispone de host ni credenciales para ese ambiente.
+La integración continua se define en `.github/workflows/ci.yml` (dependencias,
+lint mínimo y compilación), `.github/workflows/tests.yml` (pytest, Vitest y Playwright
+en tres navegadores con artefactos), `.github/workflows/codeql.yml` (análisis estático
+de Python y JavaScript/TypeScript), `.github/workflows/green-audit.yml` (Lighthouse CI)
+y `.github/workflows/deploy-production.yml` (despliegue a Producción desactivado por
+defecto). El despliegue real en Staging y Producción **no está verificado** porque el
+repositorio no dispone de host ni credenciales para esos ambientes.
 
 El detalle de la arquitectura por niveles (C4) se encuentra en
 [`docs/04 Arquitectura/01 Modelo C4`](docs/04%20Arquitectura/01%20Modelo%20C4%20V_1_0_0.md).
@@ -249,11 +262,11 @@ El repositorio organiza su documentación y código fuente de acuerdo con el cic
 | :--- | :--- | :--- |
 | 1 | `docs/01 Inicio/` | Constitución, visión, supuestos, restricciones iniciales e interesados |
 | 2 | `docs/02 Planificación/` | Backlog, Jira, riesgos, presupuesto, requisitos (RF/RNF), roles, reglas de negocio, BD y plan de pruebas |
-| 3 | `docs/03 Implementación/` | Entregables y reportes agrupados por sprint (`Sprint 1/`, `Sprint 2/`, `Sprint 03/`) |
+| 3 | `docs/03 Implementación/` | Entregables y reportes agrupados por sprint (`Sprint 1/`, `Sprint 2/`, `Sprint 03/`, `Sprint 4/`) |
 | 4 | `docs/04 Arquitectura/` | Arquitectura del sistema, Modelo C4, especificaciones técnicas y seguridad MFA (`specs/`) |
-| 5 | `docs/05 Evidencias/` | Registro de evidencias de validación, auditoría de API y resultados de pruebas |
+| 5 | `docs/05 Evidencias/` | Registro de evidencias de validación, auditoría de API, resultados de pruebas y capturas de Playwright |
 | 6 | `src/` | Código fuente del sistema (`backend/` FastAPI y `frontend/` React) |
-| 7 | `.github/workflows/` | Integración continua, CodeQL y despliegue a Staging (desactivado por defecto) |
+| 7 | `.github/workflows/` | CI, pruebas E2E, CodeQL, auditoría Green IT y despliegues desactivados por defecto |
 
 ```text
 /
@@ -271,9 +284,12 @@ El repositorio organiza su documentación y código fuente de acuerdo con el cic
 |
 |-- .github/
 |   `-- workflows/
-|       |-- ci.yml               # pytest + cobertura, Vitest + build y Ruff mínimo
+|       |-- ci.yml               # Dependencias, Ruff mínimo y compilación
+|       |-- tests.yml            # pytest, Vitest y Playwright (3 navegadores)
 |       |-- codeql.yml           # Análisis CodeQL de Python y JavaScript/TypeScript
-|       `-- deploy-staging.yml   # Despliegue a Staging, desactivado por defecto
+|       |-- green-audit.yml      # Lighthouse CI de rendimiento y sostenibilidad
+|       |-- deploy-staging.yml   # Despliegue a Staging, desactivado por defecto
+|       `-- deploy-production.yml # Despliegue a Producción, desactivado por defecto
 |
 |-- docs/
 |   |-- 01 Inicio/               # Fase de Inicio (5 documentos)
@@ -281,9 +297,10 @@ El repositorio organiza su documentación y código fuente de acuerdo con el cic
 |   |-- 03 Implementación/       # Entregables organizados por sprint
 |   |   |-- Sprint 1/            # 4 entregables del Sprint 1 (V_1_0_0)
 |   |   |-- Sprint 2/            # 4 entregables del Sprint 2 (V_2_0_0)
-|   |   `-- Sprint 03/           # 5 entregables del Sprint 3 (V_1_0_0)
+|   |   |-- Sprint 03/           # 5 entregables del Sprint 3 (V_1_0_0)
+|   |   `-- Sprint 4/            # 4 entregables del Sprint 4 (V_1_0_0)
 |   |-- 04 Arquitectura/         # Modelo C4 y especificaciones MFA (con specs/)
-|   `-- 05 Evidencias/           # Inventario de evidencias de pruebas y auditoría
+|   `-- 05 Evidencias/           # Inventario de evidencias y capturas de Playwright
 |
 |-- src/                         # Código fuente del sistema
 |   |-- backend/                 # FastAPI (Python)
@@ -307,8 +324,10 @@ El repositorio organiza su documentación y código fuente de acuerdo con el cic
 |       |   |-- logica/              # Distancias y exportación (con pruebas)
 |       |   |-- styles/              # CSS plano
 |       |   `-- main.jsx
+|       |-- e2e/                     # Suite Playwright (5 specs y ayudantes)
 |       |-- index.html
 |       |-- package.json
+|       |-- playwright.config.js     # Chromium, Firefox y WebKit
 |       |-- vite.config.js
 |       `-- vitest.config.js
 ```
@@ -341,6 +360,7 @@ verifican; no se duplican en una carpeta de pruebas separada.
 | Base de datos | PostgreSQL | 16 |
 | Pruebas backend | pytest + pytest-cov | 8.3.4 / 7.1.0 |
 | Pruebas frontend | Vitest + @vitest/coverage-v8 | 5.0.5 |
+| Pruebas E2E | Playwright (Chromium, Firefox, WebKit) | 1.65.1 |
 | Análisis estático | Ruff | 0.17.2 en CI |
 | Integración continua | GitHub Actions + CodeQL | — |
 | Control de versiones | Git + GitHub | — |
@@ -460,7 +480,7 @@ source venv/bin/activate          # Windows: venv\Scripts\activate
 pytest
 ```
 
-Resultado actual: **65 pruebas en verde**. Las pruebas usan la base `DB_NAME_TEST`,
+Resultado actual: **66 pruebas en verde**. Las pruebas usan la base `DB_NAME_TEST`,
 separada de la base de trabajo para no destruir datos.
 
 Para obtener la cobertura:
@@ -469,7 +489,7 @@ Para obtener la cobertura:
 pytest --cov=app --cov-report=term-missing --cov-report=xml
 ```
 
-Cobertura actual: **60.82 % global** (883 sentencias, 346 sin cubrir). El módulo de
+Cobertura actual: **61 % global** (1 030 sentencias, 399 sin cubrir). El módulo de
 exportación del Sprint 3 (`app/services/exportacion.py`) alcanza **100 %** y el
 optimizador **90 %**.
 
@@ -508,26 +528,58 @@ npm run build         # Compilación de producción
 
 Resultado actual: **24 pruebas en verde** en 3 archivos, con **93.22 %** de sentencias,
 **85.24 %** de ramas, **91.3 %** de funciones y **97.84 %** de líneas sobre
-`src/logica/**`. La compilación produce 83 módulos con Vite 8.3.5.
+`src/logica/**`. La compilación produce 85 módulos con Vite 8.3.5.
 
 La cobertura se limita a la lógica de distancias, exportación y trazado por calles; **no
 hay pruebas de componentes React ni de los popups del mapa**.
+
+### Extremo a extremo (Playwright)
+
+```bash
+cd src/frontend
+npm ci
+npx playwright install chromium firefox webkit
+npm run test:e2e            # Chromium, Firefox y WebKit
+npm run test:e2e:report     # Reporte HTML local
+```
+
+Resultado real del 17/11/2026: **79 pruebas aprobadas, 2 omitidas y 0 fallidas** sobre
+81 ejecuciones (27 casos por navegador). La omisión corresponde a las capturas visuales,
+que se generan solo en Chromium. La suite levanta el backend y el frontend
+automáticamente, mide TTFB/FCP/LCP y tiempos de API, y verifica respuestas `401`, `400`,
+`404`, `422`, cabeceras de endurecimiento, caché y errores de red en la interfaz.
+
+Las evidencias están en
+[`docs/05 Evidencias/playwright-sprint4/`](docs/05%20Evidencias/playwright-sprint4/) y
+el análisis completo en
+[`03 Analisis PlayWrigth`](docs/03%20Implementación/Sprint%204/03%20Analisis%20PlayWrigth%20V_1_0_0.md).
+El reporte HTML completo (`playwright-report/`) no se versiona; se publica como artefacto
+en el workflow `tests.yml`.
 
 ### Integración continua
 
 El flujo `.github/workflows/ci.yml` ejecuta:
 
-- backend con Python 3.12, PostgreSQL 16 como servicio, `pytest` con cobertura y la
-  verificación mínima de Ruff (`E9`, `F63`, `F7`, `F82`);
-- frontend con Node.js 22, `npm ci`, `npm run coverage` y `npm run build`;
-- un job opcional de SonarQube que solo corre con `SONAR_ENABLED=true` y
-  `SONAR_TOKEN`.
+- backend con Python 3.12, `pip check`, la verificación mínima de Ruff (`E9`, `F63`,
+  `F7`, `F82`), compilación y prueba de importación de la aplicación;
+- frontend con Node.js 22, `npm ci` y `npm run build`, con publicación del build como
+  artefacto.
 
-`.github/workflows/codeql.yml` analiza Python y JavaScript/TypeScript, y
-`.github/workflows/deploy-staging.yml` queda preparado para un *deploy hook* de
-Staging, desactivado mientras `STAGING_DEPLOY_ENABLED` no sea `true`. **Ninguno de
-estos workflows se ejecutó en GitHub desde el entorno local** y el despliegue en
-Staging no se realizó.
+El flujo `.github/workflows/tests.yml` ejecuta:
+
+- backend con Python 3.12, PostgreSQL 16 como servicio, `python -m pytest` con cobertura
+  y publicación del reporte;
+- frontend con Node.js 22, `npm ci` y `npm run coverage`, con publicación de la cobertura;
+- Playwright en Chromium, Firefox y WebKit, con publicación del reporte HTML, los
+  resultados y las capturas como artefactos;
+- un job opcional de SonarQube que solo corre con `SONAR_ENABLED=true` y `SONAR_TOKEN`.
+
+`.github/workflows/codeql.yml` analiza Python y JavaScript/TypeScript;
+`.github/workflows/green-audit.yml` ejecuta Lighthouse CI; `.github/workflows/deploy-staging.yml`
+y `.github/workflows/deploy-production.yml` quedan preparados para un *deploy hook*,
+desactivados mientras `STAGING_DEPLOY_ENABLED` o `PRODUCTION_DEPLOY_ENABLED` no sean
+`true`. **Ninguno de estos workflows se ejecutó en GitHub desde el entorno local** y los
+despliegues a Staging y Producción no se realizaron.
 
 ### Lint y formato
 
@@ -632,6 +684,19 @@ El detalle del backlog, los sprints y la Definition of Done se encuentran en
 | 04 | [OWASP V_1_0_0.md](docs/03%20Implementación/Sprint%2003/04%20OWASP%20V_1_0_0.md) |
 | 05 | [WCAG V_1_0_0.md](docs/03%20Implementación/Sprint%2003/05%20WCAG%20V_1_0_0.md) |
 
+#### Entregables del Sprint 4 (periodo 09/11/2026 al 17/11/2026):
+
+| # | Documento |
+| :--- | :--- |
+| 01 | [Revisión del Sprint V_1_0_0.md](docs/03%20Implementación/Sprint%204/01%20Revisión%20del%20Sprint%20V_1_0_0.md) |
+| 02 | [Retrospectiva del Sprint V_1_0_0.md](docs/03%20Implementación/Sprint%204/02%20Retrospectiva%20del%20Sprint%20V_1_0_0.md) |
+| 03 | [Análisis de Playwright V_1_0_0.md](docs/03%20Implementación/Sprint%204/03%20Analisis%20PlayWrigth%20V_1_0_0.md) |
+| 04 | [Usabilidad SUS V_1_0_0.md](docs/03%20Implementación/Sprint%204/04%20Usabilidad%20V_1_0_0.md) |
+
+> El Sprint 4 no incorpora historias nuevas del backlog: consolida la calidad con pruebas
+> E2E, métricas de rendimiento, el instrumento SUS y los workflows de CI/CD. El SUS quedó
+> **preparado pero no aplicado** y el despliegue a Producción **no está configurado**.
+
 ### Fase de Arquitectura (`docs/04 Arquitectura/`)
 
 | # | Documento |
@@ -645,7 +710,8 @@ El detalle del backlog, los sprints y la Definition of Done se encuentran en
 
 | Documento | Descripción |
 | :--- | :--- |
-| [Registro y Repositorio de Evidencias](docs/05%20Evidencias/README.md) | Inventario de pruebas automatizadas (65 pytest + 24 Vitest), cobertura, auditoría hermética de API, smoke tests y evidencias de SonarQube |
+| [Registro y Repositorio de Evidencias](docs/05%20Evidencias/README.md) | Inventario de pruebas automatizadas (66 pytest + 24 Vitest + 79 E2E), cobertura, auditoría hermética de API, smoke tests, evidencias de SonarQube y capturas de Playwright |
+| [Evidencias de Playwright — Sprint 4](docs/05%20Evidencias/playwright-sprint4/README.md) | Resultados JSON, métricas de rendimiento por navegador y siete capturas reales |
 
 ---
 
@@ -678,6 +744,8 @@ Ingeniería de Sistemas e Informática.
 - **Fase de Planificación:** [`docs/02 Planificación/`](docs/02%20Planificación/)
 - **Fase de Implementación:** [`docs/03 Implementación/`](docs/03%20Implementación/)
 - **Sprint 3:** [`docs/03 Implementación/Sprint 03/`](docs/03%20Implementación/Sprint%2003/)
+- **Sprint 4:** [`docs/03 Implementación/Sprint 4/`](docs/03%20Implementación/Sprint%204/)
+- **Evidencias E2E del Sprint 4:** [`docs/05 Evidencias/playwright-sprint4/`](docs/05%20Evidencias/playwright-sprint4/)
 - **Fase de Arquitectura:** [`docs/04 Arquitectura/`](docs/04%20Arquitectura/)
 - **Fase de Evidencias:** [`docs/05 Evidencias/`](docs/05%20Evidencias/)
 - **Decisiones de diseño:** [DESIGN.md](DESIGN.md)

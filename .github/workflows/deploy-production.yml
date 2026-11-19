@@ -1,0 +1,57 @@
+name: Deploy Production
+
+on:
+  workflow_run:
+    workflows: [Tests]
+    types: [completed]
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: production-deploy
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: Desplegar en Produccion
+    runs-on: ubuntu-latest
+    environment: production
+    # Desactivado por defecto: sin un proveedor de Produccion configurado no
+    # debe existir un despliegue real. Se activa con la variable
+    # PRODUCTION_DEPLOY_ENABLED=true y el secreto PRODUCTION_DEPLOY_HOOK.
+    if: >-
+      vars.PRODUCTION_DEPLOY_ENABLED == 'true' &&
+      (github.event_name == 'workflow_dispatch' ||
+       (github.event.workflow_run.conclusion == 'success' &&
+        github.event.workflow_run.head_branch == 'main'))
+    steps:
+      - name: Verificar configuracion del ambiente
+        env:
+          PRODUCTION_DEPLOY_HOOK: ${{ secrets.PRODUCTION_DEPLOY_HOOK }}
+          PRODUCTION_HEALTH_URL: ${{ vars.PRODUCTION_HEALTH_URL }}
+        run: |
+          if [ -z "$PRODUCTION_DEPLOY_HOOK" ]; then
+            echo "::error::Falta el secreto PRODUCTION_DEPLOY_HOOK del proveedor de Produccion."
+            exit 1
+          fi
+          if [ -z "$PRODUCTION_HEALTH_URL" ]; then
+            echo "::error::Falta la variable PRODUCTION_HEALTH_URL para verificar el despliegue."
+            exit 1
+          fi
+
+      - name: Disparar el despliegue
+        env:
+          PRODUCTION_DEPLOY_HOOK: ${{ secrets.PRODUCTION_DEPLOY_HOOK }}
+        run: curl --fail --silent --show-error --request POST "$PRODUCTION_DEPLOY_HOOK"
+
+      - name: Verificar la salud de Produccion
+        env:
+          PRODUCTION_HEALTH_URL: ${{ vars.PRODUCTION_HEALTH_URL }}
+        run: >-
+          curl --fail --silent --show-error
+          --retry 12 --retry-all-errors --retry-delay 10
+          "$PRODUCTION_HEALTH_URL"

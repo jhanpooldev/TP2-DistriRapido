@@ -48,10 +48,20 @@ export default function Dashboard({ user, onLogout }) {
   const [previewRoute, setPreviewRoute] = useState(null)
 
   const [puntoForm, setPuntoForm] = useState({ direccion: '', latitud: '', longitud: '', peso_kg: '', destinatario: '' })
-  const [optimizeForm, setOptimizeForm] = useState({ id_vehiculo: 1, punto_ids: [] })
+  const [optimizeForm, setOptimizeForm] = useState({ id_vehiculo: '', punto_ids: [] })
+  const [vehiculoForm, setVehiculoForm] = useState({
+    placa: '',
+    capacidad_kg: '',
+    factor_emision_co2: '',
+    consumo_litros_km: '',
+    velocidad_promedio_kmh: '',
+    tipo_combustible: 'Diesel',
+  })
+  const [creandoVehiculo, setCreandoVehiculo] = useState(false)
   const [geoLoading, setGeoLoading] = useState(false)
   const [exportando, setExportando] = useState(false)
   const tabsRef = useRef([])
+  const esAdmin = user?.id_rol === 1 || user?.rol?.nombre === 'Administrador'
 
   const mostrar = (tipo, texto) => setMensaje(texto ? { tipo, texto } : null)
   const cerrarMensaje = () => setMensaje(null)
@@ -123,6 +133,51 @@ export default function Dashboard({ user, onLogout }) {
     } catch (e) { mostrar('error', extraerError(e)) }
   }
 
+  // Carga el catalogo de vehiculos y mantiene una seleccion valida. Si el
+  // vehiculo elegido ya no existe (o es la primera carga), se usa el primero.
+  const fetchVehiculos = async (seleccionarId) => {
+    try {
+      const r = await api.get('/vehiculos')
+      const lista = r.data
+      setVehiculos(lista)
+      setOptimizeForm(prev => {
+        const objetivo = seleccionarId ?? prev.id_vehiculo
+        const existe = lista.some(v => v.id_vehiculo === Number(objetivo))
+        return {
+          ...prev,
+          id_vehiculo: existe ? Number(objetivo) : (lista[0]?.id_vehiculo ?? ''),
+        }
+      })
+    } catch (e) { mostrar('error', extraerError(e)) }
+  }
+
+  const crearVehiculo = async (e) => {
+    e.preventDefault()
+    if (creandoVehiculo) return
+    setCreandoVehiculo(true)
+    try {
+      const r = await api.post('/vehiculos', {
+        placa: vehiculoForm.placa.trim().toUpperCase(),
+        capacidad_kg: Number(vehiculoForm.capacidad_kg),
+        factor_emision_co2: Number(vehiculoForm.factor_emision_co2),
+        consumo_litros_km: Number(vehiculoForm.consumo_litros_km),
+        velocidad_promedio_kmh: Number(vehiculoForm.velocidad_promedio_kmh),
+        tipo_combustible: vehiculoForm.tipo_combustible,
+      })
+      setVehiculoForm({
+        placa: '',
+        capacidad_kg: '',
+        factor_emision_co2: '',
+        consumo_litros_km: '',
+        velocidad_promedio_kmh: '',
+        tipo_combustible: 'Diesel',
+      })
+      await fetchVehiculos(r.data.id_vehiculo)
+      mostrar('ok', `Vehiculo ${r.data.placa} agregado y listo para usarse en las rutas.`)
+    } catch (err) { mostrar('error', extraerError(err)) }
+    finally { setCreandoVehiculo(false) }
+  }
+
   const actualizarRutas = (data, meta = {}) => {
     setRutas(data)
     setTotalRutas(meta.total ?? data.length)
@@ -167,7 +222,7 @@ export default function Dashboard({ user, onLogout }) {
     .filter(p => optimizeForm.punto_ids.includes(p.id_punto))
     .reduce((suma, p) => suma + Number(p.peso_kg || 0), 0)
   const excedeCapacidad = Boolean(vehiculoSel) && pesoTotal > Number(vehiculoSel.capacidad_kg)
-  const puedeCalcular = cantidadPuntos >= 2 && cantidadPuntos <= MAX_PUNTOS && !excedeCapacidad
+  const puedeCalcular = cantidadPuntos >= 2 && cantidadPuntos <= MAX_PUNTOS && Boolean(vehiculoSel) && !excedeCapacidad
 
   const optimizeRuta = async (e) => {
     e.preventDefault()
@@ -222,6 +277,7 @@ export default function Dashboard({ user, onLogout }) {
   }
 
   const mensajeDeValidacion = () => {
+    if (vehiculos.length === 0) return 'No hay vehiculos registrados. Agrega uno en la pestaña Vehiculos.'
     if (cantidadPuntos === 0) return 'Agrega al menos 2 pedidos para poder calcular la ruta.'
     if (cantidadPuntos === 1) return 'Falta al menos 1 pedido: una ruta necesita 2 puntos.'
     if (cantidadPuntos > MAX_PUNTOS) return `Maximo ${MAX_PUNTOS} puntos por ruta (llevas ${cantidadPuntos}).`
@@ -478,8 +534,14 @@ export default function Dashboard({ user, onLogout }) {
                   id="ruta-vehiculo"
                   value={optimizeForm.id_vehiculo}
                   onChange={e => setOptimizeForm({ ...optimizeForm, id_vehiculo: Number(e.target.value) })}
+                  disabled={vehiculos.length === 0}
                   required
                 >
+                  {!vehiculoSel && (
+                    <option value="">
+                      {vehiculos.length === 0 ? 'Sin vehiculos registrados' : 'Selecciona un vehiculo'}
+                    </option>
+                  )}
                   {vehiculos.map(v => (
                     <option key={v.id_vehiculo} value={v.id_vehiculo}>
                       {v.placa} ({v.capacidad_kg} kg)
@@ -662,30 +724,143 @@ export default function Dashboard({ user, onLogout }) {
             <h2>Vehiculos</h2>
             <p>De aqui salen la capacidad, el consumo y el factor de emision usados en cada calculo.</p>
           </div>
+
+          {esAdmin ? (
+            <form onSubmit={crearVehiculo} className="card">
+              <h3>Agregar vehiculo</h3>
+              <p className="texto-suave">
+                Valores de referencia del vehiculo ABC-123: emision 2.68 kg CO2/L,
+                consumo 0.12 L/km y velocidad 35 km/h.
+              </p>
+              <div className="grid">
+                <div className="form-group">
+                  <label htmlFor="vehiculo-placa">Placa</label>
+                  <input
+                    id="vehiculo-placa"
+                    value={vehiculoForm.placa}
+                    onChange={e => setVehiculoForm({ ...vehiculoForm, placa: e.target.value })}
+                    placeholder="Ej. XYZ-456"
+                    maxLength={20}
+                    required
+                  />
+                </div>
+                <div className="form-group">
+                  <label htmlFor="vehiculo-capacidad">Capacidad (kg)</label>
+                  <input
+                    id="vehiculo-capacidad"
+                    type="number"
+                    step="0.1"
+                    min="0.1"
+                    value={vehiculoForm.capacidad_kg}
+                    onChange={e => setVehiculoForm({ ...vehiculoForm, capacidad_kg: e.target.value })}
+                    placeholder="Ej. 1000"
+                    required
+                  />
+                </div>
+                <div className="form-group">
+                  <label htmlFor="vehiculo-emision">Factor de emision (kg CO2/L)</label>
+                  <input
+                    id="vehiculo-emision"
+                    type="number"
+                    step="0.01"
+                    min="0.01"
+                    value={vehiculoForm.factor_emision_co2}
+                    onChange={e => setVehiculoForm({ ...vehiculoForm, factor_emision_co2: e.target.value })}
+                    placeholder="Ej. 2.68"
+                    required
+                  />
+                </div>
+                <div className="form-group">
+                  <label htmlFor="vehiculo-consumo">Consumo (L/km)</label>
+                  <input
+                    id="vehiculo-consumo"
+                    type="number"
+                    step="0.01"
+                    min="0.01"
+                    value={vehiculoForm.consumo_litros_km}
+                    onChange={e => setVehiculoForm({ ...vehiculoForm, consumo_litros_km: e.target.value })}
+                    placeholder="Ej. 0.12"
+                    required
+                  />
+                </div>
+                <div className="form-group">
+                  <label htmlFor="vehiculo-velocidad">Velocidad promedio (km/h)</label>
+                  <input
+                    id="vehiculo-velocidad"
+                    type="number"
+                    step="0.1"
+                    min="0.1"
+                    value={vehiculoForm.velocidad_promedio_kmh}
+                    onChange={e => setVehiculoForm({ ...vehiculoForm, velocidad_promedio_kmh: e.target.value })}
+                    placeholder="Ej. 35"
+                    required
+                  />
+                </div>
+                <div className="form-group">
+                  <label htmlFor="vehiculo-combustible">Combustible</label>
+                  <select
+                    id="vehiculo-combustible"
+                    value={vehiculoForm.tipo_combustible}
+                    onChange={e => setVehiculoForm({ ...vehiculoForm, tipo_combustible: e.target.value })}
+                    required
+                  >
+                    <option value="Diesel">Diesel</option>
+                    <option value="Gasolina">Gasolina</option>
+                    <option value="GLP">GLP</option>
+                    <option value="GNV">GNV</option>
+                    <option value="Electrico">Electrico</option>
+                  </select>
+                </div>
+              </div>
+              <button type="submit" className="sep" disabled={creandoVehiculo}>
+                {creandoVehiculo ? 'Agregando...' : 'Agregar vehiculo'}
+              </button>
+            </form>
+          ) : (
+            <div className="alert alert-info">
+              Solo un administrador puede agregar vehiculos. Puedes consultar los parametros de la flota.
+            </div>
+          )}
+
+          <div className="seccion-titulo">
+            <h2>Flota registrada</h2>
+            <p>{vehiculos.length} vehiculo(s) disponibles para calcular rutas.</p>
+          </div>
+
           <div className="tabla-envoltura">
-            <table className="table">
-              <caption className="sr-only">Vehiculos registrados y sus parametros</caption>
-              <thead>
-                <tr>
-                  <th scope="col">Placa</th>
-                  <th scope="col" className="num">Capacidad (kg)</th>
-                  <th scope="col" className="num">Consumo (L/km)</th>
-                  <th scope="col" className="num">Velocidad (km/h)</th>
-                  <th scope="col">Combustible</th>
-                </tr>
-              </thead>
-              <tbody>
-                {vehiculos.map(v => (
-                  <tr key={v.id_vehiculo}>
-                    <td><strong>{v.placa}</strong></td>
-                    <td className="num">{v.capacidad_kg}</td>
-                    <td className="num">{v.consumo_litros_km}</td>
-                    <td className="num">{v.velocidad_promedio_kmh}</td>
-                    <td><span className="badge badge-info">{v.tipo_combustible}</span></td>
+            {vehiculos.length === 0 ? (
+              <p className="vacio">
+                {esAdmin
+                  ? 'Todavia no hay vehiculos. Agrega el primero con el formulario de arriba.'
+                  : 'Todavia no hay vehiculos registrados.'}
+              </p>
+            ) : (
+              <table className="table">
+                <caption className="sr-only">Vehiculos registrados y sus parametros</caption>
+                <thead>
+                  <tr>
+                    <th scope="col">Placa</th>
+                    <th scope="col" className="num">Capacidad (kg)</th>
+                    <th scope="col" className="num">Emision (kg CO2/L)</th>
+                    <th scope="col" className="num">Consumo (L/km)</th>
+                    <th scope="col" className="num">Velocidad (km/h)</th>
+                    <th scope="col">Combustible</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {vehiculos.map(v => (
+                    <tr key={v.id_vehiculo}>
+                      <td><strong>{v.placa}</strong></td>
+                      <td className="num">{v.capacidad_kg}</td>
+                      <td className="num">{v.factor_emision_co2}</td>
+                      <td className="num">{v.consumo_litros_km}</td>
+                      <td className="num">{v.velocidad_promedio_kmh}</td>
+                      <td><span className="badge badge-info">{v.tipo_combustible}</span></td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
           </div>
         </div>
       )}

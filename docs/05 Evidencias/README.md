@@ -10,6 +10,7 @@ Carpeta destinada al resguardo de evidencias técnicas, resultados de corridas d
 |:---:|:---:|:---|:---|
 | 1.0.0 | 01/11/2026 | Jhunior Harold Cosme Tenorio / Equipo EcoLogística | Inventario inicial de evidencias del Sprint 2. |
 | 1.1.0 | 26/10/2026 | Jhunior Harold Cosme Tenorio / Equipo EcoLogística | Se agregan las cifras del Sprint 3 (65 pytest, 24 Vitest, 60.82 % backend), la reejecución de auditoría y smoke test, y la evidencia real de SonarQube en `sonar-sprint3/`. |
+| 1.2.0 | 17/11/2026 | Jhunior Harold Cosme Tenorio / Equipo EcoLogística | Se agregan las cifras del Sprint 4 (66 pytest, 24 Vitest, 79 E2E), las métricas de rendimiento por navegador y las capturas de `playwright-sprint4/`. |
 
 ---
 
@@ -19,12 +20,15 @@ Las suites automatizadas y scripts de verificación residen junto al código en 
 
 | Tipo de Evidencia | Herramienta / Suite | Ubicación | Estado |
 |---|---|---|---|
-| **Pruebas Unitarias e Integración (backend)** | pytest (65 pruebas) | `src/backend/tests/` | **65/65 exitosas** sobre base de prueba hermética |
-| **Cobertura del backend** | pytest-cov | `src/backend/coverage.xml` | **60.82 %** global (883 sentencias, 346 sin cubrir) |
+| **Pruebas Unitarias e Integración (backend)** | pytest (66 pruebas) | `src/backend/tests/` | **66/66 exitosas** sobre base de prueba hermética |
+| **Cobertura del backend** | pytest-cov | `src/backend/coverage.xml` | **61 %** global (1 030 sentencias, 399 sin cubrir) |
 | **Pruebas de lógica (frontend)** | Vitest (24 pruebas, 3 archivos) | `src/frontend/src/**/*.test.js` | **24/24 exitosas**; 93.22 % sentencias sobre `src/logica/**` |
+| **Pruebas E2E (Sprint 4)** | Playwright 1.65.1 (Chromium, Firefox y WebKit) | `src/frontend/e2e/` | **79 aprobadas, 2 omitidas, 0 fallidas** el 17/11/2026 |
+| **Métricas de rendimiento E2E** | Performance API + Playwright | `docs/05 Evidencias/playwright-sprint4/performance-*.json` | TTFB 3–12 ms, FCP 124–252 ms, LCP 124–744 ms |
+| **Capturas E2E** | Playwright (solo Chromium) | `docs/05 Evidencias/playwright-sprint4/*.png` | **7 capturas** de login, panel, rutas, mapa, impacto y vehículos |
 | **Auditoría de Endpoints y Aislamiento** | Script `auditoria_api.py` | `src/backend/auditoria_api.py` | **SIN ANOMALÍAS** el 26/10/2026 sobre PostgreSQL 18 local |
 | **Smoke Test End-to-End** | Script `smoke_sprint2.py` | `src/backend/smoke_sprint2.py` | **TODO OK** el 26/10/2026 sobre PostgreSQL 18 local |
-| **Compilación Frontend** | Vite Build (`npm run build`) | `src/frontend/` | **Compilación exitosa** con Vite 8.3.5; 83 módulos |
+| **Compilación Frontend** | Vite Build (`npm run build`) | `src/frontend/` | **Compilación exitosa** con Vite 8.3.5; 85 módulos |
 | **Dependencias del frontend** | `npm audit --json` | `src/frontend/` | **0 vulnerabilidades** en 106 dependencias |
 | **Integración continua** | GitHub Actions + CodeQL | `.github/workflows/` | Configurada y validada por sintaxis; **no ejecutada en GitHub** desde este entorno |
 
@@ -67,6 +71,27 @@ y en [`04 OWASP`](../03%20Implementación/Sprint%2003/04%20OWASP%20V_1_0_0.md).
 > ejecuta con `sonarsource/sonar-scanner-cli` usando un token de SonarQube. El
 > contenedor y el token son locales y no se versionan.
 
+### 1.2 Evidencias de Playwright (Sprint 4)
+
+El 17/11/2026 se ejecutó la suite E2E completa sobre Chromium, Firefox y WebKit. Las
+evidencias seleccionadas están en [`playwright-sprint4/`](playwright-sprint4/):
+
+| Archivo | Contenido | Resultado registrado |
+|---|---|---|
+| [`resultados.json`](playwright-sprint4/resultados.json) | Reporte JSON completo | 79 aprobadas, 2 omitidas, 0 fallidas, 105,1 s |
+| [`performance-chromium.json`](playwright-sprint4/performance-chromium.json) | Navegación y API en Chromium | TTFB 4–12 ms; FCP 124–252 ms; LCP 124–744 ms |
+| [`performance-firefox.json`](playwright-sprint4/performance-firefox.json) | Navegación y API en Firefox | TTFB 5–7 ms; FCP 125–219 ms; LCP 125–708 ms |
+| [`performance-webkit.json`](playwright-sprint4/performance-webkit.json) | Navegación y API en WebKit | TTFB 3 ms; FCP 156–203 ms; LCP 156–664 ms |
+| `01-login.png` … `07-panel-vehiculos-administrador.png` | Capturas de las pantallas principales | Generadas solo en Chromium |
+
+El detalle metodológico está en
+[`03 Analisis PlayWrigth`](../03%20Implementación/Sprint%204/03%20Analisis%20PlayWrigth%20V_1_0_0.md)
+y el índice de la carpeta en
+[`playwright-sprint4/README.md`](playwright-sprint4/README.md).
+
+> El reporte HTML completo (`playwright-report/`) no se versiona; se regenera con
+> `npm run test:e2e` y el workflow `tests.yml` lo publica como artefacto.
+
 ---
 
 ## 2. Entregables de Revisión y Validación por Sprint
@@ -89,10 +114,20 @@ Los informes de avance, impedimentos, revisiones y retrospectivas se organizan e
   - [Calidad de código V_1_0_0](../03%20Implementación/Sprint%2003/03%20Calidad%20de%20código%20V_1_0_0.md)
   - [OWASP V_1_0_0](../03%20Implementación/Sprint%2003/04%20OWASP%20V_1_0_0.md)
   - [WCAG V_1_0_0](../03%20Implementación/Sprint%2003/05%20WCAG%20V_1_0_0.md)
+- **Sprint 4 (09/11/2026 – 17/11/2026):** [`docs/03 Implementación/Sprint 4/`](../03%20Implementación/Sprint%204/)
+  - [Revisión del Sprint V_1_0_0](../03%20Implementación/Sprint%204/01%20Revisión%20del%20Sprint%20V_1_0_0.md)
+  - [Retrospectiva del Sprint V_1_0_0](../03%20Implementación/Sprint%204/02%20Retrospectiva%20del%20Sprint%20V_1_0_0.md)
+  - [Análisis de Playwright V_1_0_0](../03%20Implementación/Sprint%204/03%20Analisis%20PlayWrigth%20V_1_0_0.md)
+  - [Usabilidad SUS V_1_0_0](../03%20Implementación/Sprint%204/04%20Usabilidad%20V_1_0_0.md)
 
 El Sprint 3 cerró **US-006** y **US-008**. **EN-03** quedó parcial: el pipeline de
 integración continua está configurado, pero el despliegue en Staging no se realizó
 porque no existe un host ni credenciales para ese ambiente.
+
+El Sprint 4 no agregó historias de negocio: consolidó la calidad con la suite E2E, las
+métricas de rendimiento y los workflows de CI/CD. El **SUS quedó preparado pero no
+aplicado** y el **despliegue a Producción no está configurado**; ambas brechas se
+declaran en los documentos del sprint.
 
 ---
 
@@ -100,4 +135,5 @@ porque no existe un host ni credenciales para ese ambiente.
 
 - **Capturas de Pantalla:** Guardar las capturas en `img/` dentro del sprint correspondiente o en `docs/05 Evidencias/` si son de carácter global, recortadas exclusivamente al área de interés.
 - **Reportes de Cobertura y Rendimiento:** `pytest-cov` genera `src/backend/coverage.xml` y Vitest genera `src/frontend/coverage/`; ambos son artefactos generados y están excluidos por `.gitignore`. Para conservar una evidencia, copiar el reporte con la nomenclatura `coverage-sprint-X.xml` o `coverage-sprint-X.json`.
+- **Reportes de Playwright:** `playwright-report/` y `test-results/` están excluidos por `.gitignore`. Para conservar una evidencia, copiar solo los JSON y capturas seleccionadas a `docs/05 Evidencias/playwright-sprintX/`, como se hizo en el Sprint 4.
 - **Diagramas Exportados:** Formatos PNG, SVG o PDF de diagramas C4 o de base de datos para presentaciones ejecutivas.

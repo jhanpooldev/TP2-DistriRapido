@@ -1,0 +1,48 @@
+{
+  "proyecto": "chromium",
+  "fecha": "2026-11-17T18:39:43.783Z",
+  "url": "http://127.0.0.1:5173/",
+  "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/159.0.8154.6 Safari/537.36",
+  "viewport": {
+    "width": 1280,
+    "height": 720
+  },
+  "navegacion": {
+    "login": {
+      "ttfbMs": 4,
+      "fcpMs": 124,
+      "lcpMs": 124,
+      "domContentLoadedMs": 86,
+      "loadMs": 86
+    },
+    "panel": {
+      "ttfbMs": 12,
+      "fcpMs": 252,
+      "lcpMs": 744,
+      "domContentLoadedMs": 179,
+      "loadMs": 223
+    }
+  },
+  "api": {
+    "health": {
+      "ms": 7,
+      "status": 200
+    },
+    "login": {
+      "ms": 213,
+      "status": 200
+    },
+    "puntos": {
+      "ms": 11,
+      "status": 200
+    },
+    "rutas": {
+      "ms": 13,
+      "status": 200
+    },
+    "vehiculos": {
+      "ms": 7,
+      "status": 200
+    }
+  }
+}

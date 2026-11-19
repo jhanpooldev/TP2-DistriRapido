@@ -99,6 +99,14 @@ dist-ssr/
 coverage/
 .nyc_output/
 
+# Playwright (Sprint 4): reportes y artefactos locales no se versionan.
+# Las evidencias seleccionadas viven en docs/05 Evidencias/playwright-sprint4.
+playwright-report/
+test-results/
+blob-report/
+playwright/.cache/
+playwright/.auth/
+
 # Reportes generados por Lighthouse CI
 .lighthouseci/
 

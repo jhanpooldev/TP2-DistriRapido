@@ -305,8 +305,10 @@ DELETE /api/v1/rutas/{id}
 GET  /api/v1/rutas/{id}/resumen
 GET  /api/v1/rutas/{id}/export
 
-## Vehículos (solo lectura en el PMV)
+## Vehículos
 GET /api/v1/vehiculos
+POST /api/v1/vehiculos   (solo Administrador)
+GET /api/v1/vehiculos/{id}
 
 ## Indicadores
 GET /api/v1/indicadores

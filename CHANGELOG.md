@@ -9,6 +9,52 @@ versionado sigue [SemVer](https://semver.org/lang/es/) (`MAJOR.MINOR.PATCH`).
 
 ## [No publicado]
 
+### Sprint 4 — Calidad, pruebas E2E y CI/CD (17/11/2026)
+
+- **Suite E2E con Playwright 1.65.1:** se agregaron cinco archivos en
+  `src/frontend/e2e/` con 27 casos por navegador (login, pedidos, rutas, mapa,
+  impacto, vehículos, exportación, edición, eliminación, resiliencia y rendimiento).
+  Resultado real del 17/11/2026: **79 aprobadas, 2 omitidas y 0 fallidas** sobre 81
+  ejecuciones en Chromium, Firefox y WebKit.
+- **Métricas de rendimiento:** la suite mide TTFB, FCP, LCP, `DOMContentLoaded` y
+  `load`, además de los tiempos de `health`, `login`, `puntos-entrega`, `rutas` y
+  `vehiculos`. Valores locales: TTFB 3–12 ms, FCP 124–252 ms y LCP 124–744 ms. Los
+  JSON crudos quedaron en `docs/05 Evidencias/playwright-sprint4/`.
+- **Resiliencia HTTP:** 11 casos verifican `401`, `400`, `404`, `422`, cabeceras de
+  endurecimiento, `Cache-Control` y el comportamiento de la interfaz ante caída de red
+  y errores `500`.
+- **Evidencias visuales:** siete capturas reales de login, panel, rutas, mapa, impacto
+  y vehículos. El reporte HTML completo no se versiona; se publica como artefacto.
+- **Workflows:** `ci.yml` valida dependencias, lint mínimo y compilación; `tests.yml`
+  ejecuta pytest, Vitest y Playwright con artefactos; `deploy-production.yml` queda
+  desactivado por defecto y usa solo secretos y variables. `deploy-staging.yml` pasa a
+  dispararse desde `Tests`.
+- **Limpieza:** `.gitignore` excluye `playwright-report/`, `test-results/`,
+  `blob-report/`, `playwright/.cache/` y `playwright/.auth/`. No existe `.gitignore~`.
+- **Usabilidad:** se elaboró el cuestionario SUS con diez ítems, escala, fórmula y
+  protocolo. **No se aplicó a participantes reales**, por lo que no se reportan
+  puntajes ni comentarios.
+- **Documentación:** cuatro entregables en `docs/03 Implementación/Sprint 4/`, enlaces
+  y badges en el README, índice en `docs/05 Evidencias/playwright-sprint4/` y este
+  CHANGELOG.
+- **Pendiente declarado:** ejecución real de los workflows en GitHub, despliegue a
+  Producción y aplicación del SUS. No se presentan como completados.
+
+### Corrección del panel y alta de vehículos (12/11/2026)
+
+- **Corrección:** `Dashboard.jsx` llamaba a `fetchVehiculos` sin definirla, lo que
+  provocaba un `ReferenceError` y dejaba la pantalla en blanco justo después del
+  login. La función se restauró y el panel vuelve a renderizar con las cinco
+  pestañas.
+- **Vehículos:** la pestaña Vehículos incorpora un formulario de alta con placa,
+  capacidad, factor de emisión, consumo, velocidad promedio y combustible. Solo
+  se muestra al rol Administrador, que es el que exige `POST /api/v1/vehiculos`.
+- **Selección:** el vehículo recién creado queda seleccionado para armar rutas y
+  la selección inicial usa el primer vehículo disponible en lugar de un id fijo.
+  Si no hay vehículos, la optimización queda bloqueada con un aviso claro.
+- **Validación:** build de producción correcto y flujo de login, alta de vehículo
+  y selección del vehículo verificados manualmente en el navegador.
+
 ### Optimización Green IT y auditoría Lighthouse (09/11/2026)
 
 - **Consultas:** índices para los filtros del API, carga anticipada de puntos y

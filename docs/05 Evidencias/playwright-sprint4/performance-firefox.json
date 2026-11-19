@@ -1,0 +1,48 @@
+{
+  "proyecto": "firefox",
+  "fecha": "2026-11-17T18:40:18.090Z",
+  "url": "http://127.0.0.1:5173/",
+  "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:159.0) Gecko/20100101 Firefox/159.0",
+  "viewport": {
+    "width": 1280,
+    "height": 720
+  },
+  "navegacion": {
+    "login": {
+      "ttfbMs": 7,
+      "fcpMs": 125,
+      "lcpMs": 125,
+      "domContentLoadedMs": 119,
+      "loadMs": 126
+    },
+    "panel": {
+      "ttfbMs": 5,
+      "fcpMs": 219,
+      "lcpMs": 708,
+      "domContentLoadedMs": 211,
+      "loadMs": 220
+    }
+  },
+  "api": {
+    "health": {
+      "ms": 7,
+      "status": 200
+    },
+    "login": {
+      "ms": 229,
+      "status": 200
+    },
+    "puntos": {
+      "ms": 9,
+      "status": 200
+    },
+    "rutas": {
+      "ms": 13,
+      "status": 200
+    },
+    "vehiculos": {
+      "ms": 7,
+      "status": 200
+    }
+  }
+}
