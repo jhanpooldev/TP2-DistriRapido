@@ -14,7 +14,7 @@
 > de acceso por rol. La especificación permanece como trabajo pendiente y no debe
 > interpretarse como funcionalidad disponible. Se recoge como pendiente en los
 > entregables del Sprint 1, en el
-> [`02 Registro de Impedimentos V_1_0_0.md`](../03%20Implementación/Sprint%201/02%20Registro%20de%20Impedimentos%20V_1_0_0.md)
+> [`02 Registro de Impedimentos V_1_0_0.md`](../03%20Implementación/Sprint%2001/02%20Registro%20de%20Impedimentos%20V_1_0_0.md)
 > (impedimento IMP-08, acción ACT-S1-07).
 
 ---

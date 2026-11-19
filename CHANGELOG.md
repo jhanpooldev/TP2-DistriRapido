@@ -7,7 +7,7 @@ versionado sigue [SemVer](https://semver.org/lang/es/) (`MAJOR.MINOR.PATCH`).
 
 ---
 
-## [No publicado]
+## [1.0.0] — 2026-11-19
 
 ### Sprint 4 — Calidad, pruebas E2E y CI/CD (17/11/2026)
 
@@ -28,17 +28,23 @@ versionado sigue [SemVer](https://semver.org/lang/es/) (`MAJOR.MINOR.PATCH`).
 - **Workflows:** `ci.yml` valida dependencias, lint mínimo y compilación; `tests.yml`
   ejecuta pytest, Vitest y Playwright con artefactos; `deploy-production.yml` queda
   desactivado por defecto y usa solo secretos y variables. `deploy-staging.yml` pasa a
-  dispararse desde `Tests`.
+  dispararse desde `Tests`. El 19/11/2026, sobre el commit `85eac48`, **Tests, CI,
+  CodeQL y Green Audit terminaron en verde**; los deploys de Staging y Producción
+  quedaron omitidos por falta de host y credenciales.
 - **Limpieza:** `.gitignore` excluye `playwright-report/`, `test-results/`,
   `blob-report/`, `playwright/.cache/` y `playwright/.auth/`. No existe `.gitignore~`.
 - **Usabilidad:** se elaboró el cuestionario SUS con diez ítems, escala, fórmula y
   protocolo. **No se aplicó a participantes reales**, por lo que no se reportan
   puntajes ni comentarios.
-- **Documentación:** cuatro entregables en `docs/03 Implementación/Sprint 4/`, enlaces
+- **Dependencias:** `npm audit --audit-level=high` se integra en CI; se actualizó
+  `follow-redirects` a 1.16.3 y la auditoría quedó en **0 vulnerabilidades**.
+- **Documentación:** cuatro entregables en `docs/03 Implementación/Sprint 04/`, enlaces
   y badges en el README, índice en `docs/05 Evidencias/playwright-sprint4/` y este
-  CHANGELOG.
-- **Pendiente declarado:** ejecución real de los workflows en GitHub, despliegue a
-  Producción y aplicación del SUS. No se presentan como completados.
+  CHANGELOG. Se corrigieron 29 enlaces relativos; la verificación de los índices deja
+  **133 enlaces y 0 rotos**.
+- **Pendiente declarado:** despliegue a Staging/Producción y aplicación del SUS. No se
+  presentan como completados. La ejecución real de los workflows en GitHub sí quedó
+  acreditada el 19/11/2026.
 
 ### Corrección del panel y alta de vehículos (12/11/2026)
 

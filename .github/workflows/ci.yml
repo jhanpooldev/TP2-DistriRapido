@@ -73,6 +73,9 @@ jobs:
       - name: Instalar dependencias
         run: npm ci
 
+      - name: Auditar dependencias
+        run: npm audit --audit-level=high
+
       - name: Compilar para produccion
         run: npm run build
 

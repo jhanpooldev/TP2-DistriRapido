@@ -8,8 +8,8 @@ Carpeta destinada al resguardo de evidencias técnicas, resultados de corridas d
 
 | Versión | Fecha | Autor | Descripción del Cambio |
 |:---:|:---:|:---|:---|
-| 1.0.0 | 01/11/2026 | Jhunior Harold Cosme Tenorio / Equipo EcoLogística | Inventario inicial de evidencias del Sprint 2. |
-| 1.1.0 | 26/10/2026 | Jhunior Harold Cosme Tenorio / Equipo EcoLogística | Se agregan las cifras del Sprint 3 (65 pytest, 24 Vitest, 60.82 % backend), la reejecución de auditoría y smoke test, y la evidencia real de SonarQube en `sonar-sprint3/`. |
+| 1.0.0 | 19/10/2026 | Jhunior Harold Cosme Tenorio / Equipo EcoLogística | Inventario inicial de evidencias del Sprint 2. |
+| 1.1.0 | 08/11/2026 | Jhunior Harold Cosme Tenorio / Equipo EcoLogística | Se agregan las cifras del Sprint 3 (65 pytest, 24 Vitest, 60.82 % backend), la reejecución de auditoría y smoke test, y la evidencia real de SonarQube en `sonar-sprint3/`. |
 | 1.2.0 | 17/11/2026 | Jhunior Harold Cosme Tenorio / Equipo EcoLogística | Se agregan las cifras del Sprint 4 (66 pytest, 24 Vitest, 79 E2E), las métricas de rendimiento por navegador y las capturas de `playwright-sprint4/`. |
 
 ---
@@ -29,8 +29,8 @@ Las suites automatizadas y scripts de verificación residen junto al código en 
 | **Auditoría de Endpoints y Aislamiento** | Script `auditoria_api.py` | `src/backend/auditoria_api.py` | **SIN ANOMALÍAS** el 26/10/2026 sobre PostgreSQL 18 local |
 | **Smoke Test End-to-End** | Script `smoke_sprint2.py` | `src/backend/smoke_sprint2.py` | **TODO OK** el 26/10/2026 sobre PostgreSQL 18 local |
 | **Compilación Frontend** | Vite Build (`npm run build`) | `src/frontend/` | **Compilación exitosa** con Vite 8.3.5; 85 módulos |
-| **Dependencias del frontend** | `npm audit --json` | `src/frontend/` | **0 vulnerabilidades** en 106 dependencias |
-| **Integración continua** | GitHub Actions + CodeQL | `.github/workflows/` | Configurada y validada por sintaxis; **no ejecutada en GitHub** desde este entorno |
+| **Dependencias del frontend** | `npm audit --json` | `src/frontend/` | **0 vulnerabilidades** tras actualizar `follow-redirects` a 1.16.3 (19/11/2026) |
+| **Integración continua** | GitHub Actions + CodeQL | `.github/workflows/` | **Ejecutada en GitHub el 19/11/2026**; ver sección 1.3 |
 
 > Ejecución de las suites de validación:
 > ```bash
@@ -85,12 +85,31 @@ evidencias seleccionadas están en [`playwright-sprint4/`](playwright-sprint4/):
 | `01-login.png` … `07-panel-vehiculos-administrador.png` | Capturas de las pantallas principales | Generadas solo en Chromium |
 
 El detalle metodológico está en
-[`03 Analisis PlayWrigth`](../03%20Implementación/Sprint%204/03%20Analisis%20PlayWrigth%20V_1_0_0.md)
+[`03 Analisis PlayWrigth`](../03%20Implementación/Sprint%2004/03%20Analisis%20PlayWrigth%20V_1_0_0.md)
 y el índice de la carpeta en
 [`playwright-sprint4/README.md`](playwright-sprint4/README.md).
 
 > El reporte HTML completo (`playwright-report/`) no se versiona; se regenera con
 > `npm run test:e2e` y el workflow `tests.yml` lo publica como artefacto.
+
+### 1.3 Evidencias de CI/CD (Sprint 4)
+
+El 19/11/2026 se publicó el commit `85eac48` en `main` y se ejecutaron los workflows del
+repositorio:
+
+| Workflow | Run | Resultado | Artefactos |
+|---|---:|---|---|
+| **Tests** | `44560349236` | **Success** (backend, frontend y E2E) | `playwright-report`, `playwright-results`, `playwright-evidencias`, `backend-coverage`, `frontend-coverage` |
+| **CI** | `44560349613` | **Success** | `frontend-build` |
+| **CodeQL** | `44560349282` | **Success** | — |
+| **Green Audit** | `44560349327` | **Success** | Publicación configurada; la API no listó el artefacto en esa corrida |
+| **Deploy Staging** | `44561128925` | **Skipped** | — (sin host ni credenciales) |
+| **Deploy Production** | `44561129181` | **Skipped** | — (sin proveedor ni credenciales) |
+
+Los detalles de la corrida de Tests están en el job
+`E2E - Playwright en Chromium, Firefox y WebKit` (15:56:00–16:00:07Z). Los logs no se
+pueden leer sin autenticación, pero la conclusión de cada job y los artefactos publicados
+son verificables en la API pública de GitHub.
 
 ---
 
@@ -98,12 +117,12 @@ y el índice de la carpeta en
 
 Los informes de avance, impedimentos, revisiones y retrospectivas se organizan en sus respectivas carpetas por sprint:
 
-- **Sprint 1 (05/10/2026 – 18/10/2026):** [`docs/03 Implementación/Sprint 1/`](../03%20Implementación/Sprint%201/)
+- **Sprint 1 (05/10/2026 – 18/10/2026):** [`docs/03 Implementación/Sprint 01/`](../03%20Implementación/Sprint%2001/)
   - Informe de estado del proyecto
   - Registro de impedimentos
   - Revisión del sprint
   - Retrospectiva del sprint
-- **Sprint 2 (19/10/2026 – 01/11/2026):** [`docs/03 Implementación/Sprint 2/`](../03%20Implementación/Sprint%202/)
+- **Sprint 2 (19/10/2026 – 01/11/2026):** [`docs/03 Implementación/Sprint 02/`](../03%20Implementación/Sprint%2002/)
   - Informe de estado del proyecto
   - Registro de impedimentos
   - Revisión del sprint
@@ -114,11 +133,11 @@ Los informes de avance, impedimentos, revisiones y retrospectivas se organizan e
   - [Calidad de código V_1_0_0](../03%20Implementación/Sprint%2003/03%20Calidad%20de%20código%20V_1_0_0.md)
   - [OWASP V_1_0_0](../03%20Implementación/Sprint%2003/04%20OWASP%20V_1_0_0.md)
   - [WCAG V_1_0_0](../03%20Implementación/Sprint%2003/05%20WCAG%20V_1_0_0.md)
-- **Sprint 4 (09/11/2026 – 17/11/2026):** [`docs/03 Implementación/Sprint 4/`](../03%20Implementación/Sprint%204/)
-  - [Revisión del Sprint V_1_0_0](../03%20Implementación/Sprint%204/01%20Revisión%20del%20Sprint%20V_1_0_0.md)
-  - [Retrospectiva del Sprint V_1_0_0](../03%20Implementación/Sprint%204/02%20Retrospectiva%20del%20Sprint%20V_1_0_0.md)
-  - [Análisis de Playwright V_1_0_0](../03%20Implementación/Sprint%204/03%20Analisis%20PlayWrigth%20V_1_0_0.md)
-  - [Usabilidad SUS V_1_0_0](../03%20Implementación/Sprint%204/04%20Usabilidad%20V_1_0_0.md)
+- **Sprint 4 (09/11/2026 – 17/11/2026):** [`docs/03 Implementación/Sprint 04/`](../03%20Implementación/Sprint%2004/)
+  - [Revisión del Sprint V_1_0_0](../03%20Implementación/Sprint%2004/01%20Revisión%20del%20Sprint%20V_1_0_0.md)
+  - [Retrospectiva del Sprint V_1_0_0](../03%20Implementación/Sprint%2004/02%20Retrospectiva%20del%20Sprint%20V_1_0_0.md)
+  - [Análisis de Playwright V_1_0_0](../03%20Implementación/Sprint%2004/03%20Analisis%20PlayWrigth%20V_1_0_0.md)
+  - [Usabilidad SUS V_1_0_0](../03%20Implementación/Sprint%2004/04%20Usabilidad%20V_1_0_0.md)
 
 El Sprint 3 cerró **US-006** y **US-008**. **EN-03** quedó parcial: el pipeline de
 integración continua está configurado, pero el despliegue en Staging no se realizó
@@ -127,7 +146,9 @@ porque no existe un host ni credenciales para ese ambiente.
 El Sprint 4 no agregó historias de negocio: consolidó la calidad con la suite E2E, las
 métricas de rendimiento y los workflows de CI/CD. El **SUS quedó preparado pero no
 aplicado** y el **despliegue a Producción no está configurado**; ambas brechas se
-declaran en los documentos del sprint.
+declaran en los documentos del sprint. Los workflows de CI, Tests, CodeQL y Green Audit
+**se ejecutaron en verde el 19/11/2026**; los deploys de Staging y Producción quedaron
+omitidos por falta de host y credenciales.
 
 ---
 

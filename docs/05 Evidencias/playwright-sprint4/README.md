@@ -68,10 +68,10 @@ corrida y el workflow `tests.yml` lo publica como artefacto.
 
 ## Documentación relacionada
 
-- [Revisión del Sprint 4](../../03%20Implementación/Sprint%204/01%20Revisión%20del%20Sprint%20V_1_0_0.md)
-- [Análisis de Playwright](../../03%20Implementación/Sprint%204/03%20Analisis%20PlayWrigth%20V_1_0_0.md)
-- [Retrospectiva del Sprint 4](../../03%20Implementación/Sprint%204/02%20Retrospectiva%20del%20Sprint%20V_1_0_0.md)
-- [Usabilidad SUS](../../03%20Implementación/Sprint%204/04%20Usabilidad%20V_1_0_0.md)
+- [Revisión del Sprint 4](../../03%20Implementación/Sprint%2004/01%20Revisión%20del%20Sprint%20V_1_0_0.md)
+- [Análisis de Playwright](../../03%20Implementación/Sprint%2004/03%20Analisis%20PlayWrigth%20V_1_0_0.md)
+- [Retrospectiva del Sprint 4](../../03%20Implementación/Sprint%2004/02%20Retrospectiva%20del%20Sprint%20V_1_0_0.md)
+- [Usabilidad SUS](../../03%20Implementación/Sprint%2004/04%20Usabilidad%20V_1_0_0.md)
 
 ---
 

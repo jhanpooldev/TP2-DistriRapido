@@ -30,7 +30,7 @@ Las suites de pruebas viven junto al código que verifican (no se duplican):
 | Cobertura frontend (@vitest/coverage-v8) | `src/frontend/coverage/` |
 | Selección de enfoque / trazabilidad | [05 Requisitos funcionales](05%20Requisitos%20funcionales%20V_1_0_0.md), [08 Reglas de negocio](08%20Reglas%20de%20negocio%20V_1_0_0.md) |
 | Registro de KPIs y su verificación | `README.md` (sección KPIs) |
-| Impedimentos detectados al probar | [Registro de Impedimentos del Sprint 1](../03%20Implementación/Sprint%201/02%20Registro%20de%20Impedimentos%20V_1_0_0.md) |
+| Impedimentos detectados al probar | [Registro de Impedimentos del Sprint 1](../03%20Implementación/Sprint%2001/02%20Registro%20de%20Impedimentos%20V_1_0_0.md) |
 | Resultados del Sprint 3 | [Revisión del Sprint 3](../03%20Implementación/Sprint%2003/01%20Revisión%20del%20Sprint%20V_1_0_0.md) |
 
 ## Herramientas de verificación de extremo a extremo

@@ -14,6 +14,8 @@
 
 **Fecha de verificación local:** 17/11/2026
 
+**Fecha de verificación en GitHub:** 19/11/2026
+
 > El periodo se registra desde el cierre del Sprint 3 (08/11/2026) hasta la fecha de la
 > verificación local (17/11/2026). **No se declara una fecha de aceptación formal del
 > cliente** porque no se realizó una sesión de revisión con stakeholders; la demostración
@@ -25,7 +27,8 @@
 
 | Versión | Fecha | Autor | Descripción del Cambio |
 |:---:|:---:|:---|:---|
-| 1.0.0 | 17/11/2026 | Jhunior Harold Cosme Tenorio / Equipo EcoLogística | Acta de Revisión del Sprint 4 con la suite E2E, las métricas de rendimiento, el instrumento SUS y los workflows de CI/CD. |
+| 1.0.0 | 17/11/2026 | Jhunior Harold Cosme Tenorio / Equipo EcoLogística | Informe de Revisión del Sprint 4 con la suite E2E, las métricas de rendimiento, el instrumento SUS y los workflows de CI/CD. |
+| 1.1.0 | 19/11/2026 | Jhunior Harold Cosme Tenorio / Equipo EcoLogística | Se actualiza el estado de los workflows con la ejecución real en GitHub, se agrega la matriz de cumplimiento del DoD y la deuda pendiente. |
 
 ---
 
@@ -45,13 +48,13 @@ técnicos internos.
 | ET-S4-01 | Suite E2E con Playwright en Chromium, Firefox y WebKit | Pruebas | Completado |
 | ET-S4-02 | Métricas de rendimiento y pruebas de resiliencia HTTP | Pruebas | Completado |
 | ET-S4-03 | Instrumento de usabilidad SUS | Usabilidad | **Preparado, no aplicado** |
-| ET-S4-04 | Workflows de CI, pruebas y despliegue a Producción | CI/CD | **Implementado, no ejecutado en GitHub** |
+| ET-S4-04 | Workflows de CI, pruebas y despliegue a Producción | CI/CD | **Implementado y ejecutado en GitHub**; despliegue a Producción omitido |
 | ET-S4-05 | Limpieza del repositorio y exclusión de artefactos | Mantenimiento | Completado |
 | ET-S4-06 | Documentación del Sprint 4 y navegación del README | Documentación | Completado |
 
-**Resultado:** cuatro entregables completados y dos con alcance parcial honestamente
-declarado (SUS sin respuestas reales y despliegue a Producción sin proveedor
-configurado). No se declara terminado nada que no haya sido ejecutado o verificado.
+**Resultado:** cuatro entregables completados (ET-S4-01, ET-S4-02, ET-S4-05 y ET-S4-06),
+uno ejecutado con el despliegue pendiente (ET-S4-04) y uno parcial (ET-S4-03: instrumento
+SUS sin aplicar). No se declara terminado nada que no haya sido ejecutado o verificado.
 
 ---
 
@@ -138,18 +141,31 @@ pendiente del sprint y requiere personas reales.
 
 | Archivo | Función | Estado real |
 |---|---|---|
-| `.github/workflows/ci.yml` | Validación de dependencias, Ruff mínimo, compilación e importación del backend; `npm ci` y build del frontend. | Implementado y validado por sintaxis YAML. |
-| `.github/workflows/tests.yml` | pytest con cobertura, Vitest con cobertura y Playwright en tres navegadores, con publicación de artefactos. | Implementado y validado por sintaxis YAML; **no ejecutado en GitHub desde este entorno**. |
-| `.github/workflows/deploy-production.yml` | Despliegue a Producción por *deploy hook*, con verificación de salud y activación explícita. | Implementado y **desactivado por defecto**; sin proveedor, URL ni secretos configurados. |
-| `.github/workflows/deploy-staging.yml` | Despliegue a Staging existente. | Se cambió su disparador de `CI` a `Tests`; sigue desactivado por defecto. |
+| `.github/workflows/ci.yml` | Validación de dependencias, Ruff mínimo, compilación e importación del backend; `npm ci`, `npm audit` y build del frontend. | **Ejecutado en GitHub el 19/11/2026** (run `44560349613`, success). |
+| `.github/workflows/tests.yml` | pytest con cobertura, Vitest con cobertura y Playwright en tres navegadores, con publicación de artefactos. | **Ejecutado en GitHub el 19/11/2026** (run `44560349236`, success; artefactos publicados). |
+| `.github/workflows/deploy-production.yml` | Despliegue a Producción por *deploy hook*, con verificación de salud y activación explícita. | Implementado y **desactivado**; corrida `44561129181` omitida (*skipped*) por falta de proveedor, URL y secretos. |
+| `.github/workflows/deploy-staging.yml` | Despliegue a Staging existente. | Implementado y **desactivado**; corrida `44561128925` omitida (*skipped*) por falta de host y credenciales. |
 
 Ningún workflow usa credenciales en el código: el despliegue depende de
 `PRODUCTION_DEPLOY_ENABLED`, `PRODUCTION_DEPLOY_HOOK`, `PRODUCTION_HEALTH_URL` y sus
 equivalentes de Staging, definidos como *secrets* o *variables* del repositorio.
 
-**Limitación declarada:** los workflows se validaron con `yaml.safe_load`, pero no se
-ejecutaron en GitHub porque no se realizó `push` ni se dispone de acceso a las
-ejecuciones del repositorio. Por tanto **no se afirma que existan corridas en verde**.
+**Ejecución real en GitHub (19/11/2026, commit `85eac48`):**
+
+| Workflow | Run | Resultado |
+|---|---:|---|
+| Tests | `44560349236` | **Success** (backend, frontend y E2E) |
+| CI | `44560349613` | **Success** |
+| CodeQL | `44560349282` | **Success** |
+| Green Audit | `44560349327` | **Success** |
+| Deploy Staging | `44561128925` | **Skipped** |
+| Deploy Production | `44561129181` | **Skipped** |
+
+La corrida de Tests publicó los artefactos `playwright-report`, `playwright-results`,
+`playwright-evidencias`, `backend-coverage` y `frontend-coverage`. El job de SonarQube
+quedó omitido porque `SONAR_ENABLED` no está activo. Los logs detallados no son legibles
+sin autenticación, pero la conclusión de cada job y los artefactos son verificables en la
+API pública de GitHub.
 
 ### ET-S4-05 — Limpieza del repositorio
 
@@ -164,8 +180,10 @@ ejecuciones del repositorio. Por tanto **no se afirma que existan corridas en ve
 
 ### ET-S4-06 — Documentación y navegación
 
-- Cuatro entregables Markdown en `docs/03 Implementación/Sprint 4/`.
+- Cuatro entregables Markdown en `docs/03 Implementación/Sprint 04/`.
 - Enlaces directos desde el README principal y desde el índice de evidencias.
+- **133 enlaces relativos verificados, 0 rotos**, tras corregir las referencias a las
+  carpetas `Sprint 01/`, `Sprint 02/` y `Sprint 04/`.
 - Badges de GitHub Actions apuntando a los workflows reales del repositorio.
 - `CHANGELOG.md` actualizado con los cambios del sprint.
 
@@ -182,10 +200,11 @@ ejecuciones del repositorio. Por tanto **no se afirma que existan corridas en ve
 | ET-S4-02 | Verifica respuestas HTTP y resiliencia. | **Cumplido.** 401, 400, 404, 422, cabeceras, caché y errores de interfaz. | `resiliencia.spec.js`. |
 | ET-S4-03 | Instrumento SUS listo para aplicar. | **Cumplido.** Cuestionario, fórmula y protocolo. | `04 Usabilidad V_1_0_0.md`. |
 | ET-S4-03 | Resultados SUS con participantes reales. | **No cumplido.** No se aplicó la encuesta. | Declarado como pendiente. |
-| ET-S4-04 | Tres workflows con secretos, sin credenciales duras. | **Cumplido.** `ci.yml`, `tests.yml`, `deploy-production.yml`. | Archivos YAML validados. |
-| ET-S4-04 | Ejecución real en GitHub y despliegue a Producción. | **No cumplido.** Sin `push`, sin proveedor y sin URL. | Declarado como pendiente. |
+| ET-S4-04 | Workflows con secretos, sin credenciales duras. | **Cumplido.** `ci.yml`, `tests.yml`, `deploy-production.yml` y `deploy-staging.yml`. | Archivos YAML validados y ejecutados. |
+| ET-S4-04 | Ejecución real de CI y Tests en GitHub. | **Cumplido.** Tests, CI, CodeQL y Green Audit en verde el 19/11/2026. | API de GitHub; runs `44560349236`, `44560349613`, `44560349282` y `44560349327`. |
+| ET-S4-04 | Despliegue a Producción. | **No cumplido.** Corrida omitida; sin proveedor, URL ni secretos. | Declarado como pendiente. |
 | ET-S4-05 | Artefactos de Playwright fuera de Git. | **Cumplido.** Verificado con `git check-ignore`. | `.gitignore`. |
-| ET-S4-06 | Enlaces de retorno y navegación. | **Cumplido.** Cada documento enlaza al README principal. | Este documento y los otros tres. |
+| ET-S4-06 | Enlaces de retorno y navegación. | **Cumplido.** 133 enlaces relativos verificados, 0 rotos. | README e índices de evidencias. |
 
 ---
 
@@ -195,7 +214,7 @@ Todas las cifras provienen de comandos ejecutados el 17/11/2026 en el entorno lo
 
 | Verificación | Comando | Resultado |
 |---|---|---|
-| Pruebas del backend | `python -m pytest -q --cov=app --cov-report=term` | **66 aprobadas**, 0 fallidas. |
+| Pruebas del backend | `python -m pytest -q --cov=app --cov-report=term` | **66 coleccionadas y aprobadas**, 0 fallidas. |
 | Cobertura del backend | Reporte de `pytest-cov` | **61 %** global (1 030 sentencias, 399 sin cubrir). |
 | Pruebas del frontend | `npm test` (Vitest) | **24 aprobadas** en 3 archivos. |
 | Compilación del frontend | `npm run build` | **Exitosa** con Vite 8.3.5. |
@@ -203,7 +222,10 @@ Todas las cifras provienen de comandos ejecutados el 17/11/2026 en el entorno lo
 | Navegadores E2E | Chromium, Firefox y WebKit | Los tres ejecutaron la suite. |
 | Sintaxis YAML | `yaml.safe_load` sobre `.github/workflows/*.yml` | **Válida** en los seis workflows. |
 | Exclusión de artefactos | `git check-ignore -v` | `playwright-report/`, `test-results/` y `node_modules/` ignorados. |
-| Enlaces relativos | Revisión de rutas Markdown | **Verificados** (ver nota de la sección final). |
+| Ejecución en GitHub Actions | API pública de GitHub | **Tests, CI, CodeQL y Green Audit en verde**; deploys omitidos. |
+| Artefactos E2E | API pública de GitHub | `playwright-report`, `playwright-results`, `playwright-evidencias`, `backend-coverage`, `frontend-coverage`. |
+| Dependencias del frontend | `npm audit --audit-level=high` | **0 vulnerabilidades**. |
+| Enlaces relativos | Revisión de 133 enlaces Markdown | **0 rotos**. |
 
 > La cobertura del backend subió de 60.82 % (Sprint 3) a **61 %** porque la suite creció
 > a 66 pruebas y se modificó código del panel y de vehículos. Sigue por debajo del
@@ -235,25 +257,52 @@ Recorrido funcional que cubre la suite:
 
 ---
 
+## Cumplimiento del Definition of Done
+
+El DoD global está en
+[`01 Transformando a ágil`](../../02%20Planificación/01%20Transformando%20a%20ágil%20V_1_0_0.md).
+Para el Sprint 4 se evalúa así:
+
+| Criterio del DoD | Estado | Evidencia o brecha |
+|---|---|---|
+| Código implementado y funcionando según criterios | **Cumplido** | Suite E2E 79/2/0; flujos de negocio cubiertos. |
+| Cobertura ≥ 80 % sobre código nuevo o modificado | **No acreditado** | Backend 61 % global; no hay medición separada del código nuevo. |
+| Análisis estático y seguridad sin críticos ni bloqueantes | **Parcial** | CodeQL en verde y `npm audit` en 0; Ruff solo `E9,F63,F7,F82`; sin ESLint. |
+| Peer Review por un integrante distinto al autor, vía Pull Request | **No cumplido** | No se creó Pull Request; el sprint entró en un commit único. |
+| Despliegue automático verificado en Staging/Pruebas | **No cumplido** | `deploy-staging.yml` y `deploy-production.yml` quedaron `skipped`. |
+| Documentación de API/código actualizada | **Parcial** | FastAPI expone OpenAPI; no hubo endpoints nuevos que documentar. |
+| Sin errores críticos ni bloqueantes en el flujo cubierto | **Cumplido** | 0 fallidas y 0 inestables en la suite E2E. |
+| Tarjeta movida a "Done" en Jira con evidencia enlazada | **No verificable** | No hay tablero Jira en el repositorio. |
+
+La deuda anterior se registra como deuda técnica del sprint, no como funcionalidad
+entregada.
+
+---
+
 ## Pendientes y limitaciones
 
 1. **SUS sin resultados reales.** No se aplicó el cuestionario; no hay puntaje ni
    participantes que reportar. Ver [`04 Usabilidad V_1_0_0.md`](04%20Usabilidad%20V_1_0_0.md).
-2. **GitHub Actions no ejecutado.** Los workflows están escritos y su sintaxis validada,
-   pero no se ejecutaron en GitHub ni se verificaron corridas en verde.
-3. **Despliegue a Producción no configurado.** No existe proveedor, URL ni secretos; el
-   workflow está desactivado por defecto.
-4. **Rendimiento medido en local.** Los tiempos corresponden al servidor de desarrollo
+2. **Despliegue a Staging y Producción no configurado.** Los workflows están escritos y
+   desactivados; las corridas del 19/11/2026 quedaron omitidas. No hay proveedor, URL ni
+   secretos. El DoD exige Staging verificado.
+3. **Revisión por pares pendiente.** No se creó Pull Request ni aprobación de otro
+   integrante; el sprint entró en un commit único.
+4. **Cobertura del backend en 61 %.** Por debajo del 70 % de `SPECS.md` y del 80 % del DoD
+   sobre código nuevo; no hay umbral en CI.
+5. **Rendimiento medido en local.** Los tiempos corresponden al servidor de desarrollo
    de Vite y a PostgreSQL local; no representan un ambiente productivo ni una red real.
-5. **Evidencia visual de Lighthouse ausente.** La carpeta `.lighthouseci/` no existe en
-   el entorno local. El workflow `green-audit.yml` sí está configurado, pero no se
-   ejecutó en GitHub.
-6. **Sin pruebas de componentes React.** La suite E2E cubre flujos completos, pero sigue
+6. **Evidencia visual de Lighthouse.** El workflow Green Audit terminó en verde, pero la
+   API no listó el artefacto `lighthouse-report` en esa corrida; conviene verificar la
+   publicación en la próxima ejecución.
+7. **Sin pruebas de componentes React.** La suite E2E cubre flujos completos, pero sigue
    sin haber pruebas unitarias de componentes ni de los popups del mapa.
-7. **Las capturas se generan solo en Chromium.** Firefox y WebKit omiten ese caso para
+8. **Las capturas se generan solo en Chromium.** Firefox y WebKit omiten ese caso para
    no duplicar imágenes equivalentes.
-8. **La suite comparte una sola base de datos.** Se ejecuta en serie (`workers: 1`) para
+9. **La suite comparte una sola base de datos.** Se ejecuta en serie (`workers: 1`) para
    evitar interferencias; no está preparada para ejecución paralela.
+10. **Lint mínimo y sin ESLint.** Ruff solo verifica `E9,F63,F7,F82`; no hay ESLint ni
+    Prettier. `npm audit` ya está integrado en CI.
 
 ---
 

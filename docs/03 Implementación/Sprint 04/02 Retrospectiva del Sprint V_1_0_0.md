@@ -39,7 +39,8 @@
 
 3. **Las aserciones deben leer la interfaz real, no lo que el equipo recuerda.** Tres
    pruebas fallaron en la primera corrida por suponer textos que no existían: el nombre
-   del operador era `Operador Demo` y no `Operador Principal`; el CSV exportado usa la
+   del operador era `Operador Demo` en la base local y no `Operador Principal` (el
+   sembrado actual de `main.py` usa `Operador Principal`); el CSV exportado usa la
    columna `Orden,Destinatario`; y el mensaje de filtro vacío vive en un `p.vacio`
    concreto. Corregir la aserción —sin debilitarla— fue más honesto que cambiar la
    aplicación para que coincidiera con el test.
@@ -59,9 +60,10 @@
    escala, fórmula y protocolo— y se dejó constancia de que **no se aplicó**. Inventar
    respuestas habría convertido un entregable incompleto en una afirmación falsa.
 
-7. **Un workflow sin ejecución es una hipótesis, no una evidencia.** Los tres workflows
-   se validaron con `yaml.safe_load`, pero no se ejecutaron en GitHub. La retrospectiva
-   registra esa diferencia para no confundir "archivo creado" con "pipeline probado".
+7. **Un workflow sin ejecución es una hipótesis, no una evidencia.** Los workflows
+   se validaron primero con `yaml.safe_load`; el 19/11/2026 se ejecutaron en GitHub sobre
+   el commit `85eac48` y Tests, CI, CodeQL y Green Audit terminaron en verde. La lección
+   se mantiene: hasta que corrieron, eran una hipótesis, no un pipeline probado.
 
 ## ¿Qué estamos haciendo bien?
 
@@ -74,9 +76,9 @@
    registra pedidos, arma y guarda rutas, exporta el CSV, edita, elimina y verifica el
    mapa y el impacto ambiental. También cubre el rol Administrador frente al Operador.
 
-3. **Honestidad sobre lo pendiente.** El SUS, la ejecución real de GitHub Actions y el
-   despliegue a Producción se declaran como no completados. No se presentan como logros
-   por el hecho de tener archivos o plantillas.
+3. **Honestidad sobre lo pendiente.** El SUS y el despliegue a Producción se declaran
+   como no completados. No se presentan como logros por el hecho de tener archivos o
+   plantillas. La ejecución en GitHub sí quedó acreditada el 19/11/2026.
 
 4. **Limpieza del repositorio.** Los reportes de Playwright (`playwright-report/`,
    `test-results/`, `blob-report/`) quedaron fuera de Git. Solo se versionan las
@@ -117,8 +119,8 @@
 ### Procesos
 
 - **Ejecutar los workflows en GitHub y adjuntar la corrida.** La validación de sintaxis
-  no reemplaza una ejecución real. El siguiente paso es hacer `push` autorizado y
-  enlazar la corrida en verde (o el fallo) desde la revisión.
+  no reemplaza una ejecución real. La corrida se hizo el 19/11/2026 sobre `85eac48` y
+  quedó enlazada en la revisión; falta completar el despliegue a Staging/Producción.
 - **Convertir la suite E2E en un gate obligatorio.** Hoy `tests.yml` la ejecuta, pero
   no se ha verificado que un Pull Request no pueda fusionarse con E2E en rojo.
 - **Fijar un umbral de cobertura y sostenerlo.** El backend está en 61 % y el objetivo
@@ -134,8 +136,9 @@
   dentro de la misma suite, complementando la revisión manual del Sprint 3.
 - **Considerar un entorno dedicado para E2E.** La base compartida y la ejecución en
   serie limitan la velocidad; un contenedor efímero por corrida sería más limpio.
-- **Conservar el reporte HTML como artefacto enlazado.** Hoy se publica en CI, pero no
-  se enlaza desde la documentación porque no existe una corrida real que enlazar.
+- **Conservar el reporte HTML como artefacto enlazado.** Se publica en CI y la corrida
+  `44560349236` lo dejó como artefacto `playwright-report`; conviene enlazarlo desde la
+  documentación cuando la URL sea estable.
 
 ### Acciones a realizar
 
@@ -149,6 +152,10 @@
 | **ACT-S4-06** | Incorporar `@axe-core/playwright` y reportar hallazgos de accesibilidad en la suite E2E. | Herramientas | Andrew Steven Vega Reyes | 08/12/2026 | La suite ejecuta una verificación automática y el informe queda como artefacto. |
 | **ACT-S4-07** | Generar y conservar la evidencia visual de Lighthouse CI (`.lighthouseci/`) o documentar su exclusión. | Herramientas | Andrew Steven Vega Reyes | 24/11/2026 | Existe la carpeta con los reportes o una nota firmada que justifica no conservarla. |
 | **ACT-S4-08** | Documentar el ciclo de vida de los datos de prueba de la suite E2E. | Procesos | Jhanpool Ernesto Flores Torres | 24/11/2026 | `e2e/utils.js` y la revisión explican qué se crea, qué se limpia y cómo verificarlo. |
+
+> **Estado al 19/11/2026:** ACT-S4-02 se cumplió parcialmente. `ci.yml`, `tests.yml`,
+> `codeql.yml` y `green-audit.yml` corrieron en verde sobre `85eac48`; `deploy-staging.yml`
+> y `deploy-production.yml` quedaron omitidos. Las demás acciones siguen abiertas.
 
 ---
 

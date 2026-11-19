@@ -36,8 +36,7 @@ deliberadamente simulan fallos de red o errores del servidor.
 
 **Queda fuera del alcance de este documento:**
 
-- la aplicación en Producción (no existe un ambiente desplegado);
-- la ejecución real de los workflows en GitHub (no se realizó `push`);
+- el despliegue en Producción (no existe un ambiente desplegado);
 - la prueba de usabilidad SUS (ver [`04 Usabilidad V_1_0_0.md`](04%20Usabilidad%20V_1_0_0.md));
 - la auditoría Lighthouse (corresponde a `green-audit.yml` y al informe de impacto
   ambiental del repositorio).
@@ -339,9 +338,11 @@ suite en un runner `ubuntu-latest`:
 6. Publicación de `playwright-report/`, `test-results/` y las evidencias visuales como
    artefactos, incluso si la suite falla.
 
-**Estado real:** el workflow está escrito y su sintaxis YAML fue validada, pero **no se
-ejecutó en GitHub** porque no se realizó `push`. No se afirma que exista una corrida en
-verde.
+**Estado real:** el workflow **se ejecutó en GitHub el 19/11/2026** sobre el commit
+`85eac48` (run `44560349236`, conclusión **success**). El job E2E terminó en verde entre
+las 15:56:00 y las 16:00:07 UTC y publicó `playwright-report`, `playwright-results` y
+`playwright-evidencias`. Los logs detallados no son legibles sin autenticación, pero la
+conclusión del job y los artefactos son verificables en la API pública de GitHub.
 
 ---
 
@@ -380,7 +381,8 @@ La suite requiere PostgreSQL en ejecución y el archivo `.env` configurado en la
    capturas son evidencia, no una aserción visual.
 6. **Sin auditoría de accesibilidad automatizada.** No se ejecutó axe ni otra herramienta
    dentro de la suite.
-7. **Sin ejecución real en CI.** El workflow existe, pero no hay corrida verificada.
+7. **Ejecución en CI verificada; despliegue pendiente.** La suite corrió en GitHub el
+   19/11/2026, pero el despliegue a Producción sigue sin proveedor ni credenciales.
 8. **LCP dependiente del navegador.** Si un motor no expone
    `largest-contentful-paint`, el caso lo reporta como `null` y no inventa un valor.
 
@@ -396,8 +398,9 @@ La suite requiere PostgreSQL en ejecución y el archivo `.env` configurado en la
   fallos de red y de servidor sin quedarse en blanco.
 - El rendimiento local es holgadamente inferior a los umbrales de sanidad: TTFB de 3–12
   ms, FCP de 124–252 ms y LCP de 124–744 ms.
-- Lo que falta es verificable y está declarado: ejecución real en GitHub, despliegue a
-  Producción, aplicación del SUS y pruebas de componentes.
+- Lo que falta es verificable y está declarado: despliegue a Producción, aplicación del
+  SUS y pruebas de componentes. La ejecución real en GitHub quedó acreditada el
+  19/11/2026 con la corrida `44560349236`.
 
 ---
 

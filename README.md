@@ -113,30 +113,30 @@ alcance del PMV (ver `SPECS.md`).
 
 ## Stakeholders Involucrados
 
-| Stakeholder | Rol |
-| :--- | :--- |
-| Clientes | Reciben productos en sus domicilios |
-| Conductores | Realizan las entregas en campo |
+| Stakeholder               | Rol                                                   |
+| :------------------------ | :---------------------------------------------------- |
+| Clientes                  | Reciben productos en sus domicilios                   |
+| Conductores               | Realizan las entregas en campo                        |
 | Administrador del Sistema | Gestiona usuarios, roles y parámetros de la operación |
-| Operador Logístico | Registra puntos de entrega y genera rutas |
-| Gerencia de Operaciones | Consulta indicadores y supervisa el proceso logístico |
-| Sistema | Genera rutas optimizadas automáticamente |
+| Operador Logístico        | Registra puntos de entrega y genera rutas             |
+| Gerencia de Operaciones   | Consulta indicadores y supervisa el proceso logístico |
+| Sistema                   | Genera rutas optimizadas automáticamente              |
 
 ---
 
 ## Indicadores Clave de Éxito (KPIs)
 
-| KPI | Objetivo del PMV | Estado de verificación |
-| :--- | :--- | :--- |
-| Tiempo de generación de una ruta (hasta 20 puntos) | ≤ 5 segundos | **Verificado**: máximo de 20.2 ms medido en `src/backend/tests/test_optimizer.py` |
-| Distancia calculada entre coordenadas | Geodésica | **Verificado**: fórmula de Haversine con prueba de distancia conocida |
-| Ruta no generable con menos de 2 puntos | Rechazo con mensaje | **Verificado**: la API responde `400` (**RN-010**) |
-| Aislamiento de datos por usuario | Un operador no accede a los recursos de otro | **Verificado** en `src/backend/auditoria_api.py` |
-| Emisiones estimadas de CO₂ | Según el factor del vehículo asignado | **Verificado** (**RN-017**) |
-| Reducción de distancia frente a la ruta no optimizada | ≥ 15 % | **Pendiente**: requiere prueba comparativa de referencia |
-| Reducción de emisiones frente a la ruta no optimizada | ≥ 10 % | **Pendiente**: requiere prueba comparativa de referencia |
-| Flujo principal de generación de ruta | ≤ 3 pasos y ≤ 3 minutos | **Pendiente**: sin medición formal registrada |
-| Cobertura de pruebas automatizadas | ≥ 70 % global | **Parcial**: backend 61 % global; frontend 93.22 % de sentencias sobre `src/logica/**`; SonarQube 9.8 % global |
+| KPI                                                   | Objetivo del PMV                             | Estado de verificación                                                                                         |
+| :---------------------------------------------------- | :------------------------------------------- | :------------------------------------------------------------------------------------------------------------- |
+| Tiempo de generación de una ruta (hasta 20 puntos)    | ≤ 5 segundos                                 | **Verificado**: máximo de 20.2 ms medido en `src/backend/tests/test_optimizer.py`                              |
+| Distancia calculada entre coordenadas                 | Geodésica                                    | **Verificado**: fórmula de Haversine con prueba de distancia conocida                                          |
+| Ruta no generable con menos de 2 puntos               | Rechazo con mensaje                          | **Verificado**: la API responde `400` (**RN-010**)                                                             |
+| Aislamiento de datos por usuario                      | Un operador no accede a los recursos de otro | **Verificado** en `src/backend/auditoria_api.py`                                                               |
+| Emisiones estimadas de CO₂                            | Según el factor del vehículo asignado        | **Verificado** (**RN-017**)                                                                                    |
+| Reducción de distancia frente a la ruta no optimizada | ≥ 15 %                                       | **Pendiente**: requiere prueba comparativa de referencia                                                       |
+| Reducción de emisiones frente a la ruta no optimizada | ≥ 10 %                                       | **Pendiente**: requiere prueba comparativa de referencia                                                       |
+| Flujo principal de generación de ruta                 | ≤ 3 pasos y ≤ 3 minutos                      | **Pendiente**: sin medición formal registrada                                                                  |
+| Cobertura de pruebas automatizadas                    | ≥ 70 % global                                | **Parcial**: backend 61 % global; frontend 93.22 % de sentencias sobre `src/logica/**`; SonarQube 9.8 % global |
 
 ---
 
@@ -218,7 +218,7 @@ orden en que se envían los puntos resulta mejor que ese, la API puede informar 
 `distancia_total_km` levemente mayor que `distancia_sin_optimizar_km`. El ahorro no llega
 a ser negativo porque se acota en cero. Con cuatro o más puntos la búsqueda actúa con
 normalidad. Registrado como **IMP-10** en el
-[`Registro de Impedimentos del Sprint 1`](docs/03%20Implementación/Sprint%201/02%20Registro%20de%20Impedimentos%20V_1_0_0.md).
+[`Registro de Impedimentos del Sprint 1`](docs/03%20Implementación/Sprint%2001/02%20Registro%20de%20Impedimentos%20V_1_0_0.md).
 
 ---
 
@@ -246,8 +246,9 @@ lint mínimo y compilación), `.github/workflows/tests.yml` (pytest, Vitest y Pl
 en tres navegadores con artefactos), `.github/workflows/codeql.yml` (análisis estático
 de Python y JavaScript/TypeScript), `.github/workflows/green-audit.yml` (Lighthouse CI)
 y `.github/workflows/deploy-production.yml` (despliegue a Producción desactivado por
-defecto). El despliegue real en Staging y Producción **no está verificado** porque el
-repositorio no dispone de host ni credenciales para esos ambientes.
+defecto). El 19/11/2026, sobre el commit `85eac48`, **Tests, CI, CodeQL y Green Audit
+terminaron en verde**; los despliegues a Staging y Producción quedaron omitidos porque
+el repositorio no dispone de host ni credenciales para esos ambientes.
 
 El detalle de la arquitectura por niveles (C4) se encuentra en
 [`docs/04 Arquitectura/01 Modelo C4`](docs/04%20Arquitectura/01%20Modelo%20C4%20V_1_0_0.md).
@@ -258,15 +259,15 @@ El detalle de la arquitectura por niveles (C4) se encuentra en
 
 El repositorio organiza su documentación y código fuente de acuerdo con el ciclo de vida del proyecto y las etapas de desarrollo:
 
-| # | Directorio | Contenido |
-| :--- | :--- | :--- |
-| 1 | `docs/01 Inicio/` | Constitución, visión, supuestos, restricciones iniciales e interesados |
-| 2 | `docs/02 Planificación/` | Backlog, Jira, riesgos, presupuesto, requisitos (RF/RNF), roles, reglas de negocio, BD y plan de pruebas |
-| 3 | `docs/03 Implementación/` | Entregables y reportes agrupados por sprint (`Sprint 1/`, `Sprint 2/`, `Sprint 03/`, `Sprint 4/`) |
-| 4 | `docs/04 Arquitectura/` | Arquitectura del sistema, Modelo C4, especificaciones técnicas y seguridad MFA (`specs/`) |
-| 5 | `docs/05 Evidencias/` | Registro de evidencias de validación, auditoría de API, resultados de pruebas y capturas de Playwright |
-| 6 | `src/` | Código fuente del sistema (`backend/` FastAPI y `frontend/` React) |
-| 7 | `.github/workflows/` | CI, pruebas E2E, CodeQL, auditoría Green IT y despliegues desactivados por defecto |
+| #   | Directorio                | Contenido                                                                                                |
+| :-- | :------------------------ | :------------------------------------------------------------------------------------------------------- |
+| 1   | `docs/01 Inicio/`         | Constitución, visión, supuestos, restricciones iniciales e interesados                                   |
+| 2   | `docs/02 Planificación/`  | Backlog, Jira, riesgos, presupuesto, requisitos (RF/RNF), roles, reglas de negocio, BD y plan de pruebas |
+| 3   | `docs/03 Implementación/` | Entregables y reportes agrupados por sprint (`Sprint 01/`, `Sprint 02/`, `Sprint 03/`, `Sprint 04/`)     |
+| 4   | `docs/04 Arquitectura/`   | Arquitectura del sistema, Modelo C4, especificaciones técnicas y seguridad MFA (`specs/`)                |
+| 5   | `docs/05 Evidencias/`     | Registro de evidencias de validación, auditoría de API, resultados de pruebas y capturas de Playwright   |
+| 6   | `src/`                    | Código fuente del sistema (`backend/` FastAPI y `frontend/` React)                                       |
+| 7   | `.github/workflows/`      | CI, pruebas E2E, CodeQL, auditoría Green IT y despliegues desactivados por defecto                       |
 
 ```text
 /
@@ -295,10 +296,10 @@ El repositorio organiza su documentación y código fuente de acuerdo con el cic
 |   |-- 01 Inicio/               # Fase de Inicio (5 documentos)
 |   |-- 02 Planificación/        # Fase de Planificación y Requisitos (12 documentos)
 |   |-- 03 Implementación/       # Entregables organizados por sprint
-|   |   |-- Sprint 1/            # 4 entregables del Sprint 1 (V_1_0_0)
-|   |   |-- Sprint 2/            # 4 entregables del Sprint 2 (V_2_0_0)
+|   |   |-- Sprint 01/           # 4 entregables del Sprint 1 (V_1_0_0)
+|   |   |-- Sprint 02/           # 4 entregables del Sprint 2 (V_2_0_0)
 |   |   |-- Sprint 03/           # 5 entregables del Sprint 3 (V_1_0_0)
-|   |   `-- Sprint 4/            # 4 entregables del Sprint 4 (V_1_0_0)
+|   |   `-- Sprint 04/           # 4 entregables del Sprint 4 (V_1_0_0)
 |   |-- 04 Arquitectura/         # Modelo C4 y especificaciones MFA (con specs/)
 |   `-- 05 Evidencias/           # Inventario de evidencias y capturas de Playwright
 |
@@ -343,27 +344,27 @@ verifican; no se duplican en una carpeta de pruebas separada.
 
 ## Tecnologías Utilizadas
 
-| Capa | Tecnología | Versión |
-| :--- | :--- | :--- |
-| Frontend | React | 18.3.1 |
-| Empaquetador | Vite | 8.3.5 |
-| Cliente HTTP (frontend) | axios | 1.7.7 |
-| Mapas | Leaflet + OpenStreetMap / Nominatim | 1.9.4 |
-| Estilos | CSS plano | — |
-| Backend | FastAPI | 0.115.6 |
-| Servidor ASGI | Uvicorn | 0.34.0 |
-| ORM | SQLAlchemy | 2.0.36 |
-| Driver de PostgreSQL | psycopg2-binary | 2.9.10 |
-| Validación | Pydantic + pydantic-settings | 2.10.4 / 2.7.0 |
-| Autenticación | PyJWT + bcrypt | 2.10.1 / 4.2.1 |
-| Optimización | Heurística propia (Haversine + NN + 2-opt) | — |
-| Base de datos | PostgreSQL | 16 |
-| Pruebas backend | pytest + pytest-cov | 8.3.4 / 7.1.0 |
-| Pruebas frontend | Vitest + @vitest/coverage-v8 | 5.0.5 |
-| Pruebas E2E | Playwright (Chromium, Firefox, WebKit) | 1.65.1 |
-| Análisis estático | Ruff | 0.17.2 en CI |
-| Integración continua | GitHub Actions + CodeQL | — |
-| Control de versiones | Git + GitHub | — |
+| Capa                    | Tecnología                                 | Versión                 |
+| :---------------------- | :----------------------------------------- | :---------------------- |
+| Frontend                | React                                      | 18.3.1                  |
+| Empaquetador            | Vite                                       | 8.3.5                   |
+| Cliente HTTP (frontend) | axios                                      | 1.7.7                   |
+| Mapas                   | Leaflet + OpenStreetMap / Nominatim        | 1.9.4                   |
+| Estilos                 | CSS plano                                  | —                       |
+| Backend                 | FastAPI                                    | 0.115.6                 |
+| Servidor ASGI           | Uvicorn                                    | 0.34.0                  |
+| ORM                     | SQLAlchemy                                 | 2.0.36                  |
+| Driver de PostgreSQL    | psycopg2-binary                            | 2.9.10                  |
+| Validación              | Pydantic + pydantic-settings               | 2.10.4 / 2.7.0          |
+| Autenticación           | PyJWT + bcrypt                             | 2.10.1 / 4.2.1          |
+| Optimización            | Heurística propia (Haversine + NN + 2-opt) | —                       |
+| Base de datos           | PostgreSQL                                 | 16                      |
+| Pruebas backend         | pytest + pytest-cov                        | 8.3.4 / 7.1.0           |
+| Pruebas frontend        | Vitest + @vitest/coverage-v8               | 5.0.5                   |
+| Pruebas E2E             | Playwright (Chromium, Firefox, WebKit)     | 1.65.1                  |
+| Análisis estático       | Ruff                                       | 0.17.2 en CI            |
+| Integración continua    | GitHub Actions + CodeQL                    | Ejecutada el 19/11/2026 |
+| Control de versiones    | Git + GitHub                               | —                       |
 
 **No se utilizan:** Tailwind CSS, Alembic, ESLint, Prettier ni Testing Library. El
 proyecto sí usa Vitest, Ruff y GitHub Actions.
@@ -441,24 +442,24 @@ El frontend queda disponible en `http://localhost:5173`.
 Copia `.env.example` de la raíz y renómbralo como `.env`. Ese archivo queda en la raíz y
 es el único lugar donde se configura el backend y el frontend.
 
-| Variable | Descripción | Ejemplo |
-| :--- | :--- | :--- |
-| `DB_HOST` | Host de la base de datos | `localhost` |
-| `DB_PORT` | Puerto de PostgreSQL | `5432` |
-| `DB_NAME` | Base de datos de trabajo | `distrirapido` |
-| `DB_NAME_TEST` | Base de datos usada solo por las pruebas | `distrirapido_test` |
-| `DB_USER` | Usuario de PostgreSQL | `postgres` |
-| `DB_PASSWORD` | Contraseña de PostgreSQL | `cambiar_por_tu_password` |
-| `JWT_SECRET` | Clave secreta para firmar tokens JWT | `cambiar_por_una_clave_aleatoria_y_segura` |
-| `JWT_ALGORITHM` | Algoritmo de firma JWT | `HS256` |
-| `JWT_EXPIRE_HOURS` | Duración del token en horas | `8` |
-| `HOME_ADDRESS` | Dirección del centro de distribución | `Av. Javier Prado Este 4200, Surco, Lima` |
-| `HOME_LAT` | Latitud del centro de distribución | `-12.1150000` |
-| `HOME_LNG` | Longitud del centro de distribución | `-76.9700000` |
-| `MAP_PROVIDER` | Proveedor de distancias | `haversine` |
-| `MAX_PUNTOS_POR_RUTA` | Límite de puntos por ruta | `20` |
-| `VITE_API_URL` | URL base del backend (frontend) | `http://localhost:8000` |
-| `VITE_OSRM_URL` | Servidor OSRM para el trazado por calles | `https://router.project-osrm.org` |
+| Variable              | Descripción                              | Ejemplo                                    |
+| :-------------------- | :--------------------------------------- | :----------------------------------------- |
+| `DB_HOST`             | Host de la base de datos                 | `localhost`                                |
+| `DB_PORT`             | Puerto de PostgreSQL                     | `5432`                                     |
+| `DB_NAME`             | Base de datos de trabajo                 | `distrirapido`                             |
+| `DB_NAME_TEST`        | Base de datos usada solo por las pruebas | `distrirapido_test`                        |
+| `DB_USER`             | Usuario de PostgreSQL                    | `postgres`                                 |
+| `DB_PASSWORD`         | Contraseña de PostgreSQL                 | `cambiar_por_tu_password`                  |
+| `JWT_SECRET`          | Clave secreta para firmar tokens JWT     | `cambiar_por_una_clave_aleatoria_y_segura` |
+| `JWT_ALGORITHM`       | Algoritmo de firma JWT                   | `HS256`                                    |
+| `JWT_EXPIRE_HOURS`    | Duración del token en horas              | `8`                                        |
+| `HOME_ADDRESS`        | Dirección del centro de distribución     | `Av. Javier Prado Este 4200, Surco, Lima`  |
+| `HOME_LAT`            | Latitud del centro de distribución       | `-12.1150000`                              |
+| `HOME_LNG`            | Longitud del centro de distribución      | `-76.9700000`                              |
+| `MAP_PROVIDER`        | Proveedor de distancias                  | `haversine`                                |
+| `MAX_PUNTOS_POR_RUTA` | Límite de puntos por ruta                | `20`                                       |
+| `VITE_API_URL`        | URL base del backend (frontend)          | `http://localhost:8000`                    |
+| `VITE_OSRM_URL`       | Servidor OSRM para el trazado por calles | `https://router.project-osrm.org`          |
 
 Nunca incluyas el archivo `.env` en el repositorio: está excluido por `.gitignore`. La
 plantilla `.env.example` nunca debe contener credenciales reales.
@@ -552,7 +553,7 @@ automáticamente, mide TTFB/FCP/LCP y tiempos de API, y verifica respuestas `401
 Las evidencias están en
 [`docs/05 Evidencias/playwright-sprint4/`](docs/05%20Evidencias/playwright-sprint4/) y
 el análisis completo en
-[`03 Analisis PlayWrigth`](docs/03%20Implementación/Sprint%204/03%20Analisis%20PlayWrigth%20V_1_0_0.md).
+[`03 Analisis PlayWrigth`](docs/03%20Implementación/Sprint%2004/03%20Analisis%20PlayWrigth%20V_1_0_0.md).
 El reporte HTML completo (`playwright-report/`) no se versiona; se publica como artefacto
 en el workflow `tests.yml`.
 
@@ -576,16 +577,19 @@ El flujo `.github/workflows/tests.yml` ejecuta:
 
 `.github/workflows/codeql.yml` analiza Python y JavaScript/TypeScript;
 `.github/workflows/green-audit.yml` ejecuta Lighthouse CI; `.github/workflows/deploy-staging.yml`
-y `.github/workflows/deploy-production.yml` quedan preparados para un *deploy hook*,
+y `.github/workflows/deploy-production.yml` quedan preparados para un _deploy hook_,
 desactivados mientras `STAGING_DEPLOY_ENABLED` o `PRODUCTION_DEPLOY_ENABLED` no sean
-`true`. **Ninguno de estos workflows se ejecutó en GitHub desde el entorno local** y los
-despliegues a Staging y Producción no se realizaron.
+`true`. El 19/11/2026, sobre el commit `85eac48`, **Tests, CI, CodeQL y Green Audit
+terminaron en verde**; **Deploy Staging y Deploy Production quedaron omitidos** porque
+las variables de activación y las credenciales no están configuradas.
 
 ### Lint y formato
 
 - **Backend:** Ruff se usa como verificación mínima en CI; no hay configuración de
   formato automático ni `ruff format` aplicado al repositorio.
-- **Frontend:** no hay ESLint ni Prettier configurados.
+- **Frontend:** no hay ESLint ni Prettier configurados. CI ejecuta
+  `npm audit --audit-level=high`; la auditoría del 19/11/2026 reportó **0 vulnerabilidades**
+  tras actualizar `follow-redirects` a 1.16.3.
 
 La verificación local de Ruff reporta **112 hallazgos** de estilo y tipado moderno,
 ninguno de la familia `E9`, `F63`, `F7` o `F82`. El detalle está en
@@ -601,14 +605,14 @@ conservan en
 
 ## Estándares y Buenas Prácticas Aplicadas
 
-| Estándar | Aplicación |
-| :--- | :--- |
-| ISO/IEC 25010 | Calidad del software |
+| Estándar            | Aplicación                                                                  |
+| :------------------ | :-------------------------------------------------------------------------- |
+| ISO/IEC 25010       | Calidad del software                                                        |
 | OWASP Top 10 (2025) | Revisión con SonarQube, controles y brechas documentados; sin certificación |
-| WCAG 2.1 / 2.2 AA | Revisión manual de accesibilidad; sin certificación externa |
-| Git Flow | Control de versiones |
-| Scrum | Gestión ágil |
-| Convenciones | Semantic Versioning (SemVer) |
+| WCAG 2.1 / 2.2 AA   | Revisión manual de accesibilidad; sin certificación externa                 |
+| Git Flow            | Control de versiones                                                        |
+| Scrum               | Gestión ágil                                                                |
+| Convenciones        | Semantic Versioning (SemVer)                                                |
 
 ---
 
@@ -629,100 +633,101 @@ El detalle del backlog, los sprints y la Definition of Done se encuentran en
 
 ### Fase de Inicio (`docs/01 Inicio/`)
 
-| # | Documento |
-| :--- | :--- |
-| 01 | [Selección del enfoque del proyecto](docs/01%20Inicio/01%20Selección%20del%20enfoque%20del%20proyecto%20V_1_0_0.md) |
-| 02 | [Acta de constitución del proyecto](docs/01%20Inicio/02%20Acta%20de%20constitución%20V_1_0_0.md) |
-| 03 | [Declaración de la visión](docs/01%20Inicio/03%20Declaración%20de%20la%20visión%20V_1_0_0.md) |
-| 04 | [Registro de supuestos y restricciones](docs/01%20Inicio/04%20Registro%20de%20supuestos%20y%20restricciones%20V_1_0_0.md) |
-| 05 | [Registro de interesados](docs/01%20Inicio/05%20Registro%20de%20interesados%20V_1_0_0.md) |
+| #   | Documento                                                                                                                 |
+| :-- | :------------------------------------------------------------------------------------------------------------------------ |
+| 01  | [Selección del enfoque del proyecto](docs/01%20Inicio/01%20Selección%20del%20enfoque%20del%20proyecto%20V_1_0_0.md)       |
+| 02  | [Acta de constitución del proyecto](docs/01%20Inicio/02%20Acta%20de%20constitución%20V_1_0_0.md)                          |
+| 03  | [Declaración de la visión](docs/01%20Inicio/03%20Declaración%20de%20la%20visión%20V_1_0_0.md)                             |
+| 04  | [Registro de supuestos y restricciones](docs/01%20Inicio/04%20Registro%20de%20supuestos%20y%20restricciones%20V_1_0_0.md) |
+| 05  | [Registro de interesados](docs/01%20Inicio/05%20Registro%20de%20interesados%20V_1_0_0.md)                                 |
 
 ### Fase de Planificación (`docs/02 Planificación/`)
 
-| # | Documento |
-| :--- | :--- |
-| 01 | [Transformando a ágil (backlog priorizado y Definition of Done)](docs/02%20Planificación/01%20Transformando%20a%20ágil%20V_1_0_0.md) |
-| 02 | [Artefactos Jira](docs/02%20Planificación/02%20Artefactos%20Jira%20V_1_0_0.md) |
-| 03 | [Registro de riesgos](docs/02%20Planificación/03%20Registro%20de%20riesgos%20V_1_0_0.md) |
-| 04 | [Presupuesto del proyecto](docs/02%20Planificación/04%20Presupuesto%20del%20proyecto%20V_1_0_0.md) |
-| 05 | [Requisitos funcionales (RF-001 a RF-014)](docs/02%20Planificación/05%20Requisitos%20funcionales%20V_1_0_0.md) |
-| 06 | [Requisitos no funcionales (RNF-001 a RNF-015)](docs/02%20Planificación/06%20Requisitos%20no%20funcionales%20V_1_0_0.md) |
-| 07 | [Identificación y perfiles de usuarios (Roles y permisos)](docs/02%20Planificación/07%20Usuarios%20roles%20y%20permisos%20V_1_0_0.md) |
-| 08 | [Reglas de negocio y trazabilidad (RN-001 a RN-020)](docs/02%20Planificación/08%20Reglas%20de%20negocio%20V_1_0_0.md) |
-| 09 | [Evaluación e identificación del stack tecnológico](docs/02%20Planificación/09%20Evaluación%20de%20tecnologías%20V_1_0_0.md) |
-| 10 | [Diseño e ingeniería de base de datos](docs/02%20Planificación/10%20Base%20de%20datos%20V_1_0_0.md) |
-| 11 | [Análisis multidimensional de restricciones](docs/02%20Planificación/11%20Análisis%20de%20restricciones%20V_1_0_0.md) |
-| 12 | [Plan y estrategia de pruebas](docs/02%20Planificación/12%20Plan%20de%20pruebas%20V_1_0_0.md) |
+| #   | Documento                                                                                                                             |
+| :-- | :------------------------------------------------------------------------------------------------------------------------------------ |
+| 01  | [Transformando a ágil (backlog priorizado y Definition of Done)](docs/02%20Planificación/01%20Transformando%20a%20ágil%20V_1_0_0.md)  |
+| 02  | [Artefactos Jira](docs/02%20Planificación/02%20Artefactos%20Jira%20V_1_0_0.md)                                                        |
+| 03  | [Registro de riesgos](docs/02%20Planificación/03%20Registro%20de%20riesgos%20V_1_0_0.md)                                              |
+| 04  | [Presupuesto del proyecto](docs/02%20Planificación/04%20Presupuesto%20del%20proyecto%20V_1_0_0.md)                                    |
+| 05  | [Requisitos funcionales (RF-001 a RF-014)](docs/02%20Planificación/05%20Requisitos%20funcionales%20V_1_0_0.md)                        |
+| 06  | [Requisitos no funcionales (RNF-001 a RNF-015)](docs/02%20Planificación/06%20Requisitos%20no%20funcionales%20V_1_0_0.md)              |
+| 07  | [Identificación y perfiles de usuarios (Roles y permisos)](docs/02%20Planificación/07%20Usuarios%20roles%20y%20permisos%20V_1_0_0.md) |
+| 08  | [Reglas de negocio y trazabilidad (RN-001 a RN-020)](docs/02%20Planificación/08%20Reglas%20de%20negocio%20V_1_0_0.md)                 |
+| 09  | [Evaluación e identificación del stack tecnológico](docs/02%20Planificación/09%20Evaluación%20de%20tecnologías%20V_1_0_0.md)          |
+| 10  | [Diseño e ingeniería de base de datos](docs/02%20Planificación/10%20Base%20de%20datos%20V_1_0_0.md)                                   |
+| 11  | [Análisis multidimensional de restricciones](docs/02%20Planificación/11%20Análisis%20de%20restricciones%20V_1_0_0.md)                 |
+| 12  | [Plan y estrategia de pruebas](docs/02%20Planificación/12%20Plan%20de%20pruebas%20V_1_0_0.md)                                         |
 
 ### Fase de Implementación (`docs/03 Implementación/`)
 
 #### Entregables del Sprint 1 (periodo 05/10/2026 al 18/10/2026):
 
-| # | Documento |
-| :--- | :--- |
-| 01 | [Informe de estado del proyecto V_1_0_0.md](docs/03%20Implementación/Sprint%201/01%20Informe%20de%20estado%20del%20proyecto%20V_1_0_0.md) |
-| 02 | [Registro de Impedimentos V_1_0_0.md](docs/03%20Implementación/Sprint%201/02%20Registro%20de%20Impedimentos%20V_1_0_0.md) |
-| 03 | [Revisión del Sprint V_1_0_0.md](docs/03%20Implementación/Sprint%201/03%20Revisión%20del%20Sprint%20V_1_0_0.md) |
-| 04 | [Retrospectiva del Sprint V_1_0_0.md](docs/03%20Implementación/Sprint%201/04%20Retrospectiva%20del%20Sprint%20V_1_0_0.md) |
+| #   | Documento                                                                                                                                  |
+| :-- | :----------------------------------------------------------------------------------------------------------------------------------------- |
+| 01  | [Informe de estado del proyecto V_1_0_0.md](docs/03%20Implementación/Sprint%2001/01%20Informe%20de%20estado%20del%20proyecto%20V_1_0_0.md) |
+| 02  | [Registro de Impedimentos V_1_0_0.md](docs/03%20Implementación/Sprint%2001/02%20Registro%20de%20Impedimentos%20V_1_0_0.md)                 |
+| 03  | [Revisión del Sprint V_1_0_0.md](docs/03%20Implementación/Sprint%2001/03%20Revisión%20del%20Sprint%20V_1_0_0.md)                           |
+| 04  | [Retrospectiva del Sprint V_1_0_0.md](docs/03%20Implementación/Sprint%2001/04%20Retrospectiva%20del%20Sprint%20V_1_0_0.md)                 |
 
 #### Entregables del Sprint 2 (periodo 19/10/2026 al 01/11/2026):
 
-| # | Documento |
-| :--- | :--- |
-| 01 | [Informe de estado del proyecto V_2_0_0.md](docs/03%20Implementación/Sprint%202/01%20Informe%20de%20estado%20del%20proyecto%20V_2_0_0.md) |
-| 02 | [Registro de Impedimentos V_2_0_0.md](docs/03%20Implementación/Sprint%202/02%20Registro%20de%20Impedimentos%20V_2_0_0.md) |
-| 03 | [Revisión del Sprint V_2_0_0.md](docs/03%20Implementación/Sprint%202/03%20Revisión%20del%20Sprint%20V_2_0_0.md) |
-| 04 | [Retrospectiva del Sprint V_2_0_0.md](docs/03%20Implementación/Sprint%202/04%20Retrospectiva%20del%20Sprint%20V_2_0_0.md) |
+| #   | Documento                                                                                                                                  |
+| :-- | :----------------------------------------------------------------------------------------------------------------------------------------- |
+| 01  | [Informe de estado del proyecto V_2_0_0.md](docs/03%20Implementación/Sprint%2002/01%20Informe%20de%20estado%20del%20proyecto%20V_2_0_0.md) |
+| 02  | [Registro de Impedimentos V_2_0_0.md](docs/03%20Implementación/Sprint%2002/02%20Registro%20de%20Impedimentos%20V_2_0_0.md)                 |
+| 03  | [Revisión del Sprint V_2_0_0.md](docs/03%20Implementación/Sprint%2002/03%20Revisión%20del%20Sprint%20V_2_0_0.md)                           |
+| 04  | [Retrospectiva del Sprint V_2_0_0.md](docs/03%20Implementación/Sprint%2002/04%20Retrospectiva%20del%20Sprint%20V_2_0_0.md)                 |
 
 #### Entregables del Sprint 3 (periodo 02/11/2026 al 08/11/2026):
 
-| # | Documento |
-| :--- | :--- |
-| 01 | [Revisión del Sprint V_1_0_0.md](docs/03%20Implementación/Sprint%2003/01%20Revisión%20del%20Sprint%20V_1_0_0.md) |
-| 02 | [Retrospectiva del Sprint V_1_0_0.md](docs/03%20Implementación/Sprint%2003/02%20Retrospectiva%20del%20Sprint%20V_1_0_0.md) |
-| 03 | [Calidad de código V_1_0_0.md](docs/03%20Implementación/Sprint%2003/03%20Calidad%20de%20código%20V_1_0_0.md) |
-| 04 | [OWASP V_1_0_0.md](docs/03%20Implementación/Sprint%2003/04%20OWASP%20V_1_0_0.md) |
-| 05 | [WCAG V_1_0_0.md](docs/03%20Implementación/Sprint%2003/05%20WCAG%20V_1_0_0.md) |
+| #   | Documento                                                                                                                  |
+| :-- | :------------------------------------------------------------------------------------------------------------------------- |
+| 01  | [Revisión del Sprint V_1_0_0.md](docs/03%20Implementación/Sprint%2003/01%20Revisión%20del%20Sprint%20V_1_0_0.md)           |
+| 02  | [Retrospectiva del Sprint V_1_0_0.md](docs/03%20Implementación/Sprint%2003/02%20Retrospectiva%20del%20Sprint%20V_1_0_0.md) |
+| 03  | [Calidad de código V_1_0_0.md](docs/03%20Implementación/Sprint%2003/03%20Calidad%20de%20código%20V_1_0_0.md)               |
+| 04  | [OWASP V_1_0_0.md](docs/03%20Implementación/Sprint%2003/04%20OWASP%20V_1_0_0.md)                                           |
+| 05  | [WCAG V_1_0_0.md](docs/03%20Implementación/Sprint%2003/05%20WCAG%20V_1_0_0.md)                                             |
 
 #### Entregables del Sprint 4 (periodo 09/11/2026 al 17/11/2026):
 
-| # | Documento |
-| :--- | :--- |
-| 01 | [Revisión del Sprint V_1_0_0.md](docs/03%20Implementación/Sprint%204/01%20Revisión%20del%20Sprint%20V_1_0_0.md) |
-| 02 | [Retrospectiva del Sprint V_1_0_0.md](docs/03%20Implementación/Sprint%204/02%20Retrospectiva%20del%20Sprint%20V_1_0_0.md) |
-| 03 | [Análisis de Playwright V_1_0_0.md](docs/03%20Implementación/Sprint%204/03%20Analisis%20PlayWrigth%20V_1_0_0.md) |
-| 04 | [Usabilidad SUS V_1_0_0.md](docs/03%20Implementación/Sprint%204/04%20Usabilidad%20V_1_0_0.md) |
+| #   | Documento                                                                                                                  |
+| :-- | :------------------------------------------------------------------------------------------------------------------------- |
+| 01  | [Revisión del Sprint V_1_0_0.md](docs/03%20Implementación/Sprint%2004/01%20Revisión%20del%20Sprint%20V_1_0_0.md)           |
+| 02  | [Retrospectiva del Sprint V_1_0_0.md](docs/03%20Implementación/Sprint%2004/02%20Retrospectiva%20del%20Sprint%20V_1_0_0.md) |
+| 03  | [Análisis de Playwright V_1_0_0.md](docs/03%20Implementación/Sprint%2004/03%20Analisis%20PlayWrigth%20V_1_0_0.md)          |
+| 04  | [Usabilidad SUS V_1_0_0.md](docs/03%20Implementación/Sprint%2004/04%20Usabilidad%20V_1_0_0.md)                             |
 
 > El Sprint 4 no incorpora historias nuevas del backlog: consolida la calidad con pruebas
 > E2E, métricas de rendimiento, el instrumento SUS y los workflows de CI/CD. El SUS quedó
-> **preparado pero no aplicado** y el despliegue a Producción **no está configurado**.
+> **preparado pero no aplicado**, el despliegue a Producción **no está configurado** y los
+> workflows de CI, pruebas, CodeQL y Green Audit **se ejecutaron en verde el 19/11/2026**.
 
 ### Fase de Arquitectura (`docs/04 Arquitectura/`)
 
-| # | Documento |
-| :--- | :--- |
-| 01 | [Arquitectura de software (modelo C4)](docs/04%20Arquitectura/01%20Modelo%20C4%20V_1_0_0.md) |
-| 02 | [Especificación MFA y sesiones (OpenSpec)](docs/04%20Arquitectura/02%20Especificacion%20MFA%20y%20Sesiones%20V_1_0_0.md) |
-| — | [OpenSpec borrador](docs/04%20Arquitectura/specs/auth_mfa_borrador.openspec.yaml) |
-| — | [OpenSpec final auditado](docs/04%20Arquitectura/specs/auth_mfa_final.openspec.yaml) |
+| #   | Documento                                                                                                                |
+| :-- | :----------------------------------------------------------------------------------------------------------------------- |
+| 01  | [Arquitectura de software (modelo C4)](docs/04%20Arquitectura/01%20Modelo%20C4%20V_1_0_0.md)                             |
+| 02  | [Especificación MFA y sesiones (OpenSpec)](docs/04%20Arquitectura/02%20Especificacion%20MFA%20y%20Sesiones%20V_1_0_0.md) |
+| —   | [OpenSpec borrador](docs/04%20Arquitectura/specs/auth_mfa_borrador.openspec.yaml)                                        |
+| —   | [OpenSpec final auditado](docs/04%20Arquitectura/specs/auth_mfa_final.openspec.yaml)                                     |
 
 ### Fase de Evidencias (`docs/05 Evidencias/`)
 
-| Documento | Descripción |
-| :--- | :--- |
-| [Registro y Repositorio de Evidencias](docs/05%20Evidencias/README.md) | Inventario de pruebas automatizadas (66 pytest + 24 Vitest + 79 E2E), cobertura, auditoría hermética de API, smoke tests, evidencias de SonarQube y capturas de Playwright |
-| [Evidencias de Playwright — Sprint 4](docs/05%20Evidencias/playwright-sprint4/README.md) | Resultados JSON, métricas de rendimiento por navegador y siete capturas reales |
+| Documento                                                                                | Descripción                                                                                                                                                                |
+| :--------------------------------------------------------------------------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [Registro y Repositorio de Evidencias](docs/05%20Evidencias/README.md)                   | Inventario de pruebas automatizadas (66 pytest + 24 Vitest + 79 E2E), cobertura, auditoría hermética de API, smoke tests, evidencias de SonarQube y capturas de Playwright |
+| [Evidencias de Playwright — Sprint 4](docs/05%20Evidencias/playwright-sprint4/README.md) | Resultados JSON, métricas de rendimiento por navegador y siete capturas reales                                                                                             |
 
 ---
 
 ## Integrantes del Equipo
 
-| # | Apellidos y Nombres | Rol |
-| :--- | :--- | :--- |
-| 01 | Cosme Tenorio, Jhunior Harold | Líder del proyecto |
-| 02 | Flores Torres, Jhanpool Ernesto | Backend y arquitectura |
-| 03 | Tucto Ubaldo, Ricardo David | Frontend y UX/UI |
-| 04 | Vega Reyes, Andrew Steven | QA y DevOps |
+| #   | Apellidos y Nombres             | Rol                    |
+| :-- | :------------------------------ | :--------------------- |
+| 01  | Cosme Tenorio, Jhunior Harold   | Líder del proyecto     |
+| 02  | Flores Torres, Jhanpool Ernesto | Backend y arquitectura |
+| 03  | Tucto Ubaldo, Ricardo David     | Frontend y UX/UI       |
+| 04  | Vega Reyes, Andrew Steven       | QA y DevOps            |
 
 El detalle completo de cada integrante se registra en
 [`docs/01 Inicio/05. Registro de interesados`](docs/01%20Inicio/05%20Registro%20de%20interesados%20V_1_0_0.md).
@@ -739,12 +744,13 @@ Ingeniería de Sistemas e Informática.
 ## Enlaces
 
 - **Repositorio:** https://github.com/jhanpooldev/TP2-DistriRapido
+- **JIRA:** https://lewolfdx.atlassian.net/?continue=https%3A%2F%2Flewolfdx.atlassian.net%2Fwelcome%2Fsoftware%3FprojectId%3D10000&atlOrigin=eyJpIjoiODJlZWRjMmU1ZDE4NDk3M2E0Y2NkMDZiODcxYjBmNTYiLCJwIjoiamlyYS1zb2Z0d2FyZSJ9
 - **Documentación:** [`docs/`](docs/)
 - **Fase de Inicio:** [`docs/01 Inicio/`](docs/01%20Inicio/)
 - **Fase de Planificación:** [`docs/02 Planificación/`](docs/02%20Planificación/)
 - **Fase de Implementación:** [`docs/03 Implementación/`](docs/03%20Implementación/)
 - **Sprint 3:** [`docs/03 Implementación/Sprint 03/`](docs/03%20Implementación/Sprint%2003/)
-- **Sprint 4:** [`docs/03 Implementación/Sprint 4/`](docs/03%20Implementación/Sprint%204/)
+- **Sprint 4:** [`docs/03 Implementación/Sprint 04/`](docs/03%20Implementación/Sprint%2004/)
 - **Evidencias E2E del Sprint 4:** [`docs/05 Evidencias/playwright-sprint4/`](docs/05%20Evidencias/playwright-sprint4/)
 - **Fase de Arquitectura:** [`docs/04 Arquitectura/`](docs/04%20Arquitectura/)
 - **Fase de Evidencias:** [`docs/05 Evidencias/`](docs/05%20Evidencias/)
