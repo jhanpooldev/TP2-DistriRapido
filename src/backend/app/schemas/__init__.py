@@ -135,6 +135,26 @@ class RutaResponse(BaseModel):
     origen_direccion: Optional[str] = None
     puntos: List[PuntoRutaResponse] = Field(default_factory=list)
 
+class IndicadoresResponse(BaseModel):
+    """RF-013 / RN-020: resumen logístico del gerente."""
+    cantidad_rutas: int
+    distancia_total_km: float
+    emisiones_estimadas_kg: float
+    sin_datos: bool = False
+    mensaje: Optional[str] = None
+
+
+class IndicadoresSostenibilidadResponse(BaseModel):
+    """RF-012 / RN-019: emisiones, emisiones por entrega y ahorro de CO₂."""
+    emisiones_totales_kg: float
+    emisiones_por_entrega_kg: float
+    ahorro_co2_kg: float
+    ahorro_co2_pct: float
+    entregas: int
+    sin_datos: bool = False
+    mensaje: Optional[str] = None
+
+
 class ResumenRuta(BaseModel):
     id_ruta: uuid.UUID
     puntos: List[PuntoRutaResponse]

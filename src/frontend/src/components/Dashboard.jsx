@@ -9,6 +9,7 @@ const MapView = lazy(() => import('./MapView'))
 const MapPicker = lazy(() => import('./MapPicker'))
 const RutasTab = lazy(() => import('./RutasTab'))
 const ImpactoTab = lazy(() => import('./ImpactoTab'))
+const IndicadoresTab = lazy(() => import('./IndicadoresTab'))
 const SelectorPuntos = lazy(() => import('./SelectorPuntos'))
 
 const PUNTOS_POR_PAGINA = 12
@@ -26,6 +27,7 @@ const TABS = [
   { id: 'mapa', num: 3, label: 'Mapa' },
   { id: 'impacto', num: 4, label: 'Impacto' },
   { id: 'vehiculos', num: 5, label: 'Vehiculos' },
+  { id: 'indicadores', num: 6, label: 'Indicadores' },
 ]
 
 const MAX_PUNTOS = 20
@@ -716,6 +718,12 @@ export default function Dashboard({ user, onLogout }) {
             )
           })()}
         </div>
+      )}
+
+      {activeTab === 'indicadores' && (
+        <Suspense fallback={<CargandoPanel texto="Cargando indicadores..." />}>
+          <IndicadoresTab />
+        </Suspense>
       )}
 
       {activeTab === 'vehiculos' && (
