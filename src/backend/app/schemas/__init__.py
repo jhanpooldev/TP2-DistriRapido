@@ -14,7 +14,9 @@ class UsuarioCreate(BaseModel):
     nombre: str = Field(..., min_length=1, max_length=100)
     correo: EmailStr
     password: str = Field(..., min_length=6)
-    id_rol: int = Field(..., ge=1)
+    # RF-002: la ruta feliz permite omitir el rol; el endpoint resuelve
+    # "Operador Logístico" como valor por defecto contra la base de datos.
+    id_rol: Optional[int] = Field(None, ge=1)
 
 class RolResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
