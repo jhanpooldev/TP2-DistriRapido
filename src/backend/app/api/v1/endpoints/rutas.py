@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, Query, Response, status
 from sqlalchemy import func, inspect
 from sqlalchemy.orm import Session, joinedload, selectinload
-from datetime import datetime, time as time_type
+from datetime import datetime, time as time_type, timezone
 from typing import List, Optional
 import uuid
 
@@ -26,25 +26,30 @@ PAGE_SIZE_MAX = 100
 # RN-013: estados que implican entregas ya realizadas o en marcha.
 ESTADOS_CON_ENTREGAS = ("En curso", "Completada", "Cancelada")
 ESTADOS_ELIMINABLES = ("Confirmada", "Borrador")
+ESTADOS_EDITABLES = ESTADOS_ELIMINABLES
+
 
 def _parsear_fecha(valor: str, fin_del_dia: bool = False) -> Optional[datetime]:
-    """Acepta 'YYYY-MM-DD' o ISO completo.
+    """Acepta 'YYYY-MM-DD' o ISO completo y devuelve un datetime en UTC.
 
-    Devuelve None si el formato no es reconocido, para no aplicar un filtro
-    invalido en silencio.
+    Las columnas de fecha son TIMESTAMPTZ: compararlas contra fechas naive
+    depende del fuso horario del servidor y puede dejar fuera el ultimo dia
+    de un rango. Se devuelve None si el formato no es reconocido, para no
+    aplicar un filtro invalido en silencio.
     """
     texto = valor.strip()
+    fecha: Optional[datetime] = None
     try:
-        fecha = datetime.strptime(texto, "%Y-%m-%d")
-        return datetime.combine(fecha.date(), time_type.max) if fin_del_dia else fecha
+        solo_fecha = datetime.strptime(texto, "%Y-%m-%d")
+        fecha = datetime.combine(solo_fecha.date(), time_type.max if fin_del_dia else time_type.min)
     except ValueError:
-        pass
-    for formato in ("%Y-%m-%dT%H:%M:%S", "%Y-%m-%dT%H:%M:%S.%f"):
         try:
-            return datetime.strptime(texto, formato)
+            fecha = datetime.fromisoformat(texto.replace("Z", "+00:00"))
         except ValueError:
-            continue
-    return None
+            return None
+    if fecha.tzinfo is None:
+        return fecha.replace(tzinfo=timezone.utc)
+    return fecha.astimezone(timezone.utc)
 
 def get_puntos_entrega(db: Session, punto_ids: List[uuid.UUID], operador_id: uuid.UUID) -> List:
     return db.query(PuntoEntrega).filter(
@@ -81,6 +86,25 @@ def _validar_capacidad(puntos: List[PuntoEntregaResponse], vehiculo) -> None:
                 f"vehiculo ({capacidad:.1f} kg). Quita puntos o elige otro vehiculo."
             ),
         )
+
+def _validar_puntos_disponibles(
+    db: Session, punto_ids: List[uuid.UUID], excluir_ruta_id: Optional[uuid.UUID] = None
+) -> None:
+    """RN-009: ningun punto de una ruta guardada puede reutilizarse."""
+    consulta = db.query(RutaPunto.id_punto)
+    if excluir_ruta_id is not None:
+        consulta = consulta.filter(RutaPunto.id_ruta != excluir_ruta_id)
+    ids_asignados = {fila[0] for fila in consulta.all()}
+    puntos_en_uso = [pid for pid in dict.fromkeys(punto_ids) if pid in ids_asignados]
+    if puntos_en_uso:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=(
+                f"{len(puntos_en_uso)} punto(s) ya pertenecen a otra ruta guardada "
+                "y no pueden reasignarse."
+            ),
+        )
+
 
 def _puntos_en_orden_de_ingreso(
     puntos_db: List, punto_ids: List[uuid.UUID]
@@ -130,6 +154,8 @@ def optimizar_ruta(request: RutaOptimizarRequest, db: Session = Depends(get_db),
 
 @router.post("", response_model=RutaResponse, status_code=status.HTTP_201_CREATED)
 def confirmar_ruta(request: RutaOptimizarRequest, db: Session = Depends(get_db), operador = Depends(get_current_operador)):
+    # RN-009: un punto confirmado en otra ruta no puede volver a asignarse.
+    _validar_puntos_disponibles(db, request.punto_ids)
     response, opt_route = _calcular_ruta(db, request, operador)
     persist_ruta(db, response, opt_route)
     return response
@@ -225,6 +251,16 @@ def editar_ruta(
     if ruta.id_operador != operador.id_usuario:
         raise HTTPException(status_code=403, detail="No autorizado")
 
+    # RN-013: una ruta con entregas en curso, completadas o canceladas no se edita.
+    if ruta.estado not in ESTADOS_EDITABLES:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=(
+                f"RN-013: no se puede editar una ruta en estado '{ruta.estado}'. "
+                "Solo se editan rutas en borrador o confirmadas."
+            ),
+        )
+
     _validar_cantidad_puntos(request.punto_ids)
 
     puntos_db = get_puntos_entrega(db, request.punto_ids, operador.id_usuario)
@@ -234,23 +270,8 @@ def editar_ruta(
             detail="Alguno de los puntos seleccionados no existe o no te pertenece",
         )
 
-    # RN-009: un punto que ya pertenece a otra ruta confirmada no se puede reutilizar.
-    ya_asignados = (
-        db.query(RutaPunto.id_punto)
-        .join(Ruta, Ruta.id_ruta == RutaPunto.id_ruta)
-        .filter(Ruta.id_operador == operador.id_usuario, Ruta.id_ruta != ruta_id)
-        .all()
-    )
-    ids_asignados = {row[0] for row in ya_asignados}
-    puntos_en_uso = [p for p in request.punto_ids if p in ids_asignados]
-    if puntos_en_uso:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=(
-                f"{len(puntos_en_uso)} punto(s) ya pertenecen a otra ruta guardada "
-                "y no pueden reasignarse."
-            ),
-        )
+    # RN-009: un punto que ya pertenece a otra ruta guardada no se reutiliza.
+    _validar_puntos_disponibles(db, request.punto_ids, excluir_ruta_id=ruta_id)
 
     vehiculo = db.query(ParametrosVehiculo).filter(ParametrosVehiculo.id_vehiculo == request.id_vehiculo).first()
     if not vehiculo:
@@ -337,6 +358,7 @@ def list_rutas(
 
     total = query.order_by(None).count()
     offset = skip if skip is not None else (page - 1) * limit
+    pagina_efectiva = offset // limit + 1
     pages = (total + limit - 1) // limit
 
     rutas = (
@@ -349,7 +371,7 @@ def list_rutas(
 
     response.headers["X-Total-Count"] = str(total)
     response.headers["X-Total-Pages"] = str(pages)
-    response.headers["X-Page"] = str(page)
+    response.headers["X-Page"] = str(pagina_efectiva)
     response.headers["X-Page-Size"] = str(limit)
 
     return [_ruta_to_response(db, r) for r in rutas]

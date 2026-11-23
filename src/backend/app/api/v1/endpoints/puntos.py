@@ -47,6 +47,7 @@ def list_puntos(
     filtro = PuntoEntrega.id_operador == operador.id_usuario
     total = db.query(func.count(PuntoEntrega.id_punto)).filter(filtro).scalar() or 0
     offset = skip if skip is not None else (page - 1) * limit
+    pagina_efectiva = offset // limit + 1
 
     puntos = (
         db.query(PuntoEntrega)
@@ -60,7 +61,7 @@ def list_puntos(
     return {
         "puntos": puntos,
         "total": total,
-        "page": page,
+        "page": pagina_efectiva,
         "limit": limit,
         "pages": (total + limit - 1) // limit,
     }

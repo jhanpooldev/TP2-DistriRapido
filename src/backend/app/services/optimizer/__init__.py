@@ -157,7 +157,9 @@ def build_route_response(
         ahorro_distancia_pct=ahorro["ahorro_distancia_pct"],
         sin_reduccion_significativa=ahorro["sin_reduccion_significativa"],
         estado="Confirmada",
-        fecha_generacion=datetime.now(timezone.utc).replace(tzinfo=None),
+        # TIMESTAMPTZ: conservar el UTC explicito evita desplazamientos al
+        # persistir y al filtrar por fecha en US-007.
+        fecha_generacion=datetime.now(timezone.utc),
         origen_lat=settings.HOME_LAT,
         origen_lng=settings.HOME_LNG,
         origen_direccion=settings.HOME_ADDRESS,
