@@ -62,6 +62,13 @@ export default function Dashboard({ user, onLogout }) {
   const [creandoVehiculo, setCreandoVehiculo] = useState(false)
   const [geoLoading, setGeoLoading] = useState(false)
   const [exportando, setExportando] = useState(false)
+  const [creandoPunto, setCreandoPunto] = useState(false)
+  const [puntoEditando, setPuntoEditando] = useState(null)
+  const [formEdicionPunto, setFormEdicionPunto] = useState(null)
+  const [guardandoEdicionPunto, setGuardandoEdicionPunto] = useState(false)
+  const [eliminandoPunto, setEliminandoPunto] = useState(null)
+  const [procesandoRuta, setProcesandoRuta] = useState(false)
+  const [cerrandoSesion, setCerrandoSesion] = useState(false)
   const tabsRef = useRef([])
   const esAdmin = user?.id_rol === 1 || user?.rol?.nombre === 'Administrador'
 
@@ -189,6 +196,8 @@ export default function Dashboard({ user, onLogout }) {
 
   const crearPunto = async (e) => {
     e.preventDefault()
+    if (creandoPunto) return
+    setCreandoPunto(true)
     try {
       await api.post('/puntos-entrega', puntoForm)
       setPuntoForm({ direccion: '', latitud: '', longitud: '', peso_kg: '', destinatario: '' })
@@ -196,6 +205,73 @@ export default function Dashboard({ user, onLogout }) {
       await fetchPuntos(1)
       mostrar('ok', 'Pedido registrado. Ya aparece en la pestaña Rutas para armar la ruta.')
     } catch (err) { mostrar('error', extraerError(err)) }
+    finally { setCreandoPunto(false) }
+  }
+
+  const iniciarEdicionPunto = (punto) => {
+    setPuntoEditando(punto.id_punto)
+    setFormEdicionPunto({
+      direccion: punto.direccion,
+      latitud: String(punto.latitud),
+      longitud: String(punto.longitud),
+      peso_kg: String(punto.peso_kg),
+      destinatario: punto.destinatario,
+    })
+  }
+
+  const cancelarEdicionPunto = () => {
+    setPuntoEditando(null)
+    setFormEdicionPunto(null)
+  }
+
+  const guardarEdicionPunto = async (e) => {
+    e.preventDefault()
+    if (!puntoEditando || guardandoEdicionPunto) return
+    setGuardandoEdicionPunto(true)
+    try {
+      await api.put(`/puntos-entrega/${puntoEditando}`, formEdicionPunto)
+      cancelarEdicionPunto()
+      setPuntosTodosCargados(false)
+      await fetchPuntos(paginaPuntos)
+      mostrar('ok', 'Pedido actualizado.')
+    } catch (err) { mostrar('error', extraerError(err)) }
+    finally { setGuardandoEdicionPunto(false) }
+  }
+
+  const eliminarPunto = async (punto) => {
+    if (eliminandoPunto) return
+    const confirmado = typeof window === 'undefined' || window.confirm(
+      `¿Eliminar el pedido para ${punto.destinatario || punto.direccion}?`
+    )
+    if (!confirmado) return
+
+    setEliminandoPunto(punto.id_punto)
+    try {
+      await api.delete(`/puntos-entrega/${punto.id_punto}`)
+      if (puntoEditando === punto.id_punto) cancelarEdicionPunto()
+      setOptimizeForm(prev => ({
+        ...prev,
+        punto_ids: prev.punto_ids.filter(id => id !== punto.id_punto),
+      }))
+      setPuntosTodosCargados(false)
+      await fetchPuntos(paginaPuntos)
+      mostrar('ok', 'Pedido eliminado de la lista de planificación.')
+    } catch (err) { mostrar('error', extraerError(err)) }
+    finally { setEliminandoPunto(null) }
+  }
+
+  const cerrarSesion = async () => {
+    if (cerrandoSesion) return
+    setCerrandoSesion(true)
+    try {
+      // RF-014: se revoca el token en el backend antes de borrarlo del navegador.
+      await api.post('/auth/logout')
+    } catch (err) {
+      // Incluso si el backend no responde, la sesión local debe cerrarse.
+    } finally {
+      setCerrandoSesion(false)
+      onLogout()
+    }
   }
 
   const handlePickLocation = async (lat, lng, direccionSugerida) => {
@@ -228,6 +304,8 @@ export default function Dashboard({ user, onLogout }) {
 
   const optimizeRuta = async (e) => {
     e.preventDefault()
+    if (procesandoRuta) return
+    setProcesandoRuta(true)
     try {
       const r = await api.post('/rutas/optimizar', optimizeForm)
       setPreviewRoute(r.data)
@@ -235,10 +313,13 @@ export default function Dashboard({ user, onLogout }) {
       mostrar('ok', 'Ruta optimizada. Revisa el resultado en la pestaña Mapa.')
       setActiveTab('mapa')
     } catch (err) { mostrar('error', extraerError(err)) }
+    finally { setProcesandoRuta(false) }
   }
 
   const confirmRuta = async (e) => {
     e.preventDefault()
+    if (procesandoRuta) return
+    setProcesandoRuta(true)
     try {
       const r = await api.post('/rutas', optimizeForm)
       mostrar('ok', 'Ruta confirmada y guardada.')
@@ -247,6 +328,7 @@ export default function Dashboard({ user, onLogout }) {
       setSelectedRoute(r.data)
       setActiveTab('mapa')
     } catch (err) { mostrar('error', extraerError(err)) }
+    finally { setProcesandoRuta(false) }
   }
 
   const verEnMapa = (ruta) => {
@@ -311,7 +393,14 @@ export default function Dashboard({ user, onLogout }) {
         </div>
         <div className="app-usuario">
           <span>{user?.nombre}</span>
-          <button type="button" className="btn-secondary btn-sm" onClick={onLogout}>Salir</button>
+          <button
+            type="button"
+            className="btn-secondary btn-sm"
+            onClick={cerrarSesion}
+            disabled={cerrandoSesion}
+          >
+            {cerrandoSesion ? 'Saliendo...' : 'Salir'}
+          </button>
         </div>
       </header>
 
@@ -458,7 +547,9 @@ export default function Dashboard({ user, onLogout }) {
                 />
               </div>
             </div>
-            <button type="submit" className="sep">Registrar pedido</button>
+            <button type="submit" className="sep" disabled={creandoPunto}>
+              {creandoPunto ? 'Registrando...' : 'Registrar pedido'}
+            </button>
           </form>
 
           <div className="seccion-titulo">
@@ -479,17 +570,111 @@ export default function Dashboard({ user, onLogout }) {
                     <th scope="col" className="num">Lat</th>
                     <th scope="col" className="num">Lng</th>
                     <th scope="col" className="num">Peso (kg)</th>
+                    <th scope="col">Acciones</th>
                   </tr>
                 </thead>
                 <tbody>
                   {puntos.map(p => (
-                    <tr key={p.id_punto}>
-                      <td><strong>{p.destinatario}</strong></td>
-                      <td>{p.direccion}</td>
-                      <td className="num">{p.latitud}</td>
-                      <td className="num">{p.longitud}</td>
-                      <td className="num">{p.peso_kg}</td>
-                    </tr>
+                    <React.Fragment key={p.id_punto}>
+                      <tr>
+                        <td><strong>{p.destinatario}</strong></td>
+                        <td>{p.direccion}</td>
+                        <td className="num">{p.latitud}</td>
+                        <td className="num">{p.longitud}</td>
+                        <td className="num">{p.peso_kg}</td>
+                        <td>
+                          <div className="btn-grupo">
+                            <button
+                              type="button"
+                              className="btn-secondary btn-sm"
+                              onClick={() => iniciarEdicionPunto(p)}
+                            >
+                              Editar
+                            </button>
+                            <button
+                              type="button"
+                              className="btn-ghost btn-sm"
+                              onClick={() => eliminarPunto(p)}
+                              disabled={eliminandoPunto === p.id_punto}
+                              aria-label={`Eliminar pedido de ${p.destinatario || p.direccion}`}
+                            >
+                              {eliminandoPunto === p.id_punto ? 'Eliminando...' : 'Eliminar'}
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                      {puntoEditando === p.id_punto && formEdicionPunto && (
+                        <tr>
+                          <td colSpan={6}>
+                            <form onSubmit={guardarEdicionPunto} className="card">
+                              <h3>Editar pedido</h3>
+                              <div className="grid">
+                                <div className="form-group">
+                                  <label htmlFor={`editar-direccion-${p.id_punto}`}>Direccion</label>
+                                  <input
+                                    id={`editar-direccion-${p.id_punto}`}
+                                    value={formEdicionPunto.direccion}
+                                    onChange={e => setFormEdicionPunto({ ...formEdicionPunto, direccion: e.target.value })}
+                                    required
+                                  />
+                                </div>
+                                <div className="form-group">
+                                  <label htmlFor={`editar-latitud-${p.id_punto}`}>Latitud</label>
+                                  <input
+                                    id={`editar-latitud-${p.id_punto}`}
+                                    type="number"
+                                    step="any"
+                                    value={formEdicionPunto.latitud}
+                                    onChange={e => setFormEdicionPunto({ ...formEdicionPunto, latitud: e.target.value })}
+                                    required
+                                  />
+                                </div>
+                                <div className="form-group">
+                                  <label htmlFor={`editar-longitud-${p.id_punto}`}>Longitud</label>
+                                  <input
+                                    id={`editar-longitud-${p.id_punto}`}
+                                    type="number"
+                                    step="any"
+                                    value={formEdicionPunto.longitud}
+                                    onChange={e => setFormEdicionPunto({ ...formEdicionPunto, longitud: e.target.value })}
+                                    required
+                                  />
+                                </div>
+                                <div className="form-group">
+                                  <label htmlFor={`editar-peso-${p.id_punto}`}>Peso (kg)</label>
+                                  <input
+                                    id={`editar-peso-${p.id_punto}`}
+                                    type="number"
+                                    step="0.1"
+                                    min="0.1"
+                                    value={formEdicionPunto.peso_kg}
+                                    onChange={e => setFormEdicionPunto({ ...formEdicionPunto, peso_kg: e.target.value })}
+                                    required
+                                  />
+                                </div>
+                                <div className="form-group">
+                                  <label htmlFor={`editar-destinatario-${p.id_punto}`}>Destinatario</label>
+                                  <input
+                                    id={`editar-destinatario-${p.id_punto}`}
+                                    value={formEdicionPunto.destinatario}
+                                    onChange={e => setFormEdicionPunto({ ...formEdicionPunto, destinatario: e.target.value })}
+                                    required
+                                  />
+                                </div>
+                              </div>
+                              <div className="btn-grupo sep">
+                                <button type="submit" disabled={guardandoEdicionPunto}>
+                                  {guardandoEdicionPunto ? 'Guardando...' : 'Guardar cambios'}
+                                </button>
+                                <button type="button" className="btn-secondary" onClick={cancelarEdicionPunto}>
+                                  Cancelar
+                                </button>
+                              </div>
+                            </form>
+                          </td>
+                        </tr>
+                      )}
+                    </React.Fragment>
                   ))}
                 </tbody>
               </table>
@@ -556,10 +741,19 @@ export default function Dashboard({ user, onLogout }) {
             <p className={excedeCapacidad ? 'texto-error' : 'texto-suave'}>{mensajeDeValidacion()}</p>
 
             <div className="btn-grupo sep">
-              <button type="button" onClick={optimizeRuta} disabled={!puedeCalcular}>
-                Optimizar (simular)
+              <button
+                type="button"
+                onClick={optimizeRuta}
+                disabled={!puedeCalcular || procesandoRuta}
+              >
+                {procesandoRuta ? 'Procesando...' : 'Optimizar (simular)'}
               </button>
-              <button type="button" className="btn-secondary" onClick={confirmRuta} disabled={!puedeCalcular}>
+              <button
+                type="button"
+                className="btn-secondary"
+                onClick={confirmRuta}
+                disabled={!puedeCalcular || procesandoRuta}
+              >
                 Confirmar y guardar
               </button>
             </div>

@@ -28,6 +28,9 @@ class _Query:
     def filter(self, *_args):
         return self
 
+    def join(self, *_args):
+        return self
+
     def options(self, *_args):
         return self
 

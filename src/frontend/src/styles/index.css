@@ -590,3 +590,16 @@ select[multiple] option { padding: 6px 8px; border-radius: 5px; }
 .mensaje-inline.error { color: var(--error); }
 .mensaje-inline.ok { color: var(--ok); }
 .mensaje-inline.info { color: var(--acento); }
+
+/* --- accesibilidad: movimiento reducido ---------------------------------- */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
+}

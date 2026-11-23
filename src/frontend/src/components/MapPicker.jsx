@@ -150,6 +150,7 @@ export default function MapPicker({ latitud, longitud, onPick }) {
     }
 
     setMensaje({ tipo: 'info', texto: 'Obteniendo tu ubicacion...' })
+    setGeoError(false)
 
     navigator.geolocation.getCurrentPosition(
       pos => {
@@ -159,6 +160,7 @@ export default function MapPicker({ latitud, longitud, onPick }) {
         setMensaje({ tipo: 'ok', texto: 'Ubicacion detectada. Ajusta el marcador si es necesario.' })
       },
       () => {
+        setGeoError(true)
         setMensaje({ tipo: 'error', texto: 'No se pudo obtener tu ubicacion. Permite el acceso o marca el punto en el mapa.' })
       },
       { enableHighAccuracy: true, timeout: 15000 }

@@ -90,8 +90,12 @@ def _validar_capacidad(puntos: List[PuntoEntregaResponse], vehiculo) -> None:
 def _validar_puntos_disponibles(
     db: Session, punto_ids: List[uuid.UUID], excluir_ruta_id: Optional[uuid.UUID] = None
 ) -> None:
-    """RN-009: ningun punto de una ruta guardada puede reutilizarse."""
-    consulta = db.query(RutaPunto.id_punto)
+    """RN-009: ningun punto de una ruta confirmada puede reutilizarse."""
+    consulta = (
+        db.query(RutaPunto.id_punto)
+        .join(Ruta, Ruta.id_ruta == RutaPunto.id_ruta)
+        .filter(func.lower(Ruta.estado).in_(("confirmada", "en curso", "completada")))
+    )
     if excluir_ruta_id is not None:
         consulta = consulta.filter(RutaPunto.id_ruta != excluir_ruta_id)
     ids_asignados = {fila[0] for fila in consulta.all()}

@@ -11,8 +11,9 @@ function App() {
   const [user, setUser] = useState(null)
   const [cargando, setCargando] = useState(Boolean(localStorage.getItem('token')))
   const [error, setError] = useState('')
+  const [avisoSesion, setAvisoSesion] = useState('')
 
-  const logout = useCallback(() => {
+  const logout = useCallback((motivo = '') => {
     // Evita que el siguiente usuario vea respuestas cacheadas de la sesion anterior.
     limpiarCache()
     localStorage.removeItem('token')
@@ -20,6 +21,7 @@ function App() {
     setUser(null)
     setCargando(false)
     setError('')
+    setAvisoSesion(typeof motivo === 'string' ? motivo : '')
   }, [])
 
   const fetchMe = useCallback(async () => {
@@ -32,7 +34,7 @@ function App() {
       // Solo se cierra la sesion si el token es invalido o vencido. Si el
       // backend esta caido se conserva el token para poder reintentar.
       if (e?.response?.status === 401) {
-        logout()
+        logout('Su sesión expiró. Vuelva a iniciar sesión.')
       } else {
         setUser(null)
         setError(extraerError(e, 'No se pudo validar la sesión'))
@@ -46,12 +48,19 @@ function App() {
     if (token) fetchMe()
   }, [token, fetchMe])
 
+  useEffect(() => {
+    const sesionExpirada = (evento) => logout(evento.detail || 'Su sesión ha terminado.')
+    window.addEventListener('auth:expired', sesionExpirada)
+    return () => window.removeEventListener('auth:expired', sesionExpirada)
+  }, [logout])
+
   const login = (newToken) => {
+    setAvisoSesion('')
     localStorage.setItem('token', newToken)
     setToken(newToken)
   }
 
-  if (!token) return <Login onLogin={login} />
+  if (!token) return <Login onLogin={login} aviso={avisoSesion} />
 
   if (cargando) {
     return (

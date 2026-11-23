@@ -4,7 +4,7 @@ import { exportarResumenRuta } from '../logica/exportar'
 import Paginacion from './Paginacion'
 import SelectorPuntos from './SelectorPuntos'
 
-const ESTADOS = ['Confirmada', 'Borrador', 'En curso', 'Completada']
+const ESTADOS = ['Confirmada', 'Borrador', 'En curso', 'Completada', 'Cancelada']
 const RUTAS_POR_PAGINA = 12
 
 export default function RutasTab({

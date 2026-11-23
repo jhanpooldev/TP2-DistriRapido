@@ -5,7 +5,7 @@ from typing import Optional
 import uuid
 
 from app.core.database import get_db
-from app.models import PuntoEntrega, RutaPunto
+from app.models import PuntoEntrega, Ruta, RutaPunto
 from app.schemas import PuntoEntregaCreate, PuntoEntregaResponse, PuntoEntregaList
 from app.api.v1.endpoints.dependencies import get_current_operador
 
@@ -15,6 +15,12 @@ router = APIRouter()
 # tabla y anule el beneficio de la paginacion.
 PAGE_SIZE_DEFAULT = 12
 PAGE_SIZE_MAX = 100
+
+# RN-009 / RF-005: solo bloquean los puntos de rutas confirmadas (o cuyas
+# entregas ya estan en curso/completadas). Un borrador no protege el punto.
+ESTADOS_PROTEGEN_PUNTO = ("confirmada", "en curso", "completada")
+MENSAJE_EDITAR_PROTEGIDO = "No se puede modificar un punto incluido en una ruta confirmada"
+MENSAJE_ELIMINAR_PROTEGIDO = "No se puede eliminar un punto incluido en una ruta confirmada"
 
 @router.post("", response_model=PuntoEntregaResponse, status_code=status.HTTP_201_CREATED)
 def create_punto(punto: PuntoEntregaCreate, db: Session = Depends(get_db), operador = Depends(get_current_operador)):
@@ -83,7 +89,7 @@ def update_punto(
     db: Session = Depends(get_db),
     operador = Depends(get_current_operador),
 ):
-    """RN-009: un punto que ya pertenece a una ruta guardada no se modifica."""
+    """RN-009: un punto incluido en una ruta confirmada no se modifica."""
     db_punto = db.query(PuntoEntrega).filter(
         PuntoEntrega.id_punto == punto_id,
         PuntoEntrega.id_operador == operador.id_usuario
@@ -91,11 +97,10 @@ def update_punto(
     if not db_punto:
         raise HTTPException(status_code=404, detail="Punto no encontrado")
 
-    if _esta_en_alguna_ruta(db, db_punto.id_punto):
+    if _esta_en_ruta_confirmada(db, db_punto.id_punto):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="El punto ya pertenece a una ruta guardada y no puede modificarse. "
-                   "Edita la ruta desde la pestana Rutas.",
+            detail=MENSAJE_EDITAR_PROTEGIDO,
         )
 
     db_punto.direccion = punto.direccion
@@ -118,15 +123,24 @@ def delete_punto(punto_id: uuid.UUID, db: Session = Depends(get_db), operador = 
 
     # Sin esta comprobacion el borrado dejaba filas en ruta_puntos apuntando a un
     # punto inexistente, lo que rompia la lectura de la ruta con un error 500.
-    if _esta_en_alguna_ruta(db, punto.id_punto):
+    if _esta_en_ruta_confirmada(db, punto.id_punto):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="El punto pertenece a una ruta guardada. Elimina la ruta primero "
-                   "o quitale el punto desde la edicion de la ruta.",
+            detail=MENSAJE_ELIMINAR_PROTEGIDO,
         )
 
     db.delete(punto)
     db.commit()
 
-def _esta_en_alguna_ruta(db: Session, punto_id) -> bool:
-    return db.query(RutaPunto.id_ruta).filter(RutaPunto.id_punto == punto_id).first() is not None
+def _esta_en_ruta_confirmada(db: Session, punto_id) -> bool:
+    """RN-009: ¿pertenece el punto a una ruta confirmada o en entregas?"""
+    return (
+        db.query(RutaPunto.id_ruta)
+        .join(Ruta, Ruta.id_ruta == RutaPunto.id_ruta)
+        .filter(
+            RutaPunto.id_punto == punto_id,
+            func.lower(Ruta.estado).in_(ESTADOS_PROTEGEN_PUNTO),
+        )
+        .first()
+        is not None
+    )

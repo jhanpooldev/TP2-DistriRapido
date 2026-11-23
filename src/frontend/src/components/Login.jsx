@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import api, { extraerError } from '../api/client'
 
-export default function Login({ onLogin }) {
+export default function Login({ onLogin, aviso = '' }) {
   const [correo, setCorreo] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
@@ -44,6 +44,7 @@ export default function Login({ onLogin }) {
           </ul>
         </div>
 
+        {aviso && <div className="alert alert-info" role="status">{aviso}</div>}
         {error && <div className="alert alert-error" role="alert" aria-live="assertive">{error}</div>}
 
         <form onSubmit={handleSubmit}>

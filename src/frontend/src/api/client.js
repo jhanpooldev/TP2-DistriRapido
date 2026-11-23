@@ -1,6 +1,12 @@
 import axios from 'axios'
 
-const api = axios.create({ baseURL: '/api/v1', timeout: 30000 })
+// La documentación define VITE_API_URL; el valor por defecto mantiene el
+// comportamiento actual cuando la app se sirve detrás del mismo proxy /api/v1.
+const BASE_URL = (import.meta.env.VITE_API_URL || '/api/v1').replace(/\/$/, '')
+
+export const API_BASE_URL = BASE_URL
+
+const api = axios.create({ baseURL: BASE_URL, timeout: 30000 })
 
 // Cache TTL en memoria para GET. Evita repetir la misma consulta al cambiar
 // de pestaña o al re-renderizar, y se invalida en cuanto hay una mutacion.
@@ -66,13 +72,35 @@ api.interceptors.request.use((config) => {
   return config
 })
 
-api.interceptors.response.use((respuesta) => {
-  const metodo = (respuesta.config?.method || 'get').toLowerCase()
-  // Cualquier escritura invalida la cache: la siguiente lectura debe ver el
-  // cambio recien guardado, no una copia de hasta 60 segundos atras.
-  if (metodo !== 'get') limpiarCache()
-  return respuesta
-})
+api.interceptors.response.use(
+  (respuesta) => {
+    const metodo = (respuesta.config?.method || 'get').toLowerCase()
+    // Cualquier escritura invalida la cache: la siguiente lectura debe ver el
+    // cambio recien guardado, no una copia de hasta 60 segundos atras.
+    if (metodo !== 'get') limpiarCache()
+    return respuesta
+  },
+  (error) => {
+    if (error?.response?.status === 401) {
+      // Un 401 en cualquier petición autenticada invalida la sesión en todo el
+      // panel, no solo en la pestaña que hizo la llamada. Login y /me gestionan
+      // sus propios mensajes, por lo que no emiten el evento aquí.
+      limpiarCache()
+      localStorage.removeItem('token')
+      const url = error.config?.url || ''
+      const esValidacion =
+        url.includes('/auth/login') || url.includes('/auth/me') || url.includes('/auth/logout')
+      if (!esValidacion && typeof window !== 'undefined' && window.CustomEvent) {
+        window.dispatchEvent(
+          new window.CustomEvent('auth:expired', {
+            detail: 'Su sesión expiró. Vuelva a iniciar sesión.',
+          })
+        )
+      }
+    }
+    return Promise.reject(error)
+  }
+)
 
 export function extraerError(error, porDefecto = 'Ocurrio un error inesperado') {
   const detail = error?.response?.data?.detail
