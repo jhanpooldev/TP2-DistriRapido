@@ -70,21 +70,27 @@ export default function Dashboard({ user, onLogout }) {
   const [procesandoRuta, setProcesandoRuta] = useState(false)
   const [cerrandoSesion, setCerrandoSesion] = useState(false)
   const tabsRef = useRef([])
-  const esAdmin = user?.id_rol === 1 || user?.rol?.nombre === 'Administrador'
+  const rol = user?.rol?.nombre || ''
+  const esAdmin = user?.id_rol === 1 || rol === 'Administrador'
+  const esGerente = rol === 'Gerente'
+  const puedeGestionar = !esGerente
+  // La matriz de permisos da al Gerente acceso de solo lectura a pedidos y
+  // rutas; "Vehículos" es configuración exclusiva del administrador.
+  const tabsVisibles = esGerente ? TABS.filter(t => t.id !== 'vehiculos') : TABS
 
   const mostrar = (tipo, texto) => setMensaje(texto ? { tipo, texto } : null)
   const cerrarMensaje = () => setMensaje(null)
 
   const manejarTecladoTab = (evento, indice) => {
     let destino = null
-    if (evento.key === 'ArrowRight') destino = (indice + 1) % TABS.length
-    else if (evento.key === 'ArrowLeft') destino = (indice - 1 + TABS.length) % TABS.length
+    if (evento.key === 'ArrowRight') destino = (indice + 1) % tabsVisibles.length
+    else if (evento.key === 'ArrowLeft') destino = (indice - 1 + tabsVisibles.length) % tabsVisibles.length
     else if (evento.key === 'Home') destino = 0
-    else if (evento.key === 'End') destino = TABS.length - 1
+    else if (evento.key === 'End') destino = tabsVisibles.length - 1
 
     if (destino === null) return
     evento.preventDefault()
-    setActiveTab(TABS[destino].id)
+    setActiveTab(tabsVisibles[destino].id)
     tabsRef.current[destino]?.focus()
   }
 
@@ -417,7 +423,7 @@ export default function Dashboard({ user, onLogout }) {
       )}
 
       <div className="nav-tabs" role="tablist" aria-label="Secciones del panel">
-        {TABS.map((t, indice) => (
+        {tabsVisibles.map((t, indice) => (
           <button
             key={t.id}
             ref={elemento => { tabsRef.current[indice] = elemento }}
@@ -473,6 +479,8 @@ export default function Dashboard({ user, onLogout }) {
             </div>
           </div>
 
+          {puedeGestionar && (
+          <>
           <div className="seccion-titulo">
             <h2>Registrar pedido de entrega</h2>
             <p>Marca la ubicacion en el mapa y los campos se completan solos.</p>
@@ -551,6 +559,14 @@ export default function Dashboard({ user, onLogout }) {
               {creandoPunto ? 'Registrando...' : 'Registrar pedido'}
             </button>
           </form>
+          </>
+          )}
+
+          {esGerente && (
+            <p className="alert alert-info" role="status">
+              Tu rol tiene acceso de solo lectura a pedidos y rutas.
+            </p>
+          )}
 
           <div className="seccion-titulo">
             <h2>Pedidos registrados</h2>
@@ -570,7 +586,7 @@ export default function Dashboard({ user, onLogout }) {
                     <th scope="col" className="num">Lat</th>
                     <th scope="col" className="num">Lng</th>
                     <th scope="col" className="num">Peso (kg)</th>
-                    <th scope="col">Acciones</th>
+                    {puedeGestionar && <th scope="col">Acciones</th>}
                   </tr>
                 </thead>
                 <tbody>
@@ -582,26 +598,28 @@ export default function Dashboard({ user, onLogout }) {
                         <td className="num">{p.latitud}</td>
                         <td className="num">{p.longitud}</td>
                         <td className="num">{p.peso_kg}</td>
-                        <td>
-                          <div className="btn-grupo">
-                            <button
-                              type="button"
-                              className="btn-secondary btn-sm"
-                              onClick={() => iniciarEdicionPunto(p)}
-                            >
-                              Editar
-                            </button>
-                            <button
-                              type="button"
-                              className="btn-ghost btn-sm"
-                              onClick={() => eliminarPunto(p)}
-                              disabled={eliminandoPunto === p.id_punto}
-                              aria-label={`Eliminar pedido de ${p.destinatario || p.direccion}`}
-                            >
-                              {eliminandoPunto === p.id_punto ? 'Eliminando...' : 'Eliminar'}
-                            </button>
-                          </div>
-                        </td>
+                        {puedeGestionar && (
+                          <td>
+                            <div className="btn-grupo">
+                              <button
+                                type="button"
+                                className="btn-secondary btn-sm"
+                                onClick={() => iniciarEdicionPunto(p)}
+                              >
+                                Editar
+                              </button>
+                              <button
+                                type="button"
+                                className="btn-ghost btn-sm"
+                                onClick={() => eliminarPunto(p)}
+                                disabled={eliminandoPunto === p.id_punto}
+                                aria-label={`Eliminar pedido de ${p.destinatario || p.direccion}`}
+                              >
+                                {eliminandoPunto === p.id_punto ? 'Eliminando...' : 'Eliminar'}
+                              </button>
+                            </div>
+                          </td>
+                        )}
                       </tr>
                       {puntoEditando === p.id_punto && formEdicionPunto && (
                         <tr>
@@ -693,6 +711,8 @@ export default function Dashboard({ user, onLogout }) {
 
       {activeTab === 'rutas' && (
         <div>
+          {puedeGestionar && (
+          <>
           <div className="seccion-titulo">
             <h2>Armar una ruta</h2>
             <p>
@@ -758,6 +778,14 @@ export default function Dashboard({ user, onLogout }) {
               </button>
             </div>
           </form>
+          </>
+          )}
+
+          {esGerente && (
+            <p className="alert alert-info" role="status">
+              Como Gerente puedes consultar el historial y los indicadores, pero no generar ni confirmar rutas.
+            </p>
+          )}
 
           <Suspense fallback={<CargandoPanel texto="Cargando rutas guardadas..." />}>
             <RutasTab
@@ -769,6 +797,7 @@ export default function Dashboard({ user, onLogout }) {
               onVerMapa={verEnMapa}
               onCambiado={actualizarRutas}
               onMensaje={(m) => mostrar(m.tipo, m.texto)}
+              soloLectura={esGerente}
             />
           </Suspense>
         </div>

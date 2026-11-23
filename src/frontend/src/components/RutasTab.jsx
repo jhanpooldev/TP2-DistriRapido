@@ -16,6 +16,7 @@ export default function RutasTab({
   onVerMapa,
   onCambiado,
   onMensaje,
+  soloLectura = false,
 }) {
   const [filtros, setFiltros] = useState({ desde: '', hasta: '', estado: '' })
   const [filtrosAplicados, setFiltrosAplicados] = useState({})
@@ -149,10 +150,14 @@ export default function RutasTab({
     <div>
       <div className="seccion-titulo">
         <h2>Rutas guardadas</h2>
-        <p>Busca por fecha o estado, o vuelve a editar una ruta ya creada.</p>
+        <p>
+          {soloLectura
+            ? 'Busca por fecha o estado y consulta el detalle de cada ruta.'
+            : 'Busca por fecha o estado, o vuelve a editar una ruta ya creada.'}
+        </p>
       </div>
 
-      {rutaEditando && (
+      {rutaEditando && !soloLectura && (
         <form onSubmit={guardarEdicion} className="card">
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: 12, flexWrap: 'wrap' }}>
             <h3>Editando la ruta {rutaEditando.id_ruta.slice(0, 8)}...</h3>
@@ -293,22 +298,26 @@ export default function RutasTab({
                       >
                         {exportando === r.id_ruta ? 'Exportando...' : 'Exportar'}
                       </button>
-                      <button
-                        type="button"
-                        className="btn-secondary btn-sm"
-                        onClick={() => iniciarEdicion(r)}
-                        aria-label={`Editar la ruta ${r.id_ruta.slice(0, 8)}`}
-                      >
-                        Editar
-                      </button>
-                      <button
-                        type="button"
-                        className="btn-secondary btn-sm btn-eliminar"
-                        onClick={() => eliminar(r)}
-                        aria-label={`Eliminar la ruta ${r.id_ruta.slice(0, 8)}`}
-                      >
-                        Eliminar
-                      </button>
+                      {!soloLectura && (
+                        <>
+                          <button
+                            type="button"
+                            className="btn-secondary btn-sm"
+                            onClick={() => iniciarEdicion(r)}
+                            aria-label={`Editar la ruta ${r.id_ruta.slice(0, 8)}`}
+                          >
+                            Editar
+                          </button>
+                          <button
+                            type="button"
+                            className="btn-secondary btn-sm btn-eliminar"
+                            onClick={() => eliminar(r)}
+                            aria-label={`Eliminar la ruta ${r.id_ruta.slice(0, 8)}`}
+                          >
+                            Eliminar
+                          </button>
+                        </>
+                      )}
                     </div>
                   </td>
                 </tr>

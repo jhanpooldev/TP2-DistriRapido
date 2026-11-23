@@ -167,6 +167,14 @@ export default function MapPicker({ latitud, longitud, onPick }) {
     )
   }
 
+  const fijarCentroConTeclado = () => {
+    const map = mapInstance.current
+    if (!map) return
+    const centro = map.getCenter()
+    ponerMarcador(centro.lat, centro.lng, false)
+    onPickRef.current(centro.lat, centro.lng)
+  }
+
   const elegirResultado = (item) => {
     ponerMarcador(item.latitud, item.longitud)
     onPickRef.current(item.latitud, item.longitud, item.direccion)
@@ -221,7 +229,14 @@ export default function MapPicker({ latitud, longitud, onPick }) {
         ref={mapRef}
         className="mapa-mini"
         role="region"
-        aria-label="Mapa para seleccionar el punto de entrega; haz clic sobre la ubicación o arrastra el marcador"
+        tabIndex={0}
+        onKeyDown={evento => {
+          if (evento.key === 'Enter' || evento.key === ' ') {
+            evento.preventDefault()
+            fijarCentroConTeclado()
+          }
+        }}
+        aria-label="Mapa para seleccionar el punto de entrega; haz clic, pulsa Enter sobre el centro o arrastra el marcador"
       />
       <p className="mapa-ayuda">
         Busca una direccion, usa tu ubicacion o haz click en el mapa. Arrastra el marcador para
