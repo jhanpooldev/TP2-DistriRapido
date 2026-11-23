@@ -7,6 +7,28 @@ versionado sigue [SemVer](https://semver.org/lang/es/) (`MAJOR.MINOR.PATCH`).
 
 ---
 
+## [No publicado]
+
+### Documentación de cierre (sin cambios funcionales en el producto)
+
+- **Siete documentos de cierre** en `docs/04 Cierre/`, con los nombres exactos exigidos y
+  enlaces relativos bidireccionales con el README principal: Reporte de Estado, Reporte de
+  Variación, Análisis de Valor Ganado (EVM), Tableros de Control Híbridos, Radiadores de
+  Información, Reporte Final del Proyecto y Reporte Final de Lecciones Aprendidas. No se
+  dejaron marcadores sin completar; los datos sin medición real se declararon "no disponible" o
+  "no evaluable".
+- **EVM trazable:** BAC $9,978.08 y 49 SP del backlog dieron un valor unitario de
+  $203.634286 por SP; PV acumulado $9,978.08, EV acumulado $7,330.83 (36 SP cerrados),
+  SV -$2,647.25 y SPI 0.7347. Como no existe AC real, CV, CPI y las tres EAC se dejaron
+  como no evaluables, sin sustituir el costo ausente por cero ni por la estimación.
+- **Índice y estado del video:** el README enlaza los siete documentos y la carpeta
+  `docs/05 Video proyecto/`; esta última conserva un README con el estado **pendiente**
+  del MP4, la estructura requerida y lo que falta. No se generó video ficticio.
+- **Verificación de cierre:** backend 66/66 pytest, frontend 24/24 Vitest con 93.22 % de
+  sentencias sobre `src/logica/**`, y build de Vite sobre 85 módulos ejecutados en el
+  entorno de auditoría; se mantuvieron las cifras E2E y CI ya documentadas para el
+  19/11/2026.
+
 ## [1.0.0] — 2026-11-19
 
 ### Sprint 4 — Calidad, pruebas E2E y CI/CD (17/11/2026)

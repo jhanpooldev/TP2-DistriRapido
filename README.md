@@ -301,7 +301,9 @@ El repositorio organiza su documentación y código fuente de acuerdo con el cic
 |   |   |-- Sprint 03/           # 5 entregables del Sprint 3 (V_1_0_0)
 |   |   `-- Sprint 04/           # 4 entregables del Sprint 4 (V_1_0_0)
 |   |-- 04 Arquitectura/         # Modelo C4 y especificaciones MFA (con specs/)
-|   `-- 05 Evidencias/           # Inventario de evidencias y capturas de Playwright
+|   |-- 04 Cierre/               # 7 documentos de cierre (Estado a Lecciones Aprendidas)
+|   |-- 05 Evidencias/           # Inventario de evidencias y capturas de Playwright
+|   `-- 05 Video proyecto/       # Entregable MP4 pendiente; estado documentado en README
 |
 |-- src/                         # Código fuente del sistema
 |   |-- backend/                 # FastAPI (Python)
@@ -734,6 +736,28 @@ El detalle completo de cada integrante se registra en
 
 ---
 
+## Cierre del Proyecto
+
+Los siete documentos exigidos para la fase de cierre están en `docs/04 Cierre/`, con
+enlace de retorno a este README y cálculos EVM trazables al presupuesto y al backlog:
+
+| # | Documento | Contenido |
+|:-:|:---|:---|
+| 1 | [01 Reporte de Estado](docs/04%20Cierre/01%20Reporte%20de%20Estado%20V_1_0_0.md) | Alcance, cronograma, costos, proyección y riesgos al 19/11/2026 |
+| 2 | [02 Reporte de Variación](docs/04%20Cierre/02%20Reporte%20de%20Variación%20V_1_0_0.md) | Variaciones de cronograma, costo y calidad con causa raíz |
+| 3 | [03 Reporte de Análisis EVM](docs/04%20Cierre/03%20Reporte%20de%20Análisis%20de%20Valor%20Ganado%20-%20EVM%20V_1_0_0.md) | PV, EV, SV, SPI, porcentajes del BAC y tres EAC (AC no disponible) |
+| 4 | [04 Tableros de Control Híbridos](docs/04%20Cierre/04%20Tableros%20de%20Control%20-%20Híbridos%20V_1_0_0.md) | RAG, tendencias, flujo acumulado, SPI/CPI y medidores |
+| 5 | [05 Radiadores de Información](docs/04%20Cierre/05%20Radiadores%20de%20Información%20V_1_0_0.md) | Burndown, burnup, tablero Scrum, Mood Chart y retrospectivas |
+| 6 | [06 Reporte Final del Proyecto](docs/04%20Cierre/06%20Reporte%20Final%20del%20Proyecto%20V_1_0_0.md) | Desempeño global, hitos, riesgos y evaluación del éxito |
+| 7 | [07 Reporte Final de Lecciones Aprendidas](docs/04%20Cierre/07%20Reporte%20Final%20de%20Lecciones%20Aprendidas%20V_1_0_0.md) | Matriz consolidada de aprendizajes y conclusiones |
+
+**Video MP4:** pendiente. No hay grabación real versionada; el estado, la estructura
+requerida (~1 min de *Elevator Pitch* + ~4 min de demostración) y lo que falta están
+documentados en [`docs/05 Video proyecto/README.md`](docs/05%20Video%20proyecto/README.md).
+El cierre es **técnico parcial**: no se declara aceptación formal ni satisfacción medida.
+
+---
+
 ## Licencia
 
 Proyecto desarrollado con fines académicos para el curso Taller de Proyectos 2 —
@@ -753,6 +777,8 @@ Ingeniería de Sistemas e Informática.
 - **Sprint 4:** [`docs/03 Implementación/Sprint 04/`](docs/03%20Implementación/Sprint%2004/)
 - **Evidencias E2E del Sprint 4:** [`docs/05 Evidencias/playwright-sprint4/`](docs/05%20Evidencias/playwright-sprint4/)
 - **Fase de Arquitectura:** [`docs/04 Arquitectura/`](docs/04%20Arquitectura/)
+- **Fase de Cierre:** [`docs/04 Cierre/`](docs/04%20Cierre/)
+- **Video del proyecto (pendiente):** [`docs/05 Video proyecto/`](docs/05%20Video%20proyecto/)
 - **Fase de Evidencias:** [`docs/05 Evidencias/`](docs/05%20Evidencias/)
 - **Decisiones de diseño:** [DESIGN.md](DESIGN.md)
 - **Especificación técnica:** [SPECS.md](SPECS.md)
