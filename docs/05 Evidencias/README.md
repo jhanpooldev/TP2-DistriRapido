@@ -11,6 +11,7 @@ Carpeta destinada al resguardo de evidencias técnicas, resultados de corridas d
 | 1.0.0 | 19/10/2026 | Jhunior Harold Cosme Tenorio / Equipo EcoLogística | Inventario inicial de evidencias del Sprint 2. |
 | 1.1.0 | 08/11/2026 | Jhunior Harold Cosme Tenorio / Equipo EcoLogística | Se agregan las cifras del Sprint 3 (65 pytest, 24 Vitest, 60.82 % backend), la reejecución de auditoría y smoke test, y la evidencia real de SonarQube en `sonar-sprint3/`. |
 | 1.2.0 | 17/11/2026 | Jhunior Harold Cosme Tenorio / Equipo EcoLogística | Se agregan las cifras del Sprint 4 (66 pytest, 24 Vitest, 79 E2E), las métricas de rendimiento por navegador y las capturas de `playwright-sprint4/`. |
+| 1.3.0 | 23/11/2026 | Equipo EcoLogística | Se agrega la auditoría documentación vs. código: 103 pytest / 73 %, 32 Vitest / 93,07 % y build de 87 módulos; se conservan las corridas históricas como registro. |
 
 ---
 
@@ -31,6 +32,7 @@ Las suites automatizadas y scripts de verificación residen junto al código en 
 | **Compilación Frontend** | Vite Build (`npm run build`) | `src/frontend/` | **Compilación exitosa** con Vite 8.3.5; 85 módulos |
 | **Dependencias del frontend** | `npm audit --json` | `src/frontend/` | **0 vulnerabilidades** tras actualizar `follow-redirects` a 1.16.3 (19/11/2026) |
 | **Integración continua** | GitHub Actions + CodeQL | `.github/workflows/` | **Ejecutada en GitHub el 19/11/2026**; ver sección 1.3 |
+| **Auditoría documentación vs. código (23/11/2026)** | pytest + Vitest + Vite build | `docs/02 Planificación/11 Matriz de Trazabilidad V_1_0_0.md` | **103/103 backend** (73 % de cobertura), **32/32 frontend** (93,07 % instrumentado) y **build de 87 módulos**. E2E no reejecutadas: sin Docker/PostgreSQL local. |
 
 > Ejecución de las suites de validación:
 > ```bash

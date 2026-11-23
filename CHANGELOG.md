@@ -9,6 +9,37 @@ versionado sigue [SemVer](https://semver.org/lang/es/) (`MAJOR.MINOR.PATCH`).
 
 ## [No publicado]
 
+### Auditoría documentación vs. código y cierre de brechas (23/11/2026)
+
+- **Matriz de trazabilidad:** nuevo documento en `docs/02 Planificación/11 Matriz de
+  Trazabilidad V_1_0_0.md`, con requisitos RF/RN/RNF/US/ARQ y estados verificados contra
+  comportamiento ejecutable, no contra nombres de archivos.
+- **RF-002 y RN-002:** `id_rol` opcional con valor por defecto "Operador Logístico";
+  bloqueo de 15 minutos tras tres intentos fallidos con `429` y `Retry-After`
+  (`core/login_attempts.py`). `a571d2c`.
+- **RF-014:** `jti` y revocación de tokens en `core/security.py`, endpoint
+  `POST /auth/logout` y cierre de sesión desde el panel que revoca antes de limpiar el
+  almacenamiento local. Interceptor global `401` y aviso de sesión expirada. `a571d2c`,
+  `e1962ea`.
+- **RN-009 y RN-013:** validación de puntos disponibles al confirmar/editar rutas y
+  rechazo de edición en estados avanzados; fechas UTC `TIMESTAMPTZ`, paginación
+  `page`/`limit` con cabecera `X-Page` y estado `Cancelada`. `d443f3c`.
+- **RF-012/RF-013 y RN-019/RN-020:** endpoints `GET /indicadores` y
+  `/indicadores/sostenibilidad`, panel del gerente con rutas, distancia, emisiones,
+  emisiones por entrega y ahorro de CO₂. `f79ddbf`.
+- **RF-005:** edición y eliminación de pedidos desde la tabla del panel, con
+  confirmación, recarga tras mutar, guardas de doble envío y los mensajes exactos
+  documentados. `e1962ea`.
+- **Permisos y accesibilidad:** vista de solo lectura para Gerente (oculta formularios y
+  acciones), `VITE_API_URL` efectiva sin cambiar el valor por defecto, `Cancelada` en el
+  filtro, `geoError` en `MapPicker`, fijación del marcador por teclado, foco visible,
+  `aria-controls` y `prefers-reduced-motion`. `e1962ea`, `7898589`.
+- **Verificación:** backend **103/103** con cobertura **73 %**; frontend **32/32** con
+  **93,07 %** sobre archivos instrumentados; `npm run build` correcto. E2E no
+  reejecutadas por falta de Docker/PostgreSQL; se conserva el resultado archivado de
+  79 aprobadas / 2 omitidas. Las cifras antiguas de estos documentos quedan como registro
+  histórico, no como resultado vigente.
+
 ### Documentación de cierre (sin cambios funcionales en el producto)
 
 - **Siete documentos de cierre** en `docs/04 Cierre/`, con los nombres exactos exigidos y

@@ -136,7 +136,7 @@ alcance del PMV (ver `SPECS.md`).
 | Reducción de distancia frente a la ruta no optimizada | ≥ 15 %                                       | **Pendiente**: requiere prueba comparativa de referencia                                                       |
 | Reducción de emisiones frente a la ruta no optimizada | ≥ 10 %                                       | **Pendiente**: requiere prueba comparativa de referencia                                                       |
 | Flujo principal de generación de ruta                 | ≤ 3 pasos y ≤ 3 minutos                      | **Pendiente**: sin medición formal registrada                                                                  |
-| Cobertura de pruebas automatizadas                    | ≥ 70 % global                                | **Parcial**: backend 61 % global; frontend 93.22 % de sentencias sobre `src/logica/**`; SonarQube 9.8 % global |
+| Cobertura de pruebas automatizadas                    | ≥ 70 % global                                | **Parcial**: backend 73 % global (23/11/2026); frontend 93,07 % sobre archivos instrumentados; el histórico 61 %/9,8 % se conserva en evidencias |
 
 ---
 
@@ -173,7 +173,9 @@ alcance del PMV (ver `SPECS.md`).
   paradas y lo advierte en pantalla.
 - Detalle de cada parada en un popup: orden de visita, dirección, destinatario y peso (**US-006**).
 - Selección de coordenadas sobre el mapa al registrar un punto.
-- Dashboard con los indicadores calculados.
+- Dashboard con los indicadores calculados: impacto ambiental comparativo y panel del gerente con
+  emisiones totales, emisiones por entrega, ahorro de CO₂, cantidad de rutas y distancia total
+  (**RF-012/RF-013, RN-019/RN-020**).
 
 ### Exportación de rutas
 
@@ -191,7 +193,11 @@ Implementado y verificado:
 - Autenticación JWT con expiración configurable (8 horas por defecto, **RN-005**).
 - Contraseñas almacenadas con hash bcrypt irreversible (**RN-004**).
 - Control de acceso basado en roles: Administrador, Operador Logístico y Gerente
-  (**RN-003**).
+  (**RN-003**); el Gerente accede a pedidos, rutas e indicadores en modo solo lectura.
+- Bloqueo de la cuenta por tres intentos fallidos consecutivos durante 15 minutos,
+  con `429` y `Retry-After` (**RN-002**).
+- Cierre de sesión con revocación del `jti` del token (**RF-014**) y logout global del
+  frontend ante un `401`.
 - Validación de firma y caducidad del token en cada petición protegida.
 - Aislamiento de puntos y rutas por operador, con acceso de administrador cuando
   corresponde.
@@ -203,7 +209,6 @@ Implementado y verificado:
 
 Pendiente:
 
-- Bloqueo por intentos fallidos (**RN-002**): no implementado.
 - HTTPS (**RNF-02**): no implementado en la aplicación; corresponde al ambiente de
   despliegue.
 - Autenticación multifactor (MFA con TOTP): especificada en
@@ -460,7 +465,7 @@ es el único lugar donde se configura el backend y el frontend.
 | `HOME_LNG`            | Longitud del centro de distribución      | `-76.9700000`                              |
 | `MAP_PROVIDER`        | Proveedor de distancias                  | `haversine`                                |
 | `MAX_PUNTOS_POR_RUTA` | Límite de puntos por ruta                | `20`                                       |
-| `VITE_API_URL`        | URL base del backend (frontend)          | `http://localhost:8000`                    |
+| `VITE_API_URL`        | URL base del backend (frontend)          | `/api/v1` (mismo origen); `.env.example` propone `http://localhost:8000` como alternativa |
 | `VITE_OSRM_URL`       | Servidor OSRM para el trazado por calles | `https://router.project-osrm.org`          |
 
 Nunca incluyas el archivo `.env` en el repositorio: está excluido por `.gitignore`. La
@@ -483,8 +488,9 @@ source venv/bin/activate          # Windows: venv\Scripts\activate
 pytest
 ```
 
-Resultado actual: **66 pruebas en verde**. Las pruebas usan la base `DB_NAME_TEST`,
-separada de la base de trabajo para no destruir datos.
+Resultado actual (23/11/2026): **103 pruebas en verde**. Las pruebas usan la base
+`DB_NAME_TEST`, separada de la base de trabajo para no destruir datos. Las nuevas suites
+cubren RF-002, RN-002, RF-005, RN-009, RN-013, indicadores, fechas UTC y paginación.
 
 Para obtener la cobertura:
 
@@ -492,9 +498,11 @@ Para obtener la cobertura:
 pytest --cov=app --cov-report=term-missing --cov-report=xml
 ```
 
-Cobertura actual: **61 % global** (1 030 sentencias, 399 sin cubrir). El módulo de
-exportación del Sprint 3 (`app/services/exportacion.py`) alcanza **100 %** y el
-optimizador **90 %**.
+Cobertura actual: **73 % global** (1 136 sentencias, 307 sin cubrir), medida con
+`pytest --cov=app` el 23/11/2026. El módulo de exportación
+(`app/services/exportacion.py`) y el de indicadores alcanzan **100 %**; el optimizador
+**90 %**. Las cifras históricas 60,82 %/61 %/63 % se conservan en las evidencias de
+sprints anteriores.
 
 > La verificación local se ejecutó con Python 3.14.6 y una versión de pydantic más
 > reciente que la fijada en `requirements.txt`, porque el pin `2.10.4` no compila en
@@ -529,12 +537,13 @@ npm run coverage      # Vitest + cobertura V8
 npm run build         # Compilación de producción
 ```
 
-Resultado actual: **24 pruebas en verde** en 3 archivos, con **93.22 %** de sentencias,
-**85.24 %** de ramas, **91.3 %** de funciones y **97.84 %** de líneas sobre
-`src/logica/**`. La compilación produce 85 módulos con Vite 8.3.5.
+Resultado actual (23/11/2026): **32 pruebas en verde** en 5 archivos, con **93,07 %** de
+sentencias, **85,71 %** de ramas, **92,59 %** de funciones y **98,05 %** de líneas sobre
+los archivos instrumentados por Vitest (lógica de distancias, exportación, trazado por
+calles y cliente HTTP). La compilación produce 87 módulos con Vite 8.3.5.
 
-La cobertura se limita a la lógica de distancias, exportación y trazado por calles; **no
-hay pruebas de componentes React ni de los popups del mapa**.
+La cobertura **no incluye componentes React ni los popups del mapa**, por lo que no puede
+afirmarse una cobertura global del frontend.
 
 ### Extremo a extremo (Playwright)
 
@@ -546,8 +555,9 @@ npm run test:e2e            # Chromium, Firefox y WebKit
 npm run test:e2e:report     # Reporte HTML local
 ```
 
-Resultado real del 17/11/2026: **79 pruebas aprobadas, 2 omitidas y 0 fallidas** sobre
-81 ejecuciones (27 casos por navegador). La omisión corresponde a las capturas visuales,
+Resultado archivado del 17/11/2026: **79 pruebas aprobadas, 2 omitidas y 0 fallidas**
+sobre 81 ejecuciones (27 casos por navegador). No se reejecutaron el 23/11/2026 porque
+no hay Docker ni PostgreSQL local disponibles. La omisión corresponde a las capturas visuales,
 que se generan solo en Chromium. La suite levanta el backend y el frontend
 automáticamente, mide TTFB/FCP/LCP y tiempos de API, y verifica respuestas `401`, `400`,
 `404`, `422`, cabeceras de endurecimiento, caché y errores de red en la interfaz.

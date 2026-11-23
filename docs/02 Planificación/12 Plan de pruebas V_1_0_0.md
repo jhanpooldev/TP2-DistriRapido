@@ -24,8 +24,8 @@ Las suites de pruebas viven junto al código que verifican (no se duplican):
 
 | Artefacto | Ubicación |
 | :--- | :--- |
-| Suite pytest (65 pruebas) | `src/backend/tests` |
-| Suite Vitest (24 pruebas de `src/logica/**`) | `src/frontend/src/**/*.test.js` |
+| Suite pytest (103 pruebas) | `src/backend/tests` |
+| Suite Vitest (32 pruebas de lógica y cliente HTTP) | `src/frontend/src/**/*.test.js` |
 | Cobertura backend (pytest-cov) | `src/backend/coverage.xml` |
 | Cobertura frontend (@vitest/coverage-v8) | `src/frontend/coverage/` |
 | Selección de enfoque / trazabilidad | [05 Requisitos funcionales](05%20Requisitos%20funcionales%20V_1_0_0.md), [08 Reglas de negocio](08%20Reglas%20de%20negocio%20V_1_0_0.md) |
@@ -50,19 +50,21 @@ Las suites de pruebas viven junto al código que verifican (no se duplican):
 
 ## Estado
 
-- `src/backend/tests`: **65 pruebas en verde** sobre la base `DB_NAME_TEST`.
-- Cobertura backend: **60.82 %** global (883 sentencias, 346 sin cubrir); el módulo
-  de exportación del Sprint 3 alcanza **100 %**.
-- `src/frontend/src/**/*.test.js`: **24 pruebas en verde** con **93.22 %** de
-  sentencias, **85.24 %** de ramas, **91.3 %** de funciones y **97.84 %** de líneas
-  sobre `src/logica/**`. No hay pruebas de componentes React.
+- `src/backend/tests`: **103 pruebas en verde** (23/11/2026) sobre la base `DB_NAME_TEST`.
+- Cobertura backend: **73 %** global (1 136 sentencias, 307 sin cubrir); exportación e
+  indicadores alcanzan **100 %** y el optimizador **90 %**.
+- `src/frontend/src/**/*.test.js`: **32 pruebas en verde** con **93,07 %** de
+  sentencias, **85,71 %** de ramas, **92,59 %** de funciones y **98,05 %** de líneas
+  sobre archivos instrumentados (lógica y cliente HTTP). No hay pruebas de componentes
+  React.
 - Auditoría y smoke test: se reejecutaron el 26/10/2026 contra PostgreSQL 18 local,
   con resultado **SIN ANOMALÍAS** y **TODO OK** respectivamente, sin alterar los datos.
 - SonarQube: análisis real con Quality Gate **OK**, 0 bugs, 0 vulnerabilidades,
   0 code smells y 0 hotspots; cobertura global 9.8 % (incluye componentes React sin
   pruebas). Evidencias en
   [`docs/05 Evidencias/sonar-sprint3/`](../05%20Evidencias/sonar-sprint3/).
-- Pendientes registrados: cobertura global del backend ≥ 70 %, pruebas de
-  componentes React, mediciones de reducción de distancia/emisiones y ejecución
-  real de los workflows de CI/CD (ver `README.md`, sección KPIs, y la Revisión del
-  Sprint 3).
+- Pendientes registrados: cobertura global real del frontend (requiere pruebas de
+  componentes React), mediciones de reducción de distancia/emisiones, reejecución de E2E
+  con backend/PostgreSQL y ejecución de workflows de CI/CD sobre el código actual
+  (ver `README.md`, sección KPIs, y la matriz de trazabilidad). La cobertura backend
+  ≥ 70 % ya está acreditada con la corrida del 23/11/2026.
