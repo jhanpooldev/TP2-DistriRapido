@@ -9,6 +9,71 @@ versionado sigue [SemVer](https://semver.org/lang/es/) (`MAJOR.MINOR.PATCH`).
 
 ## [No publicado]
 
+### Corrección de sesión y URL base del API (25/11/2026)
+
+- **Causa:** el `.env` local define `VITE_API_URL=http://localhost:8000`. Sin el prefijo
+  `/api/v1`, `App.jsx` solicitaba `/auth/me` y FastAPI respondía `404`, por lo que el panel
+  mostraba **“No se pudo cargar la sesión — Not Found”** tras recargar con un token guardado.
+- **Solución:** `normalizarUrlBase()` en `src/api/client.js` garantiza el prefijo `/api/v1`
+  para valores vacíos, relativos, con host, con `/api` o con barra final. No se modificó
+  `.env`; `.env.example` ahora documenta `http://localhost:8000/api/v1` como valor correcto.
+- **Pruebas:** 10 casos nuevos en `client.test.js`; frontend **83/83** en 8 archivos, con
+  la misma cobertura global de **87,03 %** de sentencias.
+- **Verificación en navegador:** login con credenciales demo, `/auth/me`, recarga con token
+  persistido, logout y recorrido por las seis pestañas del panel: **0 errores de consola y
+  0 respuestas HTTP ≥ 400**. Los cambios siguen sin commitear.
+
+### Reorganización de la documentación (25/11/2026)
+
+- **Rutas renombradas:** `docs/04 Arquitectura/` pasó a `docs/Arquitectura/` y
+  `docs/05 Evidencias/` pasó a `docs/Evidencias/`, ambos con `git mv` para conservar el
+  historial. El prefijo `04` queda reservado a `docs/04 Cierre/` y `docs/05 Video proyecto/`
+  mantiene su ruta literal porque la consigna la exige.
+- **Navegación actualizada:** se ajustaron referencias en 25 archivos (README, SPECS,
+  DESIGN, CONSTITUTION, AGENTS, workflows, `.gitignore`, `sonar-project.properties`, E2E,
+  matriz de trazabilidad, plan de pruebas, sprints 03/04, cierre, video y documentos internos
+  de las carpetas renombradas). El README y los archivos de estructura ahora ordenan las
+  fases como Inicio → Planificación → Implementación → Arquitectura → Evidencias → Cierre →
+  Video.
+- **Verificación:** auditoría de **56 archivos Markdown** y **353 enlaces relativos**, con
+  **0 enlaces rotos**; tampoco quedan referencias a las rutas antiguas. Los cambios siguen
+  sin commitear a la espera de autorización explícita.
+
+### Cierre ejecutable del feedback final (25/11/2026)
+
+- **Jira y enlaces:** la URL del proyecto se normalizó a `https://lewolfdx.atlassian.net/`.
+  `docs/02 Planificación/02 Artefactos Jira V_1_0_0.md` pasó a
+  `V_1_1_0.md` para conservar el historial; el README y
+  `docs/04 Cierre/05 Radiadores de Información V_1_0_0.md` apuntan a la nueva ruta. Las
+  cinco capturas existen en `docs/02 Planificación/img/`; las descripciones que exigen
+  lectura visual se dejaron como pendientes verificables, sin transcribir datos inventados.
+- **Cobertura frontend:** `vitest.config.js` incluye `src/**/*.test.jsx` e instrumenta
+  `src/logica/**/*.js` y `src/components/**/*.jsx`. Se agregaron `componentes.test.jsx`
+  (11 pruebas SSR), `componentes.dom.test.jsx` (20 pruebas DOM) y `dashboard.dom.test.jsx`
+  (10 pruebas DOM). Resultado: **83/83 pruebas** en 8 archivos y **87,03 % de sentencias
+  global** (78,14 % ramas, 89,49 % funciones, 89,94 % líneas), frente al 93,07 % anterior
+  que solo cubría archivos instrumentados. `npm run build` transforma 87 módulos.
+  Se agregaron `happy-dom` y `@testing-library/react` como dependencias de desarrollo por
+  causa justificada: sin entorno DOM no se ejecutan efectos ni manejadores de eventos, por
+  lo que la cobertura de componentes no podía ser real. `npm audit`: 0 vulnerabilidades.
+- **RNF-004:** nuevo `tests/test_rnf004_latencia.py` con calentamiento y 10 muestras por
+  caso usando `TestClient`. 401: mediana 2.96 ms y máxima 3.75 ms; 403: mediana 3.10 ms y
+  máxima 3.50 ms. Es medición local en proceso, no un SLA de producción.
+- **RN-006 / JWT:** se eliminó la clave fija de `core/config.py`. En desarrollo se genera
+  una clave aleatoria efímera (`secrets.token_urlsafe(48)`) y se descartan los valores de
+  ejemplo y las claves vacías del `.env` histórico; en Staging/Producción la variable es
+  obligatoria y debe tener al menos 32 caracteres. `.env.example` dejó la variable
+  comentada con la instrucción `openssl rand -hex 32`; no se modificó `.env`.
+- **Verificación vigente:** backend **109/109 pytest** con **74 %** de cobertura
+  (1 218 sentencias, 312 sin cubrir); frontend **83/83 Vitest** con **87,03 % global**;
+  build correcto de 87 módulos. Las cifras del 23/11/2026 se conservan como histórico en
+  `docs/Evidencias/README.md` y en la matriz de trazabilidad.
+- **Estado de entrega:** los siete documentos de `docs/04 Cierre/` siguen vigentes sin
+  marcadores pendientes; el video MP4, la aceptación formal, el SUS aplicado, el AC real
+  (CV/CPI/EAC), el despliegue y la CI sobre los commits actuales permanecen pendientes por
+  causas externas declaradas. Los cambios de esta entrada están sin commitear a la espera
+  de autorización explícita.
+
 ### Auditoría documentación vs. código y cierre de brechas (23/11/2026)
 
 - **Matriz de trazabilidad:** nuevo documento en `docs/02 Planificación/11 Matriz de
@@ -72,7 +137,7 @@ versionado sigue [SemVer](https://semver.org/lang/es/) (`MAJOR.MINOR.PATCH`).
 - **Métricas de rendimiento:** la suite mide TTFB, FCP, LCP, `DOMContentLoaded` y
   `load`, además de los tiempos de `health`, `login`, `puntos-entrega`, `rutas` y
   `vehiculos`. Valores locales: TTFB 3–12 ms, FCP 124–252 ms y LCP 124–744 ms. Los
-  JSON crudos quedaron en `docs/05 Evidencias/playwright-sprint4/`.
+  JSON crudos quedaron en `docs/Evidencias/playwright-sprint4/`.
 - **Resiliencia HTTP:** 11 casos verifican `401`, `400`, `404`, `422`, cabeceras de
   endurecimiento, `Cache-Control` y el comportamiento de la interfaz ante caída de red
   y errores `500`.
@@ -92,7 +157,7 @@ versionado sigue [SemVer](https://semver.org/lang/es/) (`MAJOR.MINOR.PATCH`).
 - **Dependencias:** `npm audit --audit-level=high` se integra en CI; se actualizó
   `follow-redirects` a 1.16.3 y la auditoría quedó en **0 vulnerabilidades**.
 - **Documentación:** cuatro entregables en `docs/03 Implementación/Sprint 04/`, enlaces
-  y badges en el README, índice en `docs/05 Evidencias/playwright-sprint4/` y este
+  y badges en el README, índice en `docs/Evidencias/playwright-sprint4/` y este
   CHANGELOG. Se corrigieron 29 enlaces relativos; la verificación de los índices deja
   **133 enlaces y 0 rotos**.
 - **Pendiente declarado:** despliegue a Staging/Producción y aplicación del SUS. No se
@@ -236,7 +301,7 @@ versionado sigue [SemVer](https://semver.org/lang/es/) (`MAJOR.MINOR.PATCH`).
   **0 min**, ratings **A/A/A**, cobertura 9.8 % (6.6 % de líneas, 85.2 % de ramas),
   duplicación 1.4 % (66 líneas en 4 bloques) y 0 incidencias abiertas.
 - **Evidencias:** respuestas de la API de SonarQube en
-  `docs/05 Evidencias/sonar-sprint3/` (`measures.json`, `quality-gate.json`,
+  `docs/Evidencias/sonar-sprint3/` (`measures.json`, `quality-gate.json`,
   `issues.json`).
 - **Lectura honesta:** la cobertura global de SonarQube es 9.8 % porque incluye todos
   los componentes React sin pruebas; el backend mide 60.82 % y `src/logica/**` 93.22 %.
@@ -249,7 +314,7 @@ versionado sigue [SemVer](https://semver.org/lang/es/) (`MAJOR.MINOR.PATCH`).
   carpetas `pruebas/`, `base de datos/` y `modelos/` se retiraron para no duplicar
   contenido: las pruebas viven en `src/backend/tests` y
   `src/frontend/src/**/*.test.js`, el DDL vive en `src/backend/esquema.sql` y el
-  modelamiento en `docs/04 Arquitectura/` y `docs/02 Planificación/`.
+  modelamiento en `docs/Arquitectura/` y `docs/02 Planificación/`.
 - **`src/backend/esquema.sql`**: DDL completo de PostgreSQL, generado
   automáticamente desde los modelos SQLAlchemy (`src/backend/app/models`) e
   incluyendo constraints, checks e índices. Vive dentro del backend, junto al

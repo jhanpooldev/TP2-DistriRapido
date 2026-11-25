@@ -223,9 +223,9 @@ docker run --rm --add-host=host.docker.internal:host-gateway \
 
 **Evidencias exportadas** (respuestas de la API de SonarQube):
 
-- [`measures.json`](../../05%20Evidencias/sonar-sprint3/measures.json)
-- [`quality-gate.json`](../../05%20Evidencias/sonar-sprint3/quality-gate.json)
-- [`issues.json`](../../05%20Evidencias/sonar-sprint3/issues.json)
+- [`measures.json`](../../Evidencias/sonar-sprint3/measures.json)
+- [`quality-gate.json`](../../Evidencias/sonar-sprint3/quality-gate.json)
+- [`issues.json`](../../Evidencias/sonar-sprint3/issues.json)
 
 ---
 

@@ -9,7 +9,7 @@
 > Los gráficos de este documento son **diagramas estructurados generados a partir de datos
 > reales del repositorio**, no capturas de herramientas inexistentes. Las cifras
 > monetarias provienen del [reporte EVM](03%20Reporte%20de%20Análisis%20de%20Valor%20Ganado%20-%20EVM%20V_1_0_0.md);
-> las de pruebas, del [inventario de evidencias](../05%20Evidencias/README.md).
+> las de pruebas, del [inventario de evidencias](../Evidencias/README.md).
 > Serie de cierre: [01 Estado](01%20Reporte%20de%20Estado%20V_1_0_0.md) ·
 > [02 Variación](02%20Reporte%20de%20Variación%20V_1_0_0.md) ·
 > [03 EVM](03%20Reporte%20de%20Análisis%20de%20Valor%20Ganado%20-%20EVM%20V_1_0_0.md) ·

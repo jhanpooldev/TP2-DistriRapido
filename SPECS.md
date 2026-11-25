@@ -4,7 +4,7 @@ Especificación técnica del sistema **EcoLogística Lima – Optimizador de Rut
 
 Este documento resume la especificación del sistema. Cuando un detalle normativo
 requiere precisión (criterios de aceptación, fórmulas de cálculo, DDL), la fuente
-de verdad es el documento correspondiente en `docs/02 Planificación/` y `docs/04 Arquitectura/`, referenciado en cada
+de verdad es el documento correspondiente en `docs/02 Planificación/` y `docs/Arquitectura/`, referenciado en cada
 sección.
 
 ## Control de Versiones del Documento
@@ -22,7 +22,7 @@ sección.
 | [08 Reglas de negocio](docs/02%20Planificación/08%20Reglas%20de%20negocio%20V_1_0_0.md) | RN-001 a RN-020 con matriz de trazabilidad |
 | [09 Evaluación de tecnologías](docs/02%20Planificación/09%20Evaluación%20de%20tecnologías%20V_1_0_0.md) | Evaluación y selección del stack |
 | [10 Base de datos](docs/02%20Planificación/10%20Base%20de%20datos%20V_1_0_0.md) | Modelo conceptual, lógico y físico (DDL) |
-| [01 Modelo C4](docs/04%20Arquitectura/01%20Modelo%20C4%20V_1_0_0.md) | Arquitectura por niveles |
+| [01 Modelo C4](docs/Arquitectura/01%20Modelo%20C4%20V_1_0_0.md) | Arquitectura por niveles |
 | [11 Análisis de restricciones](docs/02%20Planificación/11%20Análisis%20de%20restricciones%20V_1_0_0.md) | Restricciones multidimensionales del proyecto |
 
 ---

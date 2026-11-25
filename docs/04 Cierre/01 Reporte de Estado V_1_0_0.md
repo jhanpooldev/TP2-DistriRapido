@@ -30,7 +30,7 @@
   85 módulos. El 19/11/2026, sobre el commit `85eac48`, los workflows Tests, CI, CodeQL y
   Green Audit terminaron en verde. Fuentes:
   [Revisión Sprint 4](../03%20Implementación/Sprint%2004/01%20Revisión%20del%20Sprint%20V_1_0_0.md)
-  y [Evidencias](../05%20Evidencias/README.md).
+  y [Evidencias](../Evidencias/README.md).
 - **Cambios al alcance (adiciones, eliminaciones o modificaciones):** se incorporó un
   Sprint 0 de base (01/10–04/10/2026, sin Story Points) no previsto en el cronograma
   inicial; el Sprint 4 se recondujo a consolidación de calidad sin historias nuevas
@@ -52,7 +52,7 @@
   ausencia de despliegue real. Fuentes:
   [Impedimentos Sprint 1](../03%20Implementación/Sprint%2001/02%20Registro%20de%20Impedimentos%20V_1_0_0.md),
   [Calidad de código](../03%20Implementación/Sprint%2003/03%20Calidad%20de%20código%20V_1_0_0.md)
-  y [mediciones Sonar](../05%20Evidencias/sonar-sprint3/measures.json).
+  y [mediciones Sonar](../Evidencias/sonar-sprint3/measures.json).
 
 ## 2. Información de Cronograma
 
@@ -134,6 +134,20 @@
   aplicado, sin Mood Chart y sin sesión de aceptación). Este documento y sus seis
   acompañantes cierran la trazabilidad documental; el video y la aceptación formal
   permanecen pendientes y se listan sin estimaciones ficticias.
+
+## 6. Actualización posterior al corte (25/11/2026)
+
+Este reporte conserva íntegramente su fecha de corte del 19/11/2026. Con posterioridad se
+ejecutó el cierre del feedback final de auditoría: el hallazgo de `JWT_SECRET` inseguro por
+defecto en `development` quedó **resuelto** (clave aleatoria efímera en desarrollo, valores
+de ejemplo y vacíos descartados, variable obligatoria ≥32 caracteres en Staging/Producción),
+la cobertura backend pasó a **74 %** y la frontend a **87,03 % global** con componentes
+React, y la latencia local de respuestas 401/403 quedó medida en `test_rnf004_latencia.py`.
+Las cifras y estados vigentes se consolidan en el
+[README principal](../../README.md) y en la
+[matriz de trazabilidad](../02%20Planificación/11%20Matriz%20de%20Trazabilidad%20V_1_0_0.md).
+El video, la aceptación formal, el SUS, el AC real y el despliegue siguen pendientes por
+las mismas causas externas declaradas en este documento.
 
 ---
 

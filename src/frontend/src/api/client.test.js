@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import api, { API_BASE_URL } from './client'
+import api, { API_BASE_URL, normalizarUrlBase } from './client'
 
 function memoriaLocalStorage() {
   const datos = new Map()
@@ -17,6 +17,23 @@ class EventoFalso {
     this.detail = opciones.detail
   }
 }
+
+describe('normalización de la URL base del API', () => {
+  it.each([
+    [undefined, '/api/v1'],
+    ['', '/api/v1'],
+    ['   ', '/api/v1'],
+    ['/api/v1', '/api/v1'],
+    ['/api/v1/', '/api/v1'],
+    ['http://localhost:8000', 'http://localhost:8000/api/v1'],
+    ['http://localhost:8000/', 'http://localhost:8000/api/v1'],
+    ['http://localhost:8000/api', 'http://localhost:8000/api/v1'],
+    ['http://localhost:8000/api/v1/', 'http://localhost:8000/api/v1'],
+    ['  http://localhost:8000  ', 'http://localhost:8000/api/v1'],
+  ])('normaliza %s a %s', (valor, esperado) => {
+    expect(normalizarUrlBase(valor)).toBe(esperado)
+  })
+})
 
 describe('configuración del cliente HTTP', () => {
   let adaptadorOriginal

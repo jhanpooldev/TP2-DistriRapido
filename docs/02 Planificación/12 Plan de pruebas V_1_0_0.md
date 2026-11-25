@@ -62,7 +62,7 @@ Las suites de pruebas viven junto al código que verifican (no se duplican):
 - SonarQube: análisis real con Quality Gate **OK**, 0 bugs, 0 vulnerabilidades,
   0 code smells y 0 hotspots; cobertura global 9.8 % (incluye componentes React sin
   pruebas). Evidencias en
-  [`docs/05 Evidencias/sonar-sprint3/`](../05%20Evidencias/sonar-sprint3/).
+  [`docs/Evidencias/sonar-sprint3/`](../Evidencias/sonar-sprint3/).
 - Pendientes registrados: cobertura global real del frontend (requiere pruebas de
   componentes React), mediciones de reducción de distancia/emisiones, reejecución de E2E
   con backend/PostgreSQL y ejecución de workflows de CI/CD sobre el código actual

@@ -64,7 +64,7 @@
 
 1. **Verificación con cifras reproducibles.** Cada métrica de esta retrospectiva se
    obtuvo de un comando ejecutado y no de una estimación; las evidencias de SonarQube
-   quedaron guardadas en `docs/05 Evidencias/sonar-sprint3/`.
+   quedaron guardadas en `docs/Evidencias/sonar-sprint3/`.
 2. **Seguridad por defecto en la exportación.** El CSV se genera en el backend, se
    codifica con BOM para Excel, se neutralizan fórmulas y se reutiliza la autorización
    de la ruta.
@@ -134,7 +134,7 @@
 | **ACT-S3-02** | Agregar pruebas de integración con PostgreSQL para rutas y exportación. | Herramientas | Jhanpool Ernesto Flores Torres | 20/11/2026 | `rutas.py` supera el 70 % de cobertura y las pruebas corren en el servicio PostgreSQL del pipeline. |
 | **ACT-S3-03** | Elevar la cobertura global del backend de 60.82 % a ≥ 70 %. | Procesos | Jhanpool Ernesto Flores Torres | 27/11/2026 | `coverage report` muestra ≥ 70 % global y el umbral queda configurado en CI. |
 | **ACT-S3-04** | Incorporar pruebas de componentes React para los popups de US-006, el trazado por calles y la descarga de US-008. | Herramientas | Ricardo David Tucto Ubaldo | 20/11/2026 | `npm run test` cubre `MapView` y la interacción de exportación con Testing Library y jsdom. |
-| **ACT-S3-05** | ~~Ejecutar SonarQube/SonarCloud y registrar el Quality Gate real.~~ **Completada el 26/10/2026** con SonarQube Community en Docker. | Herramientas | Andrew Steven Vega Reyes | 26/10/2026 | Quality Gate `OK`, 0 bugs, 0 vulnerabilidades, 0 hotspots y evidencias JSON en `docs/05 Evidencias/sonar-sprint3/`. |
+| **ACT-S3-05** | ~~Ejecutar SonarQube/SonarCloud y registrar el Quality Gate real.~~ **Completada el 26/10/2026** con SonarQube Community en Docker. | Herramientas | Andrew Steven Vega Reyes | 26/10/2026 | Quality Gate `OK`, 0 bugs, 0 vulnerabilidades, 0 hotspots y evidencias JSON en `docs/Evidencias/sonar-sprint3/`. |
 | **ACT-S3-06** | Implementar RN-002 (bloqueo por intentos fallidos) y rate limiting. | Procesos | Jhanpool Ernesto Flores Torres | 27/11/2026 | Tres intentos fallidos bloquean la cuenta 15 minutos y el endpoint de login limita la tasa de peticiones. |
 | **ACT-S3-07** | Ejecutar una auditoría de accesibilidad con axe o WAVE y una prueba con lector de pantalla. | Herramientas | Ricardo David Tucto Ubaldo | 27/11/2026 | Se registra el informe, se corrigen los hallazgos críticos y se repite la prueba. |
 | **ACT-S3-08** | Automatizar SonarQube en el pipeline de GitHub con `SONAR_TOKEN` y `SONAR_ENABLED=true`. | Herramientas | Andrew Steven Vega Reyes | 27/11/2026 | Cada Pull Request publica el Quality Gate y falla si aparecen bugs o vulnerabilidades nuevas. |

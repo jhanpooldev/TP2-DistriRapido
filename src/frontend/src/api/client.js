@@ -1,8 +1,19 @@
 import axios from 'axios'
 
-// La documentación define VITE_API_URL; el valor por defecto mantiene el
-// comportamiento actual cuando la app se sirve detrás del mismo proxy /api/v1.
-const BASE_URL = (import.meta.env.VITE_API_URL || '/api/v1').replace(/\/$/, '')
+const PREFIJO_API = '/api/v1'
+
+/** Normaliza VITE_API_URL para que siempre apunte al prefijo real de FastAPI. */
+export function normalizarUrlBase(valor) {
+  const base = String(valor ?? '').trim()
+  if (!base) return PREFIJO_API
+
+  const sinBarraFinal = base.replace(/\/+$/, '')
+  if (sinBarraFinal.endsWith(PREFIJO_API)) return sinBarraFinal
+  if (sinBarraFinal.endsWith('/api')) return `${sinBarraFinal}/v1`
+  return `${sinBarraFinal}${PREFIJO_API}`
+}
+
+const BASE_URL = normalizarUrlBase(import.meta.env.VITE_API_URL)
 
 export const API_BASE_URL = BASE_URL
 

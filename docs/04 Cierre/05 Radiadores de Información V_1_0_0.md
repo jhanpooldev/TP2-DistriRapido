@@ -9,7 +9,7 @@ reporte y control
 **Versión:** 1.0.0
 
 > Los radiadores se reconstruyen con datos reales de los
-> [sprints](../03%20Implementación/) y del [tablero Jira](../02%20Planificación/02%20Artefactos%20Jira%20V_1_0_0.md).
+> [sprints](../03%20Implementación/) y del [tablero Jira](../02%20Planificación/02%20Artefactos%20Jira%20V_1_1_0.md).
 > Cuando no existe captura o medición, se dice explícitamente; no se generan imágenes
 > artificiales. Serie de cierre: [01 Estado](01%20Reporte%20de%20Estado%20V_1_0_0.md) ·
 > [02 Variación](02%20Reporte%20de%20Variación%20V_1_0_0.md) ·
@@ -70,7 +70,7 @@ representa trabajo no aceptado, no alcance nuevo.
 ![Tablero Scrum activo de Jira](../02%20Planificación/img/Table_Scrum.png)
 
 *Captura real del tablero Scrum de Jira, conservada como Evidencia 4 en
-[Artefactos Jira](../02%20Planificación/02%20Artefactos%20Jira%20V_1_0_0.md). La
+[Artefactos Jira](../02%20Planificación/02%20Artefactos%20Jira%20V_1_1_0.md). La
 descripción del documento de origen aún no indica cuántas tarjetas hay en cada columna;
 por eso no se inventa un conteo de WIP.*
 

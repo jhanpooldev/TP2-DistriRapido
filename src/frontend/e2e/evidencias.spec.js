@@ -13,7 +13,7 @@ import {
 
 const DIRECTORIO_EVIDENCIAS = path.resolve(
   process.cwd(),
-  '../../docs/05 Evidencias/playwright-sprint4'
+  '../../docs/Evidencias/playwright-sprint4'
 )
 
 test.describe('Evidencias visuales del Sprint 4', () => {

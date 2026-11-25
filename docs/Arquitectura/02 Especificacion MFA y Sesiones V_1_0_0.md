@@ -29,7 +29,7 @@ Este documento establece la especificación formal del módulo de **Autenticaci�
 
 ## 2. Proceso de Auditoría con IA: Aplicación del Prompt Maestro
 
-Para asegurar que la especificación cumpla con estándares profesionales de arquitectura y ciberseguridad, se sometió el borrador inicial (`docs/04 Arquitectura/specs/auth_mfa_borrador.openspec.yaml`) al prompt de auditoría técnica.
+Para asegurar que la especificación cumpla con estándares profesionales de arquitectura y ciberseguridad, se sometió el borrador inicial (`docs/Arquitectura/specs/auth_mfa_borrador.openspec.yaml`) al prompt de auditoría técnica.
 
 ### 2.1 Prompt Aplicado
 

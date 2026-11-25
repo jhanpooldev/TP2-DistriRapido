@@ -93,7 +93,7 @@ los ayudantes compartidos en
 | Navegadores | Chromium 159, Firefox 159, WebKit 27.2 |
 
 El reporte crudo está en
-[`docs/05 Evidencias/playwright-sprint4/resultados.json`](../../05%20Evidencias/playwright-sprint4/resultados.json)
+[`docs/Evidencias/playwright-sprint4/resultados.json`](../../Evidencias/playwright-sprint4/resultados.json)
 y las capturas en la misma carpeta.
 
 ### ET-S4-02 — Rendimiento y resiliencia
@@ -175,7 +175,7 @@ API pública de GitHub.
   editor.
 - No existe ningún archivo `.gitignore~`.
 - Las evidencias seleccionadas se copiaron a
-  `docs/05 Evidencias/playwright-sprint4/`; el reporte HTML completo permanece ignorado
+  `docs/Evidencias/playwright-sprint4/`; el reporte HTML completo permanece ignorado
   por Git y se conserva como artefacto del workflow de pruebas.
 
 ### ET-S4-06 — Documentación y navegación
@@ -253,7 +253,7 @@ Recorrido funcional que cubre la suite:
 6. Consultar el impacto ambiental y la flota de vehículos.
 7. Iniciar sesión como Administrador y comprobar el formulario de alta de vehículos.
 8. Ejecutar los casos de resiliencia: 401, 400, 404, 422, cabeceras, caché y caída de red.
-9. Revisar las capturas en `docs/05 Evidencias/playwright-sprint4/`.
+9. Revisar las capturas en `docs/Evidencias/playwright-sprint4/`.
 
 ---
 

@@ -13,20 +13,25 @@ El proyecto será desarrollado como un Producto Mínimo Viable (PMV) durante un 
 **Estructura del Proyecto:**
 
 ```text
-/docs/01 Inicio             # Documentación de inicio y visión
+/docs/01 Inicio              # Documentación de inicio y visión
 /docs/02 Planificación       # Planificación, requisitos, base de datos y plan de pruebas
 /docs/03 Implementación      # Entregables por sprint (Sprint 1, Sprint 2)
-/docs/04 Arquitectura       # Arquitectura del sistema, Modelo C4 y especificaciones
-/docs/05 Evidencias         # Evidencias de pruebas, auditorías y validaciones
-/src/backend                # Backend FastAPI (Python)
-/src/frontend               # Frontend React + Vite
+/docs/Arquitectura           # Arquitectura del sistema, Modelo C4 y especificaciones
+/docs/Evidencias             # Evidencias de pruebas, auditorías y validaciones
+/docs/04 Cierre              # Siete documentos de cierre; el prefijo 04 pertenece solo a esta fase
+/docs/05 Video proyecto      # Entregable MP4 pendiente; ruta exigida por la consigna
+/src/backend                 # Backend FastAPI (Python)
+/src/frontend                # Frontend React + Vite
 ```
+
+`Arquitectura/` y `Evidencias/` no llevan prefijo numérico para no duplicar la
+enumeración. `05 Video proyecto/` se conserva porque la consigna exige esa ruta literal.
 
 Las pruebas automatizadas residen dentro de cada aplicación, junto al código
 que verifican: `/src/backend/tests` (pytest) y `/src/frontend/src/**/*.test.jsx` (Vitest).
 No se mantiene una carpeta `/tests` en la raíz para evitar duplicar la suite y
 repartirla entre las aplicaciones que la consumen. El plan y registro de evidencias
-se documentan en `/docs/02 Planificación/12 Plan de pruebas V_1_0_0.md` y `/docs/05 Evidencias`.
+se documentan en `/docs/02 Planificación/12 Plan de pruebas V_1_0_0.md` y `/docs/Evidencias`.
 
 `/docker` y `docker-compose.yml` se consideran **opcionales y no se aplican en el PMV**,
 por no existir Docker en el entorno de desarrollo del equipo y para mantener el

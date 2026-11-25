@@ -52,6 +52,12 @@ herencia para un siguiente equipo: mantener la honestidad de la medición, cerra
 brecha de cobertura y convertir la operación local en una entrega desplegable y
 verificable por los interesados.
 
+**Actualización del 25/11/2026:** el hallazgo "`JWT_SECRET` inseguro por defecto" de la
+matriz anterior quedó resuelto y la brecha de cobertura señalada se cerró (backend 74 %,
+frontend 87,03 % global con pruebas DOM de componentes). Se mantienen como aprendizaje las
+demás oportunidades de mejora; el estado vigente está en el
+[README principal](../../README.md).
+
 ---
 
 [← Volver al README Principal](../../README.md)

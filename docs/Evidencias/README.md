@@ -12,6 +12,8 @@ Carpeta destinada al resguardo de evidencias técnicas, resultados de corridas d
 | 1.1.0 | 08/11/2026 | Jhunior Harold Cosme Tenorio / Equipo EcoLogística | Se agregan las cifras del Sprint 3 (65 pytest, 24 Vitest, 60.82 % backend), la reejecución de auditoría y smoke test, y la evidencia real de SonarQube en `sonar-sprint3/`. |
 | 1.2.0 | 17/11/2026 | Jhunior Harold Cosme Tenorio / Equipo EcoLogística | Se agregan las cifras del Sprint 4 (66 pytest, 24 Vitest, 79 E2E), las métricas de rendimiento por navegador y las capturas de `playwright-sprint4/`. |
 | 1.3.0 | 23/11/2026 | Equipo EcoLogística | Se agrega la auditoría documentación vs. código: 103 pytest / 73 %, 32 Vitest / 93,07 % y build de 87 módulos; se conservan las corridas históricas como registro. |
+| 1.4.0 | 25/11/2026 | Equipo EcoLogística | Se registran las cifras tras cerrar la brecha de cobertura: 109 pytest / 74 %, 73 Vitest / 87,03 % global con componentes React, build de 87 módulos y medición local de RNF-004. |
+| 1.5.0 | 25/11/2026 | Equipo EcoLogística | Se corrige la URL base del API en el cliente y se actualizan las cifras vigentes a 83 Vitest / 87,03 % global. Las versiones anteriores quedan como histórico. |
 
 ---
 
@@ -21,18 +23,20 @@ Las suites automatizadas y scripts de verificación residen junto al código en 
 
 | Tipo de Evidencia | Herramienta / Suite | Ubicación | Estado |
 |---|---|---|---|
-| **Pruebas Unitarias e Integración (backend)** | pytest (66 pruebas) | `src/backend/tests/` | **66/66 exitosas** sobre base de prueba hermética |
-| **Cobertura del backend** | pytest-cov | `src/backend/coverage.xml` | **61 %** global (1 030 sentencias, 399 sin cubrir) |
-| **Pruebas de lógica (frontend)** | Vitest (24 pruebas, 3 archivos) | `src/frontend/src/**/*.test.js` | **24/24 exitosas**; 93.22 % sentencias sobre `src/logica/**` |
+| **Pruebas Unitarias e Integración (backend)** | pytest (109 pruebas) | `src/backend/tests/` | **109/109 exitosas** el 25/11/2026 sobre base de prueba hermética |
+| **Cobertura del backend** | pytest-cov | `pytest --cov=app` | **74 %** global (1 218 sentencias, 312 sin cubrir) el 25/11/2026 |
+| **Pruebas de lógica y componentes (frontend)** | Vitest (83 pruebas, 8 archivos) | `src/frontend/src/**/*.test.{js,jsx}` | **83/83 exitosas** el 25/11/2026; 87.03 % sentencias global (819/941), incluye componentes React |
 | **Pruebas E2E (Sprint 4)** | Playwright 1.65.1 (Chromium, Firefox y WebKit) | `src/frontend/e2e/` | **79 aprobadas, 2 omitidas, 0 fallidas** el 17/11/2026 |
-| **Métricas de rendimiento E2E** | Performance API + Playwright | `docs/05 Evidencias/playwright-sprint4/performance-*.json` | TTFB 3–12 ms, FCP 124–252 ms, LCP 124–744 ms |
-| **Capturas E2E** | Playwright (solo Chromium) | `docs/05 Evidencias/playwright-sprint4/*.png` | **7 capturas** de login, panel, rutas, mapa, impacto y vehículos |
+| **Métricas de rendimiento E2E** | Performance API + Playwright | `docs/Evidencias/playwright-sprint4/performance-*.json` | TTFB 3–12 ms, FCP 124–252 ms, LCP 124–744 ms |
+| **Capturas E2E** | Playwright (solo Chromium) | `docs/Evidencias/playwright-sprint4/*.png` | **7 capturas** de login, panel, rutas, mapa, impacto y vehículos |
 | **Auditoría de Endpoints y Aislamiento** | Script `auditoria_api.py` | `src/backend/auditoria_api.py` | **SIN ANOMALÍAS** el 26/10/2026 sobre PostgreSQL 18 local |
 | **Smoke Test End-to-End** | Script `smoke_sprint2.py` | `src/backend/smoke_sprint2.py` | **TODO OK** el 26/10/2026 sobre PostgreSQL 18 local |
-| **Compilación Frontend** | Vite Build (`npm run build`) | `src/frontend/` | **Compilación exitosa** con Vite 8.3.5; 85 módulos |
+| **Compilación Frontend** | Vite Build (`npm run build`) | `src/frontend/` | **Compilación exitosa** con Vite 8.3.5; 87 módulos |
 | **Dependencias del frontend** | `npm audit --json` | `src/frontend/` | **0 vulnerabilidades** tras actualizar `follow-redirects` a 1.16.3 (19/11/2026) |
 | **Integración continua** | GitHub Actions + CodeQL | `.github/workflows/` | **Ejecutada en GitHub el 19/11/2026**; ver sección 1.3 |
-| **Auditoría documentación vs. código (23/11/2026)** | pytest + Vitest + Vite build | `docs/02 Planificación/11 Matriz de Trazabilidad V_1_0_0.md` | **103/103 backend** (73 % de cobertura), **32/32 frontend** (93,07 % instrumentado) y **build de 87 módulos**. E2E no reejecutadas: sin Docker/PostgreSQL local. |
+| **Auditoría documentación vs. código (23/11/2026)** | pytest + Vitest + Vite build | `docs/02 Planificación/11 Matriz de Trazabilidad V_1_0_0.md` | Registro histórico: **103/103 backend** (73 %), **32/32 frontend** (93,07 % solo instrumentado) y build de 87 módulos. Ver filas vigentes arriba. |
+| **Medición local de RNF-004 (25/11/2026)** | `TestClient` + `perf_counter` | `src/backend/tests/test_rnf004_latencia.py` | 401: mediana 2.96 ms / máxima 3.75 ms; 403: mediana 3.10 ms / máxima 3.50 ms. Medición local, no SLA de producción. |
+| **Seguridad de `JWT_SECRET` (25/11/2026)** | pytest | `src/backend/app/core/config.py`; `tests/test_sprint3.py` | Sin clave fija: valor efímero en desarrollo, ejemplos/valores vacíos descartados y variable obligatoria ≥32 caracteres en Staging/Producción. |
 
 > Ejecución de las suites de validación:
 > ```bash
@@ -156,7 +160,7 @@ omitidos por falta de host y credenciales.
 
 ## 3. Guía para Incorporar Nuevas Evidencias
 
-- **Capturas de Pantalla:** Guardar las capturas en `img/` dentro del sprint correspondiente o en `docs/05 Evidencias/` si son de carácter global, recortadas exclusivamente al área de interés.
+- **Capturas de Pantalla:** Guardar las capturas en `img/` dentro del sprint correspondiente o en `docs/Evidencias/` si son de carácter global, recortadas exclusivamente al área de interés.
 - **Reportes de Cobertura y Rendimiento:** `pytest-cov` genera `src/backend/coverage.xml` y Vitest genera `src/frontend/coverage/`; ambos son artefactos generados y están excluidos por `.gitignore`. Para conservar una evidencia, copiar el reporte con la nomenclatura `coverage-sprint-X.xml` o `coverage-sprint-X.json`.
-- **Reportes de Playwright:** `playwright-report/` y `test-results/` están excluidos por `.gitignore`. Para conservar una evidencia, copiar solo los JSON y capturas seleccionadas a `docs/05 Evidencias/playwright-sprintX/`, como se hizo en el Sprint 4.
+- **Reportes de Playwright:** `playwright-report/` y `test-results/` están excluidos por `.gitignore`. Para conservar una evidencia, copiar solo los JSON y capturas seleccionadas a `docs/Evidencias/playwright-sprintX/`, como se hizo en el Sprint 4.
 - **Diagramas Exportados:** Formatos PNG, SVG o PDF de diagramas C4 o de base de datos para presentaciones ejecutivas.

@@ -46,7 +46,7 @@ Este documento evalúa el PMV contra las diez categorías del **OWASP Top 10:202
 **Resultado global de SonarQube:** Quality Gate **OK**, **0 vulnerabilidades**,
 **0 Security Hotspots** y **0 incidencias abiertas** después de corregir 7 hallazgos
 iniciales (5 bugs y 2 code smells). Las evidencias están en
-[`docs/05 Evidencias/sonar-sprint3/`](../../05%20Evidencias/sonar-sprint3/).
+[`docs/Evidencias/sonar-sprint3/`](../../Evidencias/sonar-sprint3/).
 
 > **Alcance honesto:** SonarQube es un análisis estático. No se ejecutó OWASP ZAP ni una
 > prueba de penetración, y `pip-audit` no está instalado. Por tanto, este documento **no
@@ -256,7 +256,7 @@ hay rate limiting en el login ni en la geocodificación.
 
 - Sin bloqueo por intentos fallidos (**RN-002**).
 - Sin MFA/TOTP; la especificación existe en
-  [`docs/04 Arquitectura/02 Especificación MFA y Sesiones`](../../04%20Arquitectura/02%20Especificacion%20MFA%20y%20Sesiones%20V_1_0_0.md),
+  [`docs/Arquitectura/02 Especificación MFA y Sesiones`](../../Arquitectura/02%20Especificacion%20MFA%20y%20Sesiones%20V_1_0_0.md),
   pero no está implementada.
 - Sin rotación de tokens ni lista de revocación.
 

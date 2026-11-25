@@ -7,14 +7,19 @@ Siempre utiliza una estructura de proyecto modular y mantenible.
 **Estructura del Proyecto:**
 
 ```text
-/docs/01 Inicio             # Documentación de inicio y visión del proyecto
+/docs/01 Inicio              # Documentación de inicio y visión del proyecto
 /docs/02 Planificación       # Planificación, requisitos, base de datos y plan de pruebas
 /docs/03 Implementación      # Entregables por sprint (Sprint 1, Sprint 2)
-/docs/04 Arquitectura       # Arquitectura del sistema, Modelo C4 y especificaciones técnicas
-/docs/05 Evidencias         # Evidencias de pruebas, auditorías y validaciones
-/src/backend                # Backend FastAPI (Python)
-/src/frontend               # Frontend React + Vite
+/docs/Arquitectura           # Arquitectura del sistema, Modelo C4 y especificaciones técnicas
+/docs/Evidencias             # Evidencias de pruebas, auditorías y validaciones
+/docs/04 Cierre              # Siete documentos de cierre; el prefijo 04 pertenece solo a esta fase
+/docs/05 Video proyecto      # Entregable MP4 pendiente; ruta exigida por la consigna
+/src/backend                 # Backend FastAPI (Python)
+/src/frontend                # Frontend React + Vite
 ```
+
+`Arquitectura/` y `Evidencias/` no llevan prefijo numérico para no duplicar la
+enumeración. `05 Video proyecto/` se conserva porque la consigna exige esa ruta literal.
 
 **Siempre incluir:**
 

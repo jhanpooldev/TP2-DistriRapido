@@ -114,7 +114,7 @@ manuales previos.
 |---|---|---|
 | Consola | `list` | No aplica |
 | HTML | `playwright-report/` | **Ignorado por Git**; se publica como artefacto en CI |
-| JSON | `test-results/results.json` | Se copia como evidencia a `docs/05 Evidencias/playwright-sprint4/resultados.json` |
+| JSON | `test-results/results.json` | Se copia como evidencia a `docs/Evidencias/playwright-sprint4/resultados.json` |
 | Trazas / capturas / videos de fallo | `test-results/artifacts/` | **Ignorados por Git**; se publican como artefacto en CI |
 
 ---
@@ -253,9 +253,9 @@ Cada endpoint se cronometra con `Date.now()` alrededor de la petición:
 
 Los archivos crudos están en:
 
-- [`performance-chromium.json`](../../05%20Evidencias/playwright-sprint4/performance-chromium.json)
-- [`performance-firefox.json`](../../05%20Evidencias/playwright-sprint4/performance-firefox.json)
-- [`performance-webkit.json`](../../05%20Evidencias/playwright-sprint4/performance-webkit.json)
+- [`performance-chromium.json`](../../Evidencias/playwright-sprint4/performance-chromium.json)
+- [`performance-firefox.json`](../../Evidencias/playwright-sprint4/performance-firefox.json)
+- [`performance-webkit.json`](../../Evidencias/playwright-sprint4/performance-webkit.json)
 
 ### 7.4 Umbrales aplicados por la prueba
 
@@ -302,7 +302,7 @@ Chromium.
 ## 9. Evidencias
 
 La carpeta
-[`docs/05 Evidencias/playwright-sprint4/`](../../05%20Evidencias/playwright-sprint4/)
+[`docs/Evidencias/playwright-sprint4/`](../../Evidencias/playwright-sprint4/)
 contiene:
 
 | Archivo | Contenido |

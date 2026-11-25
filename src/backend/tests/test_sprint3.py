@@ -155,6 +155,40 @@ def test_produccion_acepta_secreto_largo():
     assert settings.ENVIRONMENT == "production"
 
 
+def test_produccion_requiere_secreto_explicito(monkeypatch):
+    monkeypatch.delenv("JWT_SECRET", raising=False)
+    with pytest.raises(ValidationError):
+        Settings(ENVIRONMENT="production", _env_file=None)
+
+
+def test_desarrollo_genera_clave_aleatoria_sin_env():
+    primero = Settings(ENVIRONMENT="development", _env_file=None)
+    segundo = Settings(ENVIRONMENT="development", _env_file=None)
+
+    assert len(primero.JWT_SECRET) >= 32
+    assert primero.JWT_SECRET not in {
+        "clave-secreta-super-segura-para-desarrollo",
+        "cambiar_por_una_clave_aleatoria_y_segura",
+    }
+    assert primero.JWT_SECRET != segundo.JWT_SECRET
+
+
+def test_desarrollo_descarta_secreto_de_ejemplo_y_vacio():
+    ejemplo = Settings(
+        ENVIRONMENT="development",
+        JWT_SECRET="clave-secreta-super-segura-para-desarrollo",
+        _env_file=None,
+    )
+    vacio = Settings(ENVIRONMENT="development", JWT_SECRET="   ", _env_file=None)
+
+    for secreto in (ejemplo.JWT_SECRET, vacio.JWT_SECRET):
+        assert len(secreto) >= 32
+        assert secreto not in {
+            "clave-secreta-super-segura-para-desarrollo",
+            "cambiar_por_una_clave_aleatoria_y_segura",
+        }
+
+
 def test_cabeceras_de_seguridad_y_correlacion():
     from fastapi.testclient import TestClient
 

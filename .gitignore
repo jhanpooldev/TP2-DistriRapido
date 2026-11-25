@@ -100,7 +100,7 @@ coverage/
 .nyc_output/
 
 # Playwright (Sprint 4): reportes y artefactos locales no se versionan.
-# Las evidencias seleccionadas viven en docs/05 Evidencias/playwright-sprint4.
+# Las evidencias seleccionadas viven en docs/Evidencias/playwright-sprint4.
 playwright-report/
 test-results/
 blob-report/

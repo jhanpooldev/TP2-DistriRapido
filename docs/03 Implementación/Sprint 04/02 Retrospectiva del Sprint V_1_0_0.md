@@ -70,7 +70,7 @@
 1. **Verificación con cifras reproducibles.** Cada número de la revisión proviene de un
    comando ejecutado: 66 pruebas de backend, 24 de frontend, 79 E2E aprobadas y tiempos
    de API medidos en los tres navegadores. Los JSON crudos quedaron en
-   `docs/05 Evidencias/playwright-sprint4/`.
+   `docs/Evidencias/playwright-sprint4/`.
 
 2. **Cobertura de flujos, no solo de pantallas.** La suite no se limita al login:
    registra pedidos, arma y guarda rutas, exporta el CSV, edita, elimina y verifica el

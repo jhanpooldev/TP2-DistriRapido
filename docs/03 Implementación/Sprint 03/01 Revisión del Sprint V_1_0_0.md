@@ -195,7 +195,7 @@ Todas las cifras siguientes provienen de ejecuciones locales realizadas el 26/10
 | Auditoría de API | `python auditoria_api.py 8000` | **SIN ANOMALÍAS** sobre PostgreSQL 18. |
 | Smoke test de extremo a extremo | `python smoke_sprint2.py 8000` | **TODO OK**. |
 | Análisis SonarQube | `sonar-scanner` (Docker, SonarQube Community) | **Quality Gate: OK**; 0 bugs, 0 vulnerabilidades, 0 code smells, 0 hotspots; duplicación 1.4 %. |
-| Evidencia de SonarQube | `docs/05 Evidencias/sonar-sprint3/*.json` | Medidas, Quality Gate y lista de incidencias exportadas. |
+| Evidencia de SonarQube | `docs/Evidencias/sonar-sprint3/*.json` | Medidas, Quality Gate y lista de incidencias exportadas. |
 
 ### Detalle del análisis SonarQube
 
@@ -263,7 +263,7 @@ Recorrido de verificación:
 7. Abrir el CSV en una hoja de cálculo y verificar que los textos con `=`, `+`, `-` o `@`
    aparecen como texto y no como fórmulas.
 8. Revisar el panel de SonarQube (`http://localhost:9000/dashboard?id=jhanpooldev_TP2-DistriRapido`)
-   y las evidencias JSON en `docs/05 Evidencias/sonar-sprint3/`.
+   y las evidencias JSON en `docs/Evidencias/sonar-sprint3/`.
 
 ---
 

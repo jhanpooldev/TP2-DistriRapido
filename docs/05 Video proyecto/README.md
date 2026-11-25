@@ -25,7 +25,7 @@
 - Guion de negocio y problema: [Acta de Constitución](../01%20Inicio/02%20Acta%20de%20constitución%20V_1_0_0.md)
   y [Declaración de la Visión](../01%20Inicio/03%20Declaración%20de%20la%20visión%20V_1_0_0.md).
 - Flujos a demostrar y capturas reales: [Revisión del Sprint 4](../03%20Implementación/Sprint%2004/01%20Revisión%20del%20Sprint%20V_1_0_0.md)
-  y [capturas Playwright](../05%20Evidencias/playwright-sprint4/).
+  y [capturas Playwright](../Evidencias/playwright-sprint4/).
 - Instrucciones de arranque local: [README principal](../../README.md).
 
 ## Lo que falta para cerrar el entregable

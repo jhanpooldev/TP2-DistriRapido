@@ -1,16 +1,20 @@
-[← Volver al README Principal](../../README.md) · [← Planificación](README.md)
+[← Volver al README Principal](../../README.md)
 
 # 11 Matriz de Trazabilidad: Documentación vs. Sistema
 
 **Proyecto:** EcoLogística Lima – Optimizador de Rutas Sostenibles para DistriRápido S.A.C.  \
 **Versión:** 1.0.0 | **Fecha de auditoría:** 23/11/2026  \
-**Fuente de verdad:** `docs/02 Planificación/` y `docs/04 Arquitectura/` (`SPECS.md:5-8`).
+**Fuente de verdad:** `docs/02 Planificación/` y `docs/Arquitectura/` (`SPECS.md:5-8`).
 
 > Esta matriz compara cada requisito documentado con el comportamiento **real** del código al
 > momento de la auditoría. No marca como "Cumplido" un requisito por la existencia de un
 > archivo con nombre parecido: se verificó la lógica ejecutable. Los estados son
 > **Cumplido**, **Parcialmente cumplido**, **No implementado** y **No verificable**.
 > Las contradicciones documentales se conservan y se enlazan desde la sección final.
+>
+> **Actualización del 25/11/2026:** se conserva la versión del archivo y la fecha de la
+> auditoría original; las filas afectadas por el cierre del feedback final muestran el
+> estado verificado en esa fecha posterior. El detalle de cada cambio está en la sección 7.
 
 ## 1. Requisitos Funcionales
 
@@ -38,14 +42,14 @@
 | RNF-001 | Ruta ≤5 s P95 con 20 puntos; ≤50 s con 50 puntos | `06 Requisitos no funcionales:22` | `tests/test_optimizer.py` (17.9–20.2 ms con 20) | Cumplido (20 pts) / No verificable (50 pts) | El límite de `MAX_PUNTOS_POR_RUTA=20` impide medir 50 puntos. Documentar alcance. |
 | RNF-002 | Lectura ≤1,5 s P95 con ≤50 registros | `06 Requisitos no funcionales:23` | E2E `rendimiento.spec.js` mide API | No verificable | No hay informe P95 versionado con ese criterio. No inventar medición. |
 | RNF-003 | ≥10 TPS, error ≤1 % | `06 Requisitos no funcionales:24` | Sin prueba de carga | No verificable | Requiere herramienta de carga no presente. |
-| RNF-004 | 0 % accesos no autorizados; 401/403 en <300 ms | `06 Requisitos no funcionales:25` | `dependencies.py:13-73`; `client.js` (interceptor 401); `App.jsx` (`auth:expired`) | Parcialmente cumplido | Logout global implementado y probado; la latencia <300 ms no se ha medido en el entorno local. |
+| RNF-004 | 0 % accesos no autorizados; 401/403 en <300 ms | `06 Requisitos no funcionales:25` | `dependencies.py:13-73`; `client.js` (interceptor 401); `App.jsx` (`auth:expired`); `tests/test_rnf004_latencia.py` | Cumplido en medición local | 10 muestras con calentamiento: 401 mediana 2.96 ms / máxima 3.75 ms; 403 mediana 3.10 ms / máxima 3.50 ms. No sustituye el SLA en producción. |
 | RNF-005 | 0 % vulnerabilidades OWASP explotables; 100 % entradas validadas | `06 Requisitos no funcionales:26` | Pydantic + `login_attempts.py` + 429 con `Retry-After`; HTTPS/CSP fuera del alcance local | Parcialmente cumplido | RN-002 y bloqueo por intentos implementados y probados; HTTPS/CSP siguen dependiendo de infraestructura. |
 | RNF-006 | bcrypt al 100 % y 100 % de tráfico HTTPS | `06 Requisitos no funcionales:27` | `security.py:9-13` ✅; HSTS condicional en `main.py:139-144` | **Parcialmente cumplido** | HTTPS requiere terminación TLS/proveedor; fuera del entorno local. |
 | RNF-007 | Disponibilidad ≥95 %; modo degradado sin mapa en 100 % de los casos | `06 Requisitos no funcionales:28` | `MapView.jsx:136-149,261-273`; `/health` con 503 | Cumplido (degradación) / No verificable (disponibilidad) | Sin monitoreo desplegado. |
 | RNF-008 | Pérdida de datos 0 %; reintento sin duplicados | `06 Requisitos no funcionales:29` | `commit()` en escrituras; `rutas.py:275-289` | Parcialmente cumplido | Añadir rollbacks explícitos y validación de duplicados en `punto_ids`. |
 | RNF-009 | Flujo en ≤3 pasos y ≤3 minutos | `06 Requisitos no funcionales:30` | Flujo real: registrar → seleccionar → optimizar → confirmar | No verificable | No hay medición de pasos/tiempo de usuario; SUS sin aplicar. |
 | RNF-010 | WCAG 2.1 AA, contraste ≥4,5:1, 100 % campos etiquetados | `06 Requisitos no funcionales:31`; `Sprint 03/05 WCAG` | `Dashboard.jsx` (tabs y formularios); `index.css` (foco y `prefers-reduced-motion`); `MapPicker.jsx` (teclado) | Parcialmente cumplido | `aria-controls`, foco visible, movimiento reducido y marcador por teclado corregidos; auditoría WCAG completa sigue pendiente. |
-| RNF-011 | Cobertura global ≥70 % (≥80 % en validación) | `06 Requisitos no funcionales:32` | `pytest --cov=app`: **73 %**; `vitest --coverage`: **93,07 %** sobre archivos instrumentados | Parcialmente cumplido | Backend supera 70 % (73 % medido el 23/11/2026). La cifra frontend no incluye componentes React, por lo que no puede afirmarse cobertura global. |
+| RNF-011 | Cobertura global ≥70 % (≥80 % en validación) | `06 Requisitos no funcionales:32` | `pytest --cov=app`: **74 %**; `vitest --coverage`: **87,03 % global** con componentes React | Cumplido | Medido el 25/11/2026: backend 74 % (1 218/312), frontend 87,03 % sentencias (819/941), 78,14 % ramas y 89,94 % líneas. El 93,07 % del 23/11 era solo de archivos instrumentados. |
 | RNF-012 | Bajo acoplamiento y documentación actualizada | `06 Requisitos no funcionales:33` | Capas en backend; 61 documentos | Parcialmente cumplido | Service Layer/Repository ausente; no refactorizar sin decisión (ver contradicciones). |
 | RNF-013 | Chrome/Edge/Firefox 100 % funcionalidades | `06 Requisitos no funcionales:34` | E2E en Chromium, Firefox y WebKit | Parcialmente cumplido | WebKit ≠ Safari; Edge no ejecutado. No afirmar cobertura total. |
 | RNF-014 | Hosting gratuito, variables de entorno, 0 % gasto infraestructura | `06 Requisitos no funcionales:35` | `.env.example`; `client.js` usa `VITE_API_URL` con valor por defecto `/api/v1`; deploys desactivados | No verificable | La variable ya se consume sin cambiar el valor por defecto; sigue sin existir despliegue real que verificar. |
@@ -60,7 +64,7 @@
 | RN-003 | RBAC por rol | `08 Reglas de negocio:22-24` | `dependencies.py:61-73`; `Dashboard.jsx`; `RutasTab.jsx` | Cumplido | Igual que RF-003: permisos en backend y vistas de solo lectura para Gerente. |
 | RN-004 | Contraseñas solo bcrypt | `08 Reglas de negocio:26-28` | `security.py:9-13` | Cumplido | Ninguna. |
 | RN-005 | Sesión expira a las 8 horas | `08 Reglas de negocio:30-32` | `security.py` (expiración 8 h, `jti` y revocación); `auth.py:89-97` | Cumplido | Expiración y revocación explícita verificadas. |
-| RN-006 | Secretos por entorno, sin exponer en errores | `08 Reglas de negocio:34-36` | `config.py:13-62`; `.env.example` | Parcialmente cumplido | `JWT_SECRET` inseguro por defecto en `development`; corregir el valor por defecto para fallar si no se configura. |
+| RN-006 | Secretos por entorno, sin exponer en errores | `08 Reglas de negocio:34-36` | `config.py` (`_secreto_de_desarrollo`, validadores); `.env.example`; `tests/test_sprint3.py` | Cumplido | Sin clave fija: en desarrollo se genera una clave efímera y se descartan ejemplos/vacíos; en Staging/Producción la variable es obligatoria y ≥32 caracteres. No se modificó `.env`. |
 | RN-007 | Dirección/coordenada geocodificable | `08 Reglas de negocio:42-44` | `schemas/__init__.py:51-58`; `geocoding.py` | Parcialmente cumplido | La validación real depende del proveedor externo; se documenta el límite. |
 | RN-008 | Peso > 0 | `08 Reglas de negocio:46-48` | `schemas/__init__.py:40` | Cumplido | Ninguna. |
 | RN-009 | Puntos en rutas confirmadas no se modifican/eliminan ni se reasignan | `08 Reglas de negocio:50-52` | `puntos.py:79-140`; `rutas.py` (`_validar_puntos_disponibles` en crear/editar); pruebas de reglas | Cumplido | Bloqueo aplicado al confirmar, editar, modificar punto y eliminar punto; mensajes documentados. |
@@ -101,26 +105,26 @@
 | ARQ-02 | Modelo de datos con 6 tablas y relaciones | `10 Base de datos:47-220` | `models/__init__.py:7-92`; `esquema.sql:8-88` | Cumplido | Ninguna para tablas/campos/claves. |
 | ARQ-03 | CHECK de positividad y estados en DDL | `10 Base de datos:74,85-88,98-105,201-209` | Modelos y `esquema.sql` sin CHECK | Parcialmente cumplido | Los Pydantic ya validan entradas; agregar CHECK a modelos/DDL no altera tablas existentes sin migraciones. Registrar como deuda. |
 | ARQ-04 | Alembic como tecnología de migraciones | `09 Evaluación de tecnologías:39` | No existe; `database.py:58-63` usa `create_all` | No implementado | `10 Base de datos:256` decide no usarlo. Conservar la decisión documentada; no agregar dependencia. |
-| ARQ-05 | Configuración del frontend por `VITE_API_URL` | `.env.example:60-61` | `client.js` (`API_BASE_URL`) | Cumplido | La variable se lee con valor por defecto `/api/v1`; probado en `client.test.js`. |
-| SEG-01 | MFA TOTP y sesiones con `jti` | `04 Arquitectura/02 Especificacion MFA...:97-235` | No implementado | No implementado | Fuera del PMV vigente (CHANGELOG `:268-285` corrige la afirmación de implementación). Requiere nueva dependencia y decisión. |
+| ARQ-05 | Configuración del frontend por `VITE_API_URL` | `.env.example:63-67` | `client.js` (`normalizarUrlBase`, `API_BASE_URL`) | Cumplido | La variable se normaliza para garantizar el prefijo `/api/v1`; un host sin prefijo ya no produce 404. Probado en `client.test.js`. |
+| SEG-01 | MFA TOTP y sesiones con `jti` | `Arquitectura/02 Especificacion MFA...:97-235` | No implementado | No implementado | Fuera del PMV vigente (CHANGELOG `:268-285` corrige la afirmación de implementación). Requiere nueva dependencia y decisión. |
 | SEG-02 | HTTPS de extremo a extremo | `SPECS.md:478`; `README.md:207-208` | Solo HSTS condicional | No implementado | Requiere proveedor/certificado. No simulable localmente. |
 | ACC-01 | WCAG 2.1 AA sin brechas | `05 WCAG:53-75,248` | `Dashboard.jsx`; `index.css`; `MapPicker.jsx` | Parcialmente cumplido | Correcciones señaladas aplicadas; no se afirma auditoría WCAG completa sin herramienta/evidencia externa. |
-| PRB-01 | Backend 66/66; frontend 24/24; E2E 79/81 | `docs/05 Evidencias/README.md:23-33` | `src/backend/tests/**`; `src/frontend/src/**/*.test.js`; `e2e/**` | Cumplido | Ejecutado el 23/11/2026: backend **103/103**, frontend **32/32** y build correcto. E2E solo archivadas (79 aprobadas, 2 omitidas) sin backend/BD local. |
-| PRB-02 | Cobertura ≥70 % global | `SPECS.md:416-421` | `pytest --cov=app`: 73 %; `vitest --coverage`: 93,07 % (archivos instrumentados) | Parcialmente cumplido | Backend supera el umbral. La cifra frontend no cubre componentes React, por lo que el requisito "global" sigue sin poder afirmarse. |
+| PRB-01 | Backend 66/66; frontend 24/24; E2E 79/81 | `docs/Evidencias/README.md:22-38` | `src/backend/tests/**`; `src/frontend/src/**/*.test.{js,jsx}`; `e2e/**` | Cumplido | Vigente el 25/11/2026: backend **109/109**, frontend **83/83** y build correcto de 87 módulos. E2E solo archivadas (79 aprobadas, 2 omitidas); el flujo local se verificó en navegador sin errores. |
+| PRB-02 | Cobertura ≥70 % global | `SPECS.md:416-421` | `pytest --cov=app`: 74 %; `vitest --coverage`: 87,03 % global | Cumplido | Ambos umbrales superados el 25/11/2026 con instrumentación de lógica y componentes React. |
 | CIE-01 | Video MP4 de ~5 min | Consigna de cierre | `docs/05 Video proyecto/README.md` (pendiente) | No implementado | Requiere grabación real; no generar archivo ficticio. |
 | CIE-02 | Aceptación formal y SUS aplicado | `docs/04 Cierre/06 Reporte Final:124-137` | Sin acta ni encuesta | No verificable | Depende de stakeholders; no inventar resultados. |
 | CIE-03 | Costo real (AC) para CV/CPI/EAC | `docs/04 Cierre/03 EVM:83-105` | Sin registros de horas/desembolsos | No verificable | Registrar AC real antes de calcular. |
 
 ## 6. Contradicciones documentales registradas (no resueltas arbitrariamente)
 
-1. **MFA implementado vs. no implementado:** commits `697dab9`/`b13009b`/`c743d60` (01/10) afirman implementación; `CHANGELOG:268-285` y `README:209-211` (posteriores) la retiran. Prevalece documentalmente "no implementado", coherente con el código. La tabla de "Cumplido" dentro de `04 Arquitectura/02 Especificacion MFA...:241-249` contradice su propio estado `:10-18`; se conserva.
+1. **MFA implementado vs. no implementado:** commits `697dab9`/`b13009b`/`c743d60` (01/10) afirman implementación; `CHANGELOG:268-285` y `README:209-211` (posteriores) la retiran. Prevalece documentalmente "no implementado", coherente con el código. La tabla de "Cumplido" dentro de `Arquitectura/02 Especificacion MFA...:241-249` contradice su propio estado `:10-18`; se conserva.
 2. **Esquema RNF duplicado:** `01 Transformando a ágil:17-21` (`RNF-01..03`) vs `06 Requisitos no funcionales:22-36` (`RNF-001..015`). Se usa la tabla formal `06…`; README `:207` sigue con `RNF-02` como HTTPS.
 3. **HTTPS previsto vs. pendiente:** `CHANGELOG:388-389,420-422` vs `README:207-208` y cierre 19/11. Prevalece "pendiente" por ser más reciente y coincidir con el código.
 4. **RN-014 regla vs. desviación:** `08 Reglas de negocio:75-77` exige puntos pendientes; `CHANGELOG:384-387` documenta el rechazo completo como desviación. Se mantiene la desviación y se reporta en RF-007.
-5. **Cobertura histórica 61 % vs 63 % vs 9,8 %:** no reconciliada (`docs/04 Cierre/02 Reporte de Variación:49`). Para el código actual sí existe salida cruda de `pytest --cov=app` del 23/11/2026: **73 %**; las cifras antiguas se conservan como registro histórico, no como resultado vigente.
+5. **Cobertura histórica 61 % vs 63 % vs 9,8 %:** no reconciliada (`docs/04 Cierre/02 Reporte de Variación:49`). Para el código actual existe salida cruda de `pytest --cov=app`: **73 %** el 23/11/2026 y **74 %** el 25/11/2026; las cifras antiguas se conservan como registro histórico, no como resultado vigente. En frontend, el 93,07 % del 23/11 era solo de archivos instrumentados; la cifra global vigente es **87,03 %**.
 6. **Stack Tailwind/Alembic/MERN:** `Modelo C4:43,52` y `CONSTITUTION:152` vs `README:371`, `CHANGELOG:278-282`, `10 Base de datos:256`. Prevalece "no se usan" por ser la corrección registrada.
 7. **Sprint 0 y Sprint 4:** "no previstos" en cierre vs. planificación/ejecución real. Se conservan ambos con fechas.
-8. **Jira:** plantilla sin completar vs. captura local `Table_Scrum.png`. No se afirma tablero verificable en línea.
+8. **Jira:** plantilla sin completar vs. captura local `Table_Scrum.png`. La URL se normalizó a `https://lewolfdx.atlassian.net/` y el documento se versionó como `V_1_1_0.md`; la evidencia sigue siendo local y no se afirma tablero verificable en línea.
 
 ## 7. Cierre de la brecha detectada (23/11/2026)
 
@@ -136,11 +140,29 @@ matriz. Los commits que cerraron la brecha son:
 | `e1962ea` | RF-005 en UI, `VITE_API_URL`, logout/revocación, 401 global y accesibilidad. |
 | `7898589` | RBAC de solo lectura para Gerente y fijación del mapa por teclado. |
 
-**Verificación final ejecutada:** `pytest tests -q` → 103/103; `npm test` → 32/32;
+**Verificación ejecutada el 23/11/2026:** `pytest tests -q` → 103/103; `npm test` → 32/32;
 `npm run build` → correcto; `pytest --cov=app` → 73 %; `npm run coverage` → 93,07 % sobre
-archivos instrumentados. No se ejecutaron E2E con backend/PostgreSQL reales por falta de Docker y
-servidor local; se conserva el resultado archivado de 79 aprobadas / 2 omitidas.
+archivos instrumentados.
+
+**Verificación vigente del 25/11/2026 (cierre del feedback final):**
+
+| Acción | Resultado verificable |
+|:---|:---|
+| URL de Jira y renombrado del documento a `V_1_1_0.md` | Enlaces del README y del radiador actualizados; capturas locales verificadas |
+| Pruebas DOM de componentes y del panel | `componentes.dom.test.jsx` (20) y `dashboard.dom.test.jsx` (10), con `happy-dom` y `@testing-library/react` |
+| RNF-004 | `test_rnf004_latencia.py`: 401 mediana 2.96 ms / máxima 3.75 ms; 403 mediana 3.10 ms / máxima 3.50 ms |
+| RN-006 | Clave JWT fija eliminada; clave efímera en desarrollo y validación estricta en Staging/Producción |
+| `pytest tests -q --disable-warnings` | **109/109** |
+| `pytest tests -q --cov=app --cov-report=term` | **74 %** (1 218 sentencias, 312 sin cubrir) |
+| `npm test` | **83/83** en 8 archivos |
+| `npm run coverage -- --coverage.reporter=text-summary` | **87,03 %** sentencias, 78,14 % ramas, 89,49 % funciones, 89,94 % líneas |
+| `npm run build` | Correcto: 87 módulos transformados |
+| Verificación manual en navegador | Login, `/auth/me`, recarga con token, logout y seis pestañas: sin errores de consola ni respuestas HTTP ≥ 400 |
+
+No se ejecutaron E2E automatizados con backend/PostgreSQL reales por falta de Docker y servidor local; se
+conserva el resultado archivado de 79 aprobadas / 2 omitidas. Estos cambios están sin
+commitear a la espera de autorización explícita.
 
 ---
 
-[← Volver al README Principal](../../README.md) · [← Planificación](README.md)
+[← Volver al README Principal](../../README.md)

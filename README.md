@@ -11,7 +11,7 @@ en el curso Taller de Proyectos 2 — Ingeniería de Sistemas e Informática.
 > Los badges reflejan el estado de los workflows en GitHub. Si un workflow todavía no
 > tiene una corrida registrada, GitHub muestra el badge sin estado; eso **no** significa
 > que la suite haya pasado. Los resultados locales verificados están en
-> [`docs/05 Evidencias/`](docs/05%20Evidencias/).
+> [`docs/Evidencias/`](docs/Evidencias/).
 
 ## Tabla de Contenidos (TOC)
 
@@ -136,7 +136,8 @@ alcance del PMV (ver `SPECS.md`).
 | Reducción de distancia frente a la ruta no optimizada | ≥ 15 %                                       | **Pendiente**: requiere prueba comparativa de referencia                                                       |
 | Reducción de emisiones frente a la ruta no optimizada | ≥ 10 %                                       | **Pendiente**: requiere prueba comparativa de referencia                                                       |
 | Flujo principal de generación de ruta                 | ≤ 3 pasos y ≤ 3 minutos                      | **Pendiente**: sin medición formal registrada                                                                  |
-| Cobertura de pruebas automatizadas                    | ≥ 70 % global                                | **Parcial**: backend 73 % global (23/11/2026); frontend 93,07 % sobre archivos instrumentados; el histórico 61 %/9,8 % se conserva en evidencias |
+| Respuestas 401/403 sin autenticar                     | < 300 ms                                     | **Verificado localmente**: mediana 2,96 ms (401) y 3,10 ms (403); máxima 3,75 ms y 3,50 ms con `TestClient` (25/11/2026). No sustituye la medición en producción. |
+| Cobertura de pruebas automatizadas                    | ≥ 70 % backend y ≥ 80 % en validación        | **Cumplido**: backend 74 % global y frontend 87,03 % global con componentes React (25/11/2026). El histórico 61 %/9,8 % y el 93,07 % instrumentado se conservan en evidencias |
 
 ---
 
@@ -212,7 +213,7 @@ Pendiente:
 - HTTPS (**RNF-02**): no implementado en la aplicación; corresponde al ambiente de
   despliegue.
 - Autenticación multifactor (MFA con TOTP): especificada en
-  [`docs/04 Arquitectura/02 Especificación MFA y Sesiones`](docs/04%20Arquitectura/02%20Especificacion%20MFA%20y%20Sesiones%20V_1_0_0.md),
+  [`docs/Arquitectura/02 Especificación MFA y Sesiones`](docs/Arquitectura/02%20Especificacion%20MFA%20y%20Sesiones%20V_1_0_0.md),
   no implementada.
 
 ### Limitación conocida del motor de ruteo
@@ -256,7 +257,7 @@ terminaron en verde**; los despliegues a Staging y Producción quedaron omitidos
 el repositorio no dispone de host ni credenciales para esos ambientes.
 
 El detalle de la arquitectura por niveles (C4) se encuentra en
-[`docs/04 Arquitectura/01 Modelo C4`](docs/04%20Arquitectura/01%20Modelo%20C4%20V_1_0_0.md).
+[`docs/Arquitectura/01 Modelo C4`](docs/Arquitectura/01%20Modelo%20C4%20V_1_0_0.md).
 
 ---
 
@@ -264,15 +265,21 @@ El detalle de la arquitectura por niveles (C4) se encuentra en
 
 El repositorio organiza su documentación y código fuente de acuerdo con el ciclo de vida del proyecto y las etapas de desarrollo:
 
-| #   | Directorio                | Contenido                                                                                                |
-| :-- | :------------------------ | :------------------------------------------------------------------------------------------------------- |
-| 1   | `docs/01 Inicio/`         | Constitución, visión, supuestos, restricciones iniciales e interesados                                   |
-| 2   | `docs/02 Planificación/`  | Backlog, Jira, riesgos, presupuesto, requisitos (RF/RNF), roles, reglas de negocio, BD y plan de pruebas |
-| 3   | `docs/03 Implementación/` | Entregables y reportes agrupados por sprint (`Sprint 01/`, `Sprint 02/`, `Sprint 03/`, `Sprint 04/`)     |
-| 4   | `docs/04 Arquitectura/`   | Arquitectura del sistema, Modelo C4, especificaciones técnicas y seguridad MFA (`specs/`)                |
-| 5   | `docs/05 Evidencias/`     | Registro de evidencias de validación, auditoría de API, resultados de pruebas y capturas de Playwright   |
-| 6   | `src/`                    | Código fuente del sistema (`backend/` FastAPI y `frontend/` React)                                       |
-| 7   | `.github/workflows/`      | CI, pruebas E2E, CodeQL, auditoría Green IT y despliegues desactivados por defecto                       |
+| Orden | Directorio                    | Contenido                                                                                                |
+| :---: | :---------------------------- | :------------------------------------------------------------------------------------------------------- |
+| 1     | `docs/01 Inicio/`             | Constitución, visión, supuestos, restricciones iniciales e interesados                                   |
+| 2     | `docs/02 Planificación/`      | Backlog, Jira, riesgos, presupuesto, requisitos (RF/RNF), roles, reglas de negocio, BD y plan de pruebas |
+| 3     | `docs/03 Implementación/`     | Entregables y reportes agrupados por sprint (`Sprint 01/`, `Sprint 02/`, `Sprint 03/`, `Sprint 04/`)     |
+| 4     | `docs/Arquitectura/`          | Arquitectura del sistema, Modelo C4, especificaciones técnicas y seguridad MFA (`specs/`)                |
+| 5     | `docs/Evidencias/`            | Registro de evidencias de validación, auditoría de API, resultados de pruebas y capturas de Playwright   |
+| 6     | `docs/04 Cierre/`             | Siete documentos exigidos para el cierre técnico, con enlace de retorno a este README                   |
+| 7     | `docs/05 Video proyecto/`     | Entregable MP4 pendiente; la consigna exige esta ruta exacta                                             |
+| 8     | `src/`                        | Código fuente del sistema (`backend/` FastAPI y `frontend/` React)                                       |
+| 9     | `.github/workflows/`          | CI, pruebas E2E, CodeQL, auditoría Green IT y despliegues desactivados por defecto                       |
+
+El prefijo `04` queda reservado a la fase de Cierre. `Arquitectura/` y `Evidencias/` no
+llevan prefijo para no duplicar la numeración; `05 Video proyecto/` lo conserva porque la
+consigna exige esa ruta literal.
 
 ```text
 /
@@ -305,9 +312,9 @@ El repositorio organiza su documentación y código fuente de acuerdo con el cic
 |   |   |-- Sprint 02/           # 4 entregables del Sprint 2 (V_2_0_0)
 |   |   |-- Sprint 03/           # 5 entregables del Sprint 3 (V_1_0_0)
 |   |   `-- Sprint 04/           # 4 entregables del Sprint 4 (V_1_0_0)
-|   |-- 04 Arquitectura/         # Modelo C4 y especificaciones MFA (con specs/)
+|   |-- Arquitectura/            # Modelo C4 y especificaciones MFA (con specs/)
+|   |-- Evidencias/              # Inventario de evidencias y capturas de Playwright
 |   |-- 04 Cierre/               # 7 documentos de cierre (Estado a Lecciones Aprendidas)
-|   |-- 05 Evidencias/           # Inventario de evidencias y capturas de Playwright
 |   `-- 05 Video proyecto/       # Entregable MP4 pendiente; estado documentado en README
 |
 |-- src/                         # Código fuente del sistema
@@ -344,8 +351,9 @@ El archivo `.env` vive en la **raíz del repositorio** y el backend lo carga des
 el frontend lo lee mediante `envDir` en Vite. Nunca se versiona.
 
 **Pruebas automatizadas:** el backend usa pytest en `src/backend/tests` y el frontend
-usa Vitest en `src/frontend/src/**/*.test.js`. Las pruebas viven junto al código que
-verifican; no se duplican en una carpeta de pruebas separada.
+usa Vitest en `src/frontend/src/**/*.test.{js,jsx}`. Las pruebas viven junto al código que
+verifican; no se duplican en una carpeta de pruebas separada. Las pruebas DOM usan
+`happy-dom` y `@testing-library/react` para ejecutar efectos y manejadores de eventos.
 
 ---
 
@@ -457,7 +465,7 @@ es el único lugar donde se configura el backend y el frontend.
 | `DB_NAME_TEST`        | Base de datos usada solo por las pruebas | `distrirapido_test`                        |
 | `DB_USER`             | Usuario de PostgreSQL                    | `postgres`                                 |
 | `DB_PASSWORD`         | Contraseña de PostgreSQL                 | `cambiar_por_tu_password`                  |
-| `JWT_SECRET`          | Clave secreta para firmar tokens JWT     | `cambiar_por_una_clave_aleatoria_y_segura` |
+| `JWT_SECRET`          | Clave secreta para firmar tokens JWT     | Generada con `openssl rand -hex 32` (obligatoria en Staging/Producción) |
 | `JWT_ALGORITHM`       | Algoritmo de firma JWT                   | `HS256`                                    |
 | `JWT_EXPIRE_HOURS`    | Duración del token en horas              | `8`                                        |
 | `HOME_ADDRESS`        | Dirección del centro de distribución     | `Av. Javier Prado Este 4200, Surco, Lima`  |
@@ -465,15 +473,17 @@ es el único lugar donde se configura el backend y el frontend.
 | `HOME_LNG`            | Longitud del centro de distribución      | `-76.9700000`                              |
 | `MAP_PROVIDER`        | Proveedor de distancias                  | `haversine`                                |
 | `MAX_PUNTOS_POR_RUTA` | Límite de puntos por ruta                | `20`                                       |
-| `VITE_API_URL`        | URL base del backend (frontend)          | `/api/v1` (mismo origen); `.env.example` propone `http://localhost:8000` como alternativa |
+| `VITE_API_URL`        | URL base del backend (frontend)          | `/api/v1` (mismo origen); con host directo debe incluir `/api/v1` (el cliente lo agrega si falta) |
 | `VITE_OSRM_URL`       | Servidor OSRM para el trazado por calles | `https://router.project-osrm.org`          |
 
 Nunca incluyas el archivo `.env` en el repositorio: está excluido por `.gitignore`. La
 plantilla `.env.example` nunca debe contener credenciales reales.
 
-> **Advertencia de seguridad:** `src/backend/app/core/config.py` define un valor por
-> defecto para `JWT_SECRET`. Si `.env` no está configurado, la aplicación firmará tokens
-> con una clave conocida. Sustituye el valor en `.env` antes de cualquier uso real.
+> **Seguridad de `JWT_SECRET`:** el código ya no contiene una clave fija. Si no se
+> configura la variable en desarrollo, el backend genera una clave aleatoria efímera y
+> los tokens dejan de ser válidos al reiniciar el proceso. Los valores de ejemplo y las
+> claves vacías se descartan en desarrollo y se rechazan en Staging/Producción, donde la
+> variable es obligatoria y debe tener al menos 32 caracteres.
 
 ---
 
@@ -488,9 +498,11 @@ source venv/bin/activate          # Windows: venv\Scripts\activate
 pytest
 ```
 
-Resultado actual (23/11/2026): **103 pruebas en verde**. Las pruebas usan la base
-`DB_NAME_TEST`, separada de la base de trabajo para no destruir datos. Las nuevas suites
-cubren RF-002, RN-002, RF-005, RN-009, RN-013, indicadores, fechas UTC y paginación.
+Resultado vigente (25/11/2026): **109 pruebas en verde**. Las pruebas usan la base
+`DB_NAME_TEST`, separada de la base de trabajo para no destruir datos. Las suites cubren
+RF-002, RN-002, RF-005, RN-009, RN-013, indicadores, fechas UTC, paginación, la medición
+local de RNF-004 y la configuración segura de `JWT_SECRET`. La corrida del 23/11/2026
+(103 pruebas) queda como registro histórico.
 
 Para obtener la cobertura:
 
@@ -498,10 +510,10 @@ Para obtener la cobertura:
 pytest --cov=app --cov-report=term-missing --cov-report=xml
 ```
 
-Cobertura actual: **73 % global** (1 136 sentencias, 307 sin cubrir), medida con
-`pytest --cov=app` el 23/11/2026. El módulo de exportación
+Cobertura vigente: **74 % global** (1 218 sentencias, 312 sin cubrir), medida con
+`pytest --cov=app` el 25/11/2026. El módulo de exportación
 (`app/services/exportacion.py`) y el de indicadores alcanzan **100 %**; el optimizador
-**90 %**. Las cifras históricas 60,82 %/61 %/63 % se conservan en las evidencias de
+**90 %**. Las cifras históricas 60,82 %/61 %/63 %/73 % se conservan en las evidencias de
 sprints anteriores.
 
 > La verificación local se ejecutó con Python 3.14.6 y una versión de pydantic más
@@ -537,13 +549,15 @@ npm run coverage      # Vitest + cobertura V8
 npm run build         # Compilación de producción
 ```
 
-Resultado actual (23/11/2026): **32 pruebas en verde** en 5 archivos, con **93,07 %** de
-sentencias, **85,71 %** de ramas, **92,59 %** de funciones y **98,05 %** de líneas sobre
-los archivos instrumentados por Vitest (lógica de distancias, exportación, trazado por
-calles y cliente HTTP). La compilación produce 87 módulos con Vite 8.3.5.
+Resultado vigente (25/11/2026): **83 pruebas en verde** en 8 archivos, con **87,03 %** de
+sentencias (819/941), **78,14 %** de ramas, **89,49 %** de funciones y **89,94 %** de
+líneas. La instrumentación incluye la lógica y los componentes React; las pruebas DOM
+requieren `happy-dom` y `@testing-library/react` como dependencias de desarrollo. La
+compilación produce 87 módulos con Vite 8.3.5.
 
-La cobertura **no incluye componentes React ni los popups del mapa**, por lo que no puede
-afirmarse una cobertura global del frontend.
+La cifra anterior de 93,07 % correspondía **solo a archivos instrumentados** y no puede
+afirmarse como cobertura global. Las cifras del 23/11/2026 se conservan como histórico en
+`docs/Evidencias/README.md`.
 
 ### Extremo a extremo (Playwright)
 
@@ -563,7 +577,7 @@ automáticamente, mide TTFB/FCP/LCP y tiempos de API, y verifica respuestas `401
 `404`, `422`, cabeceras de endurecimiento, caché y errores de red en la interfaz.
 
 Las evidencias están en
-[`docs/05 Evidencias/playwright-sprint4/`](docs/05%20Evidencias/playwright-sprint4/) y
+[`docs/Evidencias/playwright-sprint4/`](docs/Evidencias/playwright-sprint4/) y
 el análisis completo en
 [`03 Analisis PlayWrigth`](docs/03%20Implementación/Sprint%2004/03%20Analisis%20PlayWrigth%20V_1_0_0.md).
 El reporte HTML completo (`playwright-report/`) no se versiona; se publica como artefacto
@@ -611,7 +625,7 @@ El análisis real de **SonarQube Community** (contenedor Docker local, 26/10/202
 con Quality Gate **OK**, 0 bugs, 0 vulnerabilidades, 0 code smells y 0 Security
 Hotspots después de corregir 7 hallazgos. Las respuestas de la API de SonarQube se
 conservan en
-[`docs/05 Evidencias/sonar-sprint3/`](docs/05%20Evidencias/sonar-sprint3/).
+[`docs/Evidencias/sonar-sprint3/`](docs/Evidencias/sonar-sprint3/).
 
 ---
 
@@ -658,7 +672,7 @@ El detalle del backlog, los sprints y la Definition of Done se encuentran en
 | #   | Documento                                                                                                                             |
 | :-- | :------------------------------------------------------------------------------------------------------------------------------------ |
 | 01  | [Transformando a ágil (backlog priorizado y Definition of Done)](docs/02%20Planificación/01%20Transformando%20a%20ágil%20V_1_0_0.md)  |
-| 02  | [Artefactos Jira](docs/02%20Planificación/02%20Artefactos%20Jira%20V_1_0_0.md)                                                        |
+| 02  | [Artefactos Jira](docs/02%20Planificación/02%20Artefactos%20Jira%20V_1_1_0.md)                                                        |
 | 03  | [Registro de riesgos](docs/02%20Planificación/03%20Registro%20de%20riesgos%20V_1_0_0.md)                                              |
 | 04  | [Presupuesto del proyecto](docs/02%20Planificación/04%20Presupuesto%20del%20proyecto%20V_1_0_0.md)                                    |
 | 05  | [Requisitos funcionales (RF-001 a RF-014)](docs/02%20Planificación/05%20Requisitos%20funcionales%20V_1_0_0.md)                        |
@@ -714,21 +728,21 @@ El detalle del backlog, los sprints y la Definition of Done se encuentran en
 > **preparado pero no aplicado**, el despliegue a Producción **no está configurado** y los
 > workflows de CI, pruebas, CodeQL y Green Audit **se ejecutaron en verde el 19/11/2026**.
 
-### Fase de Arquitectura (`docs/04 Arquitectura/`)
+### Fase de Arquitectura (`docs/Arquitectura/`)
 
-| #   | Documento                                                                                                                |
-| :-- | :----------------------------------------------------------------------------------------------------------------------- |
-| 01  | [Arquitectura de software (modelo C4)](docs/04%20Arquitectura/01%20Modelo%20C4%20V_1_0_0.md)                             |
-| 02  | [Especificación MFA y sesiones (OpenSpec)](docs/04%20Arquitectura/02%20Especificacion%20MFA%20y%20Sesiones%20V_1_0_0.md) |
-| —   | [OpenSpec borrador](docs/04%20Arquitectura/specs/auth_mfa_borrador.openspec.yaml)                                        |
-| —   | [OpenSpec final auditado](docs/04%20Arquitectura/specs/auth_mfa_final.openspec.yaml)                                     |
+| #   | Documento                                                                                                                 |
+| :-- | :------------------------------------------------------------------------------------------------------------------------ |
+| 01  | [Arquitectura de software (modelo C4)](docs/Arquitectura/01%20Modelo%20C4%20V_1_0_0.md)                             |
+| 02  | [Especificación MFA y sesiones (OpenSpec)](docs/Arquitectura/02%20Especificacion%20MFA%20y%20Sesiones%20V_1_0_0.md) |
+| —   | [OpenSpec borrador](docs/Arquitectura/specs/auth_mfa_borrador.openspec.yaml)                                        |
+| —   | [OpenSpec final auditado](docs/Arquitectura/specs/auth_mfa_final.openspec.yaml)                                     |
 
-### Fase de Evidencias (`docs/05 Evidencias/`)
+### Fase de Evidencias (`docs/Evidencias/`)
 
 | Documento                                                                                | Descripción                                                                                                                                                                |
-| :--------------------------------------------------------------------------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [Registro y Repositorio de Evidencias](docs/05%20Evidencias/README.md)                   | Inventario de pruebas automatizadas (66 pytest + 24 Vitest + 79 E2E), cobertura, auditoría hermética de API, smoke tests, evidencias de SonarQube y capturas de Playwright |
-| [Evidencias de Playwright — Sprint 4](docs/05%20Evidencias/playwright-sprint4/README.md) | Resultados JSON, métricas de rendimiento por navegador y siete capturas reales                                                                                             |
+| :--------------------------------------------------------------------------------------- | :----------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [Registro y Repositorio de Evidencias](docs/Evidencias/README.md)                      | Inventario de pruebas automatizadas (109 pytest + 83 Vitest + 79 E2E archivadas), cobertura, auditoría hermética de API, smoke tests, evidencias de SonarQube y capturas de Playwright |
+| [Evidencias de Playwright — Sprint 4](docs/Evidencias/playwright-sprint4/README.md)     | Resultados JSON, métricas de rendimiento por navegador y siete capturas reales                                                                                             |
 
 ---
 
@@ -778,18 +792,18 @@ Ingeniería de Sistemas e Informática.
 ## Enlaces
 
 - **Repositorio:** https://github.com/jhanpooldev/TP2-DistriRapido
-- **JIRA:** https://lewolfdx.atlassian.net/?continue=https%3A%2F%2Flewolfdx.atlassian.net%2Fwelcome%2Fsoftware%3FprojectId%3D10000&atlOrigin=eyJpIjoiODJlZWRjMmU1ZDE4NDk3M2E0Y2NkMDZiODcxYjBmNTYiLCJwIjoiamlyYS1zb2Z0d2FyZSJ9
+- **Jira (gestión del proyecto):** https://lewolfdx.atlassian.net/
 - **Documentación:** [`docs/`](docs/)
 - **Fase de Inicio:** [`docs/01 Inicio/`](docs/01%20Inicio/)
 - **Fase de Planificación:** [`docs/02 Planificación/`](docs/02%20Planificación/)
 - **Fase de Implementación:** [`docs/03 Implementación/`](docs/03%20Implementación/)
 - **Sprint 3:** [`docs/03 Implementación/Sprint 03/`](docs/03%20Implementación/Sprint%2003/)
 - **Sprint 4:** [`docs/03 Implementación/Sprint 04/`](docs/03%20Implementación/Sprint%2004/)
-- **Evidencias E2E del Sprint 4:** [`docs/05 Evidencias/playwright-sprint4/`](docs/05%20Evidencias/playwright-sprint4/)
-- **Fase de Arquitectura:** [`docs/04 Arquitectura/`](docs/04%20Arquitectura/)
+- **Fase de Arquitectura:** [`docs/Arquitectura/`](docs/Arquitectura/)
+- **Fase de Evidencias:** [`docs/Evidencias/`](docs/Evidencias/)
+- **Evidencias E2E del Sprint 4:** [`docs/Evidencias/playwright-sprint4/`](docs/Evidencias/playwright-sprint4/)
 - **Fase de Cierre:** [`docs/04 Cierre/`](docs/04%20Cierre/)
 - **Video del proyecto (pendiente):** [`docs/05 Video proyecto/`](docs/05%20Video%20proyecto/)
-- **Fase de Evidencias:** [`docs/05 Evidencias/`](docs/05%20Evidencias/)
 - **Decisiones de diseño:** [DESIGN.md](DESIGN.md)
 - **Especificación técnica:** [SPECS.md](SPECS.md)
 - **Constitución del proyecto:** [CONSTITUTION.md](CONSTITUTION.md)
