@@ -30,7 +30,7 @@ test.describe('Flujos de negocio de punta a punta', () => {
       await page.getByRole('button', { name: 'Registrar pedido' }).click()
 
       await expect(page.getByText('Pedido registrado. Ya aparece en la pestaña Rutas')).toBeVisible()
-      await expect(page.getByRole('cell', { name: destinatario })).toBeVisible()
+      await expect(page.getByRole('cell', { name: destinatario, exact: true })).toBeVisible()
     } finally {
       const listado = await request.get(`${API_BASE}/puntos-entrega`, {
         headers: cabeceras(token),

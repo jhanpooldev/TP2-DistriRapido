@@ -161,7 +161,10 @@ def test_produccion_requiere_secreto_explicito(monkeypatch):
         Settings(ENVIRONMENT="production", _env_file=None)
 
 
-def test_desarrollo_genera_clave_aleatoria_sin_env():
+def test_desarrollo_genera_clave_aleatoria_sin_env(monkeypatch):
+    # `_env_file=None` solo desactiva el archivo .env; CI puede definir
+    # JWT_SECRET en os.environ. El test debe simular development sin secreto.
+    monkeypatch.delenv("JWT_SECRET", raising=False)
     primero = Settings(ENVIRONMENT="development", _env_file=None)
     segundo = Settings(ENVIRONMENT="development", _env_file=None)
 
